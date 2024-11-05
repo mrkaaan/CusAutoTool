@@ -1,0 +1,24 @@
+# Conda environment files
+env/
+envs/
+conda_env/
+*.tar.bz2
+*.tar.gz
+*.tar.xz
+*.whl
+
+# Python build files
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+*~.py
+.Python
+
+# Python egg files
+*.egg-info/
+.eggs/
+
+# 日志
+.log
