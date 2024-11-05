@@ -21,4 +21,9 @@ __pycache__/
 .eggs/
 
 # 日志
-.log
+*.log
+
+# 文件
+form/
+image/
+temp/
