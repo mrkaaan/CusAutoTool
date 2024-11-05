@@ -85,21 +85,22 @@ class WinGUI:
         return None
 
 
-    def move_and_click(self, x, y):
+    def move_and_click(self, x, y, direction='left'):
         """
         移动鼠标到指定坐标并点击。
 
         Parameters:
             x (int): 鼠标点击的x坐标。
             y (int): 鼠标点击的y坐标。
+            direction: 鼠标左右键 默认left
 
         使用库：
             - `pyautogui`: `moveTo`和`click`方法用于移动和点击。
             - `time`: 延时操作。
         """
         pyautogui.moveTo(x, y)                         # 使用pyautogui库移动鼠标
-        pyautogui.click(x, y)                          # 使用pyautogui库点击鼠标
-        time.sleep(0.1)                                  # 使用time库延迟1秒
+        pyautogui.click(x, y, button=direction)                          # 使用pyautogui库点击鼠标
+        time.sleep(0.1)                                # 使用time库延迟1秒
     
     # 相对移动
     def rel_remove_and_click(self, x, y):
@@ -120,7 +121,7 @@ class WinGUI:
 
     # 需要 icon_path
     # 调用 locate_icon 和 move_and_click
-    def click_icon(self, icon_path,x_start_ratio=0,x_end_ratio=1.0,y_start_ratio=0,y_end_ratio=1.0):
+    def click_icon(self, icon_path,x_start_ratio=0,x_end_ratio=1.0,y_start_ratio=0,y_end_ratio=1.0,direction='left'):
         """
         定位并点击指定的图标。
 
@@ -132,9 +133,9 @@ class WinGUI:
             - `move_and_click`: 调用该方法移动鼠标并点击。
         """
         x, y, is_find = self.locate_icon(icon_path,x_start_ratio,x_end_ratio,y_start_ratio,y_end_ratio) # 调用locate_icon方法获取图标在屏幕上的位置
-        self.move_and_click(x, y)                      # 使用move_and_click方法点击图标
+        self.move_and_click(x, y, direction)                      # 使用move_and_click方法点击图标
         return is_find
-    
+
 
     # 需要 img_name、self.img_folder_path 构建图标文件路径
     # 调用 get_app_screenshot 获取应用窗口截图
@@ -146,7 +147,7 @@ class WinGUI:
         x_end_ratio=1.0,
         y_start_ratio=0,
         y_end_ratio=1.0,
-        try_number=3,
+        try_number=3
     ):
         """
         查找目标图标的中心坐标，多个相似图标可通过指定搜索区域来定位
@@ -463,9 +464,24 @@ def run_once_beizhu(window_name):
         # 点击确认
         app.click_icon('Button_Confirm_Remarks.png',0.8,1.0,0.8,1.0)
 
+        # 取消标记位置
+        app.click_icon('button_selected_session_annotation.png',0,0.4,0.2,1.0,'right')
+        app.click_icon('button_cancel_annotations.png',0,0.5,0.2,1.0)
+
         logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
     except Exception as err:
         logger.info(err)  # 记录异常信息
+
+
+# 测试
+def run_test(window_name):
+    app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+    try:
+        print()
+    except Exception as err:
+        logger.info(err)  # 记录异常信息
+    
+
 
 # need change
 def is_test_over(app):
@@ -480,6 +496,13 @@ def is_test_over(app):
         return False
     
     return not valid1   # 如果标志不存在，返回 True 表示测试结束
+
+# 快捷键
+def auto_key(window_name):
+    # 点击添加备注
+    keyboard.add_hotkey('ctrl+shift+1', lambda: run_once_beizhu(window_name)) 
+    # 保持脚本运行，直到按下退出快捷键
+    keyboard.wait('esc')  # 按下 Esc 退出监听
 
 
 if __name__ == "__main__":
@@ -500,9 +523,10 @@ if __name__ == "__main__":
     # 模拟键盘
     # keyboard.press_and_release('ctrl+shift+esc')  # 模拟按下并释放 Ctrl+Shift+Esc 组合键
     # 输入
-    # keyboard.write('Hello, World!')  # 模拟输入文本
+    # keyboard.write('Hello, World!')  # 
+    
+    # auto_key(window_name)
 
-    # run_once_beizhu(window_name)
-    keyboard.add_hotkey('ctrl+shift+1', lambda: run_once_beizhu(window_name))  # 按下 Ctrl+Shift+B 执
-    # 保持脚本运行，直到按下退出快捷键
-    keyboard.wait('esc')  # 按下 Esc 退出监听
+    run_test(window_name)
+
+    
