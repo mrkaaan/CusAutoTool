@@ -76,8 +76,8 @@ def process_original_number(input_filename, shop_name, form_folder = './form'):
     df['原始单号'] = df['原始单号'].str.replace('“', '', regex=True)
     df['原始单号'] = df['原始单号'].str.replace('”', '', regex=True)
 
-    # 将没有“原始单号”的行的“用户昵称”填到“原始单号”这一列中
-    df['原始单号'] = df['原始单号'].fillna(df['用户昵称'])
+    # 将没有“原始单号”的行的“客户网名”填到“原始单号”这一列中
+    df['原始单号'] = df['原始单号'].fillna(df['客户网名'])
 
     # 转换 "物流单号" 列为整数类型，保证无科学计数法和小数点
     # df['物流单号'] = df['物流单号'].apply(lambda x: str(int(x)) if pd.notnull(x) else x)
@@ -103,15 +103,18 @@ if __name__ == '__main__':
     日期_店铺_ERP二次导出表格.csv
         改标因为是筛选店铺 所以会有多个 即几个店铺有几个表 
         为了方便操作 需要手动重命名为: 日期_店铺_ERP二次导出表格.xlsx
-        但是该表格还无法直接使用 因为原始单号包含有引号、等号等特殊字符，以及部分行无原始单号 需要把这些行补上用户昵称
+        但是该表格还无法直接使用 因为原始单号包含有引号、等号等特殊字符，以及部分行无原始单号 需要把这些行补上客户网名
         然后调用process_original_number进行二次处理 再次形成新的表格: 日期_店铺_补发单号.xlsx
     日期_店铺_补发单号.xlsx
         该表格可以直接使用 到gui.py中调用notification_reissue,第二个参数传入表名 进行自动补发
+
+        测试发现 最终的表格还是会有部分无原始单号、无用户名 需要手动用订单编号去补充上才能自动化
+
     '''
 
     # 首次处理 筛选制定店铺名称的物流单号 一个表有两个sheet 结果文件拿去ERP搜索后导出为新的表格
-    # process_original_table('11月5号补发单号.csv')
+    # process_original_table('11月6日补发单号.csv')
 
     # 二次处理 清洗新表格的原始单号 结果文件执行自动化操作
     # 有多少个店铺 就调用多少次 
-    # processed_df = process_original_number('ERP中新导出的表格.csv') # 日期_店铺_ERP二次导出表格
+    processed_df = process_original_number('2024-11-06_余猫_ERP二次导出表格.csv','余猫') # 日期_店铺_ERP二次导出表格

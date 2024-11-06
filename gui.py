@@ -513,6 +513,10 @@ def notification_reissue(window_name, table_name, form_folder = './form'):
         # 检查是否存在"是否通知"列，如果不存在则添加
         if '是否通知' not in column_names:
             df['是否通知'] = 0
+            # 将更改写回 Excel 文件
+            with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+                df.to_excel(writer, index=False)
+            print("列 '是否通知' 已添加到表格中。")
         
         # 定义一个退出标志
         exit_flag = False
@@ -525,69 +529,105 @@ def notification_reissue(window_name, table_name, form_folder = './form'):
                 exit_flag = True
         
         keyboard.on_press(on_key_event)  # 设置按键监听
-        
         # 逐行处理DataFrame
         for index, row in df.iterrows():
             if exit_flag:
                 break  # 如果接收到退出信号，则终止循环
-            
+                
             # 检查是否已经通知
             if row['是否通知'] == 1:
                 continue  # 如果已经通知，则跳过当前行
-            
             # 获取原始单号和物流单号
+
+            time.sleep(0.5)
+
             original_number = row['原始单号']
             logistics_number = row['物流单号']
-            
-           # 模拟按下 alt+W 快捷键打开目标软件
-            keyboard.press_and_release('alt+c')
-            # 等待软件响应
+            print(original_number)
+            print(logistics_number)
+
+            app.get_app_screenshot()
+
+            app.move_and_click(750, 500)
             time.sleep(0.5)
+            
+            # 模拟按下 alt+W 快捷键打开目标软件
+            # keyboard.press_and_release('alt+c')
+            # 等待软件响应
             # 模拟按下 ctrl+F 打开搜索功能
+            keyboard.press_and_release('ctrl+i')
+            time.sleep(0.5)
             keyboard.press_and_release('ctrl+f')
 
-            # 判断搜索结果
-            if not simulate_search_result(original_number):
-                print(f"未搜索到结果，跳过 {original_number}")
-                df.at[index, '是否通知'] = 0
-                continue  # 未搜索到直接continue下一个
 
             # 等待搜索框出现
             time.sleep(0.5)
-            # 将 original_number 的内容输入到搜索框中
-            pyautogui.typewrite(original_number)
-            # 模拟按下回车键两次进入指定用户的聊天窗口
-            keyboard.press_and_release('enter')
-            time.sleep(0.1)  # 短暂等待，确保聊天窗口打开
-            keyboard.press_and_release('enter')
-            # 等待聊天窗口响应
-            time.sleep(0.5)
+            # 清除
+            keyboard.press_and_release('ctrl+a')  
+            keyboard.press_and_release('backspace')
 
+            # 将 original_number 的内容输入到搜索框中
+            # pyautogui.typewrite(original_number)
+
+            # 将中文字符串复制到剪贴板
+            pyperclip.copy(original_number)
+            time.sleep(0.1)
+            keyboard.press_and_release('ctrl+v') 
+            # 等待聊天窗口响应
+            time.sleep(0.7)
+
+
+            _, __, is_find_cumtomer = app.locate_icon('not_find_customer.png')
+            # 判断搜索结果
+            if not is_find_cumtomer:
+                print(f"未搜索到结果，跳过 {original_number}")
+                df.at[index, '是否通知'] = 0
+                continue  # 未搜索到直接continue下一个
+            
+            time.sleep(0.7)
+            # 模拟按下回车键进入指定用户的聊天窗口
+            keyboard.press_and_release('enter')
             # 按下 ctrl+J 定位到输入框中
-            # keyboard.press_and_release('ctrl+j')
+            keyboard.press_and_release('ctrl+i')
 
             # 调用 app.locate_icon 传入图片名称，找到是否有某个图片存在
-            x, y, is_find = app.locate_icon('input_box_icon.png')
-
+            # x, y, is_find = app.locate_icon('input_box_icon.png')
             # 判断 is_find 是否为 True
-            if not is_find:
-                logger.err("无法定位到输入框，程序终止")
-                break  # 无法定位到直接终止程序
-            
+            # if not is_find:
+            #     logger.err("无法定位到输入框，程序终止")
+            #     break  # 无法定位到直接终止程序
             # 如果为 True，则相对向下移动 200 个像素后点击
-            app.remove_and_click(x, y + 200)
-            # 等待输入框获得焦点
-            time.sleep(0.5)
+            # app.remove_and_click(x, y + 200)
 
+            time.sleep(0.5)
+            # 清除
+            keyboard.press_and_release('ctrl+a')  
+            keyboard.press_and_release('backspace')
+            time.sleep(0.5)
             # 将 亲 + logistics_number + 这是您的补发单号 请注意查收 这段内容输入到输入框中
             message = f"亲 {logistics_number} 这是您的补发单号 请注意查收"
-            pyautogui.typewrite(message)
+            print(message)
+            time.sleep(0.5)
+
+            # 将中文字符串复制到剪贴板
+            pyperclip.copy(message)
+            time.sleep(0.5)
+            # 使用 pyautogui.typewrite 粘贴剪贴板内容
+            # keyboard.press_and_release('ctrl+v')  
+
+            # pyautogui.typewrite(message, paste=True)
+            # time.sleep(0.2)
+
             # 模拟按下回车发送消息
-            keyboard.press_and_release('enter')
+            # keyboard.press_and_release('enter')
 
             # 将当前行的"是否通知"标记为1
-            df.at[index, '是否通知'] = 1
+            # df.at[index, '是否通知'] = 1
 
+            # 将更改写回 Excel 文件
+            # with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+                # df.to_excel(writer, index=False)
+            time.sleep(0.3)
     except Exception as err:
         logger.info(err)
 
@@ -634,4 +674,7 @@ if __name__ == "__main__":
 
     # 通知补发单号
     # 这里的表格必须经过格式化，有整理过后的原始单号以及物流单号
-    notification_reissue(window_name, '通知补发表格.xlsx')
+    # change 单号-2
+    # change 多少个补发 多少个没有补发 全部补发了的提示
+    # not_find_customer 未搜到处理办法
+    notification_reissue(window_name, '2024-11-06_220841_余猫_补发单号.xlsx')
