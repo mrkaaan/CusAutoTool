@@ -15,6 +15,9 @@ import pyperclip       # 处理剪贴板内容
 from PIL import ImageGrab     # 从PIL库导入ImageGrab模块，用于截图
 from loguru import logger     # 引入loguru库，用于简便的日志记录
 
+# 表格操作
+import pandas as pd
+from datetime import datetime
 
 class WinGUI:
     """
@@ -295,7 +298,6 @@ def get_window_pos(name):
         time.sleep(0.2)                                  # 延迟1秒，等待窗口恢复
         return win32gui.GetWindowRect(handle), handle  # 返回窗口位置和句柄
 
-
 def move_files(original_folder, target_folder, suffix_list=[]):
     """
     将 original_folder 文件夹中指定后缀的文件移动到 target_folder 的新子文件夹中。
@@ -327,7 +329,6 @@ def move_files(original_folder, target_folder, suffix_list=[]):
         source = os.path.join(original_folder, file_name)  # 文件的完整源路径
         destination = os.path.join(target_folder_new, file_name)  # 文件的目标路径
         shutil.move(source, destination)  # 使用 shutil.move 将文件移动到新位置
-
 
 # need change
 def running_program(window_name, original_folder, target_folder, cycle_number=-1, suffix_list=[]):
@@ -472,7 +473,6 @@ def run_once_beizhu(window_name):
     except Exception as err:
         logger.info(err)  # 记录异常信息
 
-
 # 测试
 def run_test(window_name):
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
@@ -481,8 +481,6 @@ def run_test(window_name):
     except Exception as err:
         logger.info(err)  # 记录异常信息
     
-
-
 # need change
 def is_test_over(app):
     """
@@ -496,6 +494,106 @@ def is_test_over(app):
         return False
     
     return not valid1   # 如果标志不存在，返回 True 表示测试结束
+
+# 模拟搜索结果
+def simulate_search_result(original_number):
+    # 模拟搜索结果判断，实际应用中应替换为具体的搜索逻辑
+    # 这里随机返回True或False来模拟是否搜索到结果
+    import random
+    return random.choice([True, False])
+
+# 通知补发单号
+def notification_reissue(window_name, table_name, form_folder = './form'):
+    app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+    try:
+
+        table_file = os.path.join(form_folder, table_name)
+        df = pd.read_excel(table_file)  # 读取 Excel 文件
+        column_names = df.columns.tolist()  # 获取列名列表
+        # 检查是否存在"是否通知"列，如果不存在则添加
+        if '是否通知' not in column_names:
+            df['是否通知'] = 0
+        
+        # 定义一个退出标志
+        exit_flag = False
+        
+        # 定义按键监听事件
+        def on_key_event(event):
+            nonlocal exit_flag
+            if event.name == 'q':
+                logger.info("terminated by user")
+                exit_flag = True
+        
+        keyboard.on_press(on_key_event)  # 设置按键监听
+        
+        # 逐行处理DataFrame
+        for index, row in df.iterrows():
+            if exit_flag:
+                break  # 如果接收到退出信号，则终止循环
+            
+            # 检查是否已经通知
+            if row['是否通知'] == 1:
+                continue  # 如果已经通知，则跳过当前行
+            
+            # 获取原始单号和物流单号
+            original_number = row['原始单号']
+            logistics_number = row['物流单号']
+            
+           # 模拟按下 alt+W 快捷键打开目标软件
+            keyboard.press_and_release('alt+c')
+            # 等待软件响应
+            time.sleep(0.5)
+            # 模拟按下 ctrl+F 打开搜索功能
+            keyboard.press_and_release('ctrl+f')
+
+            # 判断搜索结果
+            if not simulate_search_result(original_number):
+                print(f"未搜索到结果，跳过 {original_number}")
+                df.at[index, '是否通知'] = 0
+                continue  # 未搜索到直接continue下一个
+
+            # 等待搜索框出现
+            time.sleep(0.5)
+            # 将 original_number 的内容输入到搜索框中
+            pyautogui.typewrite(original_number)
+            # 模拟按下回车键两次进入指定用户的聊天窗口
+            keyboard.press_and_release('enter')
+            time.sleep(0.1)  # 短暂等待，确保聊天窗口打开
+            keyboard.press_and_release('enter')
+            # 等待聊天窗口响应
+            time.sleep(0.5)
+
+            # 按下 ctrl+J 定位到输入框中
+            # keyboard.press_and_release('ctrl+j')
+
+            # 调用 app.locate_icon 传入图片名称，找到是否有某个图片存在
+            x, y, is_find = app.locate_icon('input_box_icon.png')
+
+            # 判断 is_find 是否为 True
+            if not is_find:
+                logger.err("无法定位到输入框，程序终止")
+                break  # 无法定位到直接终止程序
+            
+            # 如果为 True，则相对向下移动 200 个像素后点击
+            app.remove_and_click(x, y + 200)
+            # 等待输入框获得焦点
+            time.sleep(0.5)
+
+            # 将 亲 + logistics_number + 这是您的补发单号 请注意查收 这段内容输入到输入框中
+            message = f"亲 {logistics_number} 这是您的补发单号 请注意查收"
+            pyautogui.typewrite(message)
+            # 模拟按下回车发送消息
+            keyboard.press_and_release('enter')
+
+            # 将当前行的"是否通知"标记为1
+            df.at[index, '是否通知'] = 1
+
+    except Exception as err:
+        logger.info(err)
+
+    keyboard.unhook_all()  # 移除所有按键监听
+    return df
+
 
 # 快捷键
 def auto_key(window_name):
@@ -524,9 +622,16 @@ if __name__ == "__main__":
     # keyboard.press_and_release('ctrl+shift+esc')  # 模拟按下并释放 Ctrl+Shift+Esc 组合键
     # 输入
     # keyboard.write('Hello, World!')  # 
+    # ------------------------------------
     
+    # 快捷键启动
+    # esc退出
+    # shift+ctrl+1 添加备注
     # auto_key(window_name)
 
-    run_test(window_name)
+    # 测试 目前为空
+    # run_test(window_name)
 
-    
+    # 通知补发单号
+    # 这里的表格必须经过格式化，有整理过后的原始单号以及物流单号
+    notification_reissue(window_name, '通知补发表格.xlsx')
