@@ -19,6 +19,9 @@ from loguru import logger     # 引入loguru库，用于简便的日志记录
 import pandas as pd
 from datetime import datetime
 
+# json操作
+import json
+
 class WinGUI:
     """
     WinGUI类用于控制Windows GUI界面，包括窗口截图、鼠标点击等操作。
@@ -634,6 +637,46 @@ def notification_reissue(window_name, table_name, form_folder = './form'):
     keyboard.unhook_all()  # 移除所有按键监听
     return df
 
+# 存储句柄
+def save_handle(name, handle):
+    handles = load_handles()
+    handles[name] = handle
+    with open('handles.json', 'w') as f:
+        json.dump(handles, f)
+
+# 加载句柄
+def load_handle(name):
+    handles = load_handles()
+    return handles.get(name)
+
+# 关闭句柄
+def load_handles():
+    if os.path.exists('handles.json'):
+        with open('handles.json', 'r') as f:
+            return json.load(f)
+    else:
+        return {}
+
+# 打开指定软件
+def open_sof(name):
+    handle = load_handle(name)
+    if handle is None:
+        handle = win32gui.FindWindow(0, name)
+        if handle == 0:
+            return None
+        save_handle(name, handle)
+    else:
+        win32gui.SendMessage(handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)  # 发送消息以确保窗口恢复显示
+        time.sleep(0.2) # 延迟1秒，等待窗口恢复
+    
+        win32gui.ShowWindow(handle, True)          # 使用win32gui库使窗口可见
+        win32gui.SetForegroundWindow(handle)       # 使用win32gui库将窗口置于前台(焦点)
+        win32gui.SendMessage(handle, win32con.SC_MAXIMIZE, 0) # 最大化窗口
+        time.sleep(0.2)                              # 使用time库延迟1秒
+        
+        pos = win32gui.GetWindowRect(handle) # 窗口位置
+
+        print(f'窗口位置 {pos}') # 打印窗口位置
 
 # 快捷键
 def auto_key(window_name):
@@ -641,6 +684,7 @@ def auto_key(window_name):
     keyboard.add_hotkey('ctrl+shift+1', lambda: run_once_beizhu(window_name)) 
     # 保持脚本运行，直到按下退出快捷键
     keyboard.wait('esc')  # 按下 Esc 退出监听
+    os.remove('handles.json')  # 清空句柄文件
 
 
 if __name__ == "__main__":
@@ -677,4 +721,7 @@ if __name__ == "__main__":
     # change 单号-2
     # change 多少个补发 多少个没有补发 全部补发了的提示
     # not_find_customer 未搜到处理办法
-    notification_reissue(window_name, '2024-11-06_220841_余猫_补发单号.xlsx')
+    # notification_reissue(window_name, '2024-11-06_220841_余猫_补发单号.xlsx')
+
+    # 打开以启动软件
+    open_sof('ToDesk')
