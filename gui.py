@@ -223,9 +223,9 @@ def notification_reissue(window_name, table_name, form_folder = './form'):
             time.sleep(0.7)
 
 
-            _, __, is_find_cumtomer = app.locate_icon('not_find_customer.png')
+            _, __, if_find_cus = app.locate_icon('not_find_customer.png')
             # 判断搜索结果
-            if not is_find_cumtomer:
+            if not if_find_cus:
                 print(f"未搜索到结果，跳过 {original_number}")
                 df.at[index, '是否通知'] = 0
                 continue  # 未搜索到直接continue下一个
@@ -405,9 +405,20 @@ if __name__ == "__main__":
     # ---------- 通知补发单号 -------------
     '''
         表格必须经过格式化，有整理过后的原始单号以及物流单号
-        change 单号-2
-        change 多少个补发 多少个没有补发 全部补发了的提示
-        not_find_customer 未搜到处理办法
+
+        change 
+            0 自动切换店铺
+
+            1 添加功能 在直径结束后 显示当前表格有多少个需要通知补发 已经通知了多少个 多少个没有通知补发
+
+            2 检查功能 is_find_cus 的未搜到处理办法 提示并跳过 有没有问题没有问题则下一个问题
+
+            3 修改功能 能否修改监听停止按钮 但用一个q容易不起作用 改为使用组合键的 ctrl+shift+q监听停止
+
+            4 修改功能 
+            是否可以保证在按下停止的案件后 如果程序执行了发送通知 则必定在回写表格后才终止
+            避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
+
     '''
     # notification_reissue(window_name, '2024-11-06_220841_余猫_补发单号.xlsx')
 

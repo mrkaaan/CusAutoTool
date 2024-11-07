@@ -69,16 +69,15 @@ def process_original_number(input_filename, shop_name, form_folder = './form'):
     if df is None:
         raise UnicodeDecodeError("都无法读取文件，请检查文件编码")
 
-    # 去除“原始单号”列中的等于号和引号
-    df['原始单号'] = df['原始单号'].str.replace('=', '', regex=True)
-    df['原始单号'] = df['原始单号'].str.replace('\"', '', regex=True)
-    df['原始单号'] = df['原始单号'].str.replace('\'', '', regex=True)
-    df['原始单号'] = df['原始单号'].str.replace('“', '', regex=True)
-    df['原始单号'] = df['原始单号'].str.replace('”', '', regex=True)
-
-    # 将没有“原始单号”的行的“客户网名”填到“原始单号”这一列中
-    df['原始单号'] = df['原始单号'].fillna(df['客户网名'])
-
+    # 清理“原始单号”列
+    df["原始单号"] = (
+        df["原始单号"]
+        .astype(str)  # 转为字符串类型
+        .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
+        .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
+        .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
+        .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
+    )
     # 转换 "物流单号" 列为整数类型，保证无科学计数法和小数点
     # df['物流单号'] = df['物流单号'].apply(lambda x: str(int(x)) if pd.notnull(x) else x)
 
@@ -110,19 +109,16 @@ if __name__ == '__main__':
     '''
     '''
     need change
-
         测试发现 最终的表格还是会有部分无原始单号、无用户名 需要手动用订单编号去补充上才能自动化
-    
-        判断搜索不到的情况 提示并跳过
-
-        是否可以保证在按下停止的q后 如果程序执行了发送通知 则必定在回写表格后才终止
-        避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
+        
+        尽可能自动化操作
     '''
 
 
-    # 首次处理 筛选制定店铺名称的物流单号 一个表有两个sheet 结果文件拿去ERP搜索后导出为新的表格
+    # 首次处理 群中表格 筛选制定店铺名称的物流单号 一个表有两个sheet 结果文件拿去ERP搜索后导出为新的表格
     # process_original_table('11月6日补发单号.csv')
 
-    # 二次处理 清洗新表格的原始单号 结果文件执行自动化操作
+    # 二次处理 ERP导出表格 清洗新表格的原始单号 结果文件执行自动化操作
     # 有多少个店铺 就调用多少次 
-    processed_df = process_original_number('2024-11-06_余猫_ERP二次导出表格.csv','余猫') # 日期_店铺_ERP二次导出表格
+    processed_df = process_original_number('2024-11-07_余猫_ERP二次导出表格.csv','余猫') # 日期_店铺_ERP二次导出表格
+    processed_df = process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv','潮洁') # 日期_店铺_ERP二次导出表格
