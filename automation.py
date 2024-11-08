@@ -1,5 +1,4 @@
 from WinGUI import WinGUI
-import organize_table as tb
 
 # 标准库
 import math       # 提供数学函数，例如三角函数、对数、幂运算等
@@ -20,10 +19,6 @@ from loguru import logger     # 引入loguru库，用于简便的日志记录
 
 # 表格操作
 import pandas as pd
-from datetime import datetime
-
-# json操作
-import json
 
 # 循环执行 直到出现标志或者手动终止 需要修改
 def running_loop(window_name, cycle_number=-1):
@@ -139,14 +134,6 @@ def run_test(window_name):
         print()
     except Exception as err:
         logger.info(err)  # 记录异常信息
-    
-
-# 模拟搜索结果
-def simulate_search_result(original_number):
-    # 模拟搜索结果判断，实际应用中应替换为具体的搜索逻辑
-    # 这里随机返回True或False来模拟是否搜索到结果
-    import random
-    return random.choice([True, False])
 
 # 通知补发单号
 def notification_reissue(window_name, table_name, form_folder = './form'):
@@ -279,148 +266,3 @@ def notification_reissue(window_name, table_name, form_folder = './form'):
 
     keyboard.unhook_all()  # 移除所有按键监听
     return df
-
-# 存储句柄
-def save_handle(name, handle):
-    handles = load_handles()
-    handles[name] = handle
-    with open('handles.json', 'w') as f:
-        json.dump(handles, f)
-
-# 加载句柄
-def load_handle(name):
-    handles = load_handles()
-    return handles.get(name)
-
-# 打开句柄文件
-def load_handles():
-    if os.path.exists('handles.json'):
-        with open('handles.json', 'r') as f:
-            return json.load(f)
-    else:
-        return {}
-
-# 打开指定软件
-def open_sof(name, handle=None, manual=0):
-    if manual:
-        # 手动模式启用，直接使用传入的句柄
-        if not handle:
-            print("手动模式下未提供句柄！")
-            return None
-        if not win32gui.IsWindow(handle):
-            print(f"提供的句柄 {handle} 无效！")
-            return None
-        print(f"手动模式启用，使用指定句柄 {handle}。")
-        save_handle(name, handle)  # 保存句柄到文件
-    else:
-        # 自动模式：从文件或窗口名称中查找句柄
-        handle = load_handle(name)  # 尝试从文件读取句柄
-        if not handle:
-            print(f'文件中未找到句柄，尝试通过窗口名称 {name} 查找...')
-            handle = win32gui.FindWindow(0, name)
-            if handle == 0:
-                print(f'未找到窗口 {name}')
-                return None
-            save_handle(name, handle)  # 保存句柄到文件
-        else:
-            print(f'文件中找到句柄 {name}：{handle}')
-
-    win32gui.SendMessage(handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)  # 发送消息以确保窗口恢复显示
-    time.sleep(0.2) # 延迟1秒，等待窗口恢复
-
-    win32gui.ShowWindow(handle, True)          # 使用win32gui库使窗口可见
-    win32gui.SetForegroundWindow(handle)       # 使用win32gui库将窗口置于前台(焦点)
-    win32gui.SendMessage(handle, win32con.SC_MAXIMIZE, 0) # 最大化窗口
-    time.sleep(0.2)                              # 使用time库延迟1秒
-    
-    pos = win32gui.GetWindowRect(handle) # 窗口位置
-    print(f'窗口位置 {pos}') # 打印窗口位置
-
-def auto_key(hotkeys):
-    # 去除空格并移除重复的快捷键
-    seen_keys = set()
-    filtered_hotkeys = []
-    for hotkey in hotkeys:
-        # 去掉快捷键中多余的空格
-        clean_key = hotkey['key'].replace(" ", "")
-        
-        if clean_key in seen_keys:
-            print(f"发现重复快捷键 {clean_key}，保留第一个绑定，移除后续重复绑定。")
-            continue  # 跳过重复的快捷键
-        
-        seen_keys.add(clean_key)
-        filtered_hotkeys.append({
-            "key": clean_key,
-            "func": hotkey['func'],
-            "args": hotkey.get('args', [])
-        })
-    # 绑定快捷键
-    for hotkey in filtered_hotkeys:
-        keyboard.add_hotkey(hotkey['key'], lambda *args, f=hotkey['func'], a=hotkey['args']: f(*a))
-    
-    # for hotkey in hotkeys:
-    #     keyboard.add_hotkey(hotkey['key'], lambda *args, f=hotkey['func'], a=hotkey.get('args', []): f(*a))
-
-    # keyboard.add_hotkey('alt+r', lambda: open_sof('ToDesk'))
-    
-    try:
-        # 保持脚本运行，直到按下退出快捷键
-        keyboard.wait('shift+ctrl+e')  # 按下 Esc 退出监听
-    finally:
-        # 无论是否按下 shift+ctrl+e 都移除所有快捷键监听
-        keyboard.unhook_all()
-        # 清空句柄文件
-        if os.path.exists('handles.json'):
-            os.remove('handles.json')
-        print('退出监听')
-
-if __name__ == "__main__":
-
-    # ---------- 配置参数 -------------
-    pyautogui.FAILSAFE = False  # 关闭 pyautogui 的故障保护机制
-    pyautogui.PAUSE = 0.1  # 设置 pyautogui 的默认操作延时 如移动和点击的间隔
-    logger.add("dev.log", rotation="10 MB")  # 设置日志文件轮换
-    # original_folder = "C:/Users/Public/Documents/Data"  # 源文件夹路径
-    # target_folder = r"C:\Users\Joey\Desktop\data"  # 目标文件夹路径
-    # suffix_list = []  # 要移动的文件后缀列表
-    # cycle_number = -1  # 循环次数，-1 表示无限循环
-    # window_name = r"千牛接待台"  # 窗口名称
-    
-    # ---------- 快捷键启动 -------------
-    '''
-        按下 esc 退出
-        按下 shift+ctrl+1 添加备注
-    '''
-    # auto_key()
-    # hotkey_actions = [
-    #     {'key': 'alt+r', 'func': open_sof, 'args': ['ToDesk']},
-    #     {'key': 'alt+t', 'func': open_sof, 'args': ['WeChat',2296752,1]},
-    #     {'key': 'alt+y', 'func': open_sof, 'args': ['哔哩哔哩',137622,1]}
-    # ]
-    # auto_key(hotkey_actions)
-
-    # ---------- 测试 -------------
-    # run_test(window_name)
-
-    # ---------- 通知补发单号 -------------
-    '''
-        表格必须经过格式化，有整理过后的原始单号以及物流单号
-
-        change 
-            0 自动切换店铺
-
-            1 添加功能 在直径结束后 显示当前表格有多少个需要通知补发 已经通知了多少个 多少个没有通知补发
-
-            2 检查功能 is_find_cus 的未搜到处理办法 提示并跳过 有没有问题没有问题则下一个问题
-
-            3 修改功能 能否修改监听停止按钮 但用一个q容易不起作用 改为使用组合键的 ctrl+shift+q监听停止
-
-            4 修改功能 
-            是否可以保证在按下停止的案件后 如果程序执行了发送通知 则必定在回写表格后才终止
-            避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
-
-    '''
-    # notification_reissue(window_name, '2024-11-06_220841_余猫_补发单号.xlsx')
-
-    # ---------- 打开以启动软件 -------------
-    # open_sof('ToDesk')
