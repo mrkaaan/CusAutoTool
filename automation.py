@@ -13,6 +13,7 @@ import pyautogui       # 提供屏幕自动化控制，如鼠标点击、键盘�
 import win32con        # 包含Windows API常量，用于与Windows系统交互
 import win32gui        # 提供与Windows GUI（图形用户界面）交互的功能
 import pyperclip       # 处理剪贴板内容
+import openpyxl
 
 from PIL import ImageGrab     # 从PIL库导入ImageGrab模块，用于截图
 from loguru import logger     # 引入loguru库，用于简便的日志记录
@@ -136,12 +137,11 @@ def run_test(window_name):
         logger.info(err)  # 记录异常信息
 
 # 通知补发单号
-def notification_reissue(window_name, table_name, form_folder = './form'):
+def notification_reissue(window_name, table_name, shop_name=None, form_folder = './form'):
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
     try:
-
         table_file = os.path.join(form_folder, table_name)
-        df = pd.read_excel(table_file)  # 读取 Excel 文件
+        df = pd.read_excel(table_file, dtype={'原始单号': str})
         column_names = df.columns.tolist()  # 获取列名列表
         # 检查是否存在"是否通知"列，如果不存在则添加
         if '是否通知' not in column_names:
@@ -162,66 +162,76 @@ def notification_reissue(window_name, table_name, form_folder = './form'):
                 exit_flag = True
         
         keyboard.on_press(on_key_event)  # 设置按键监听
+
+        # 限制 DataFrame 到前两行
+        df_subset = df.iloc[:3]
+        
         # 逐行处理DataFrame
-        for index, row in df.iterrows():
+        for index, row in df_subset.iterrows():
             if exit_flag:
                 break  # 如果接收到退出信号，则终止循环
                 
+            # app.click_icon(shop_name_icon)
             # 检查是否已经通知
             if row['是否通知'] == 1:
+                print('当前用户已通知')
                 continue  # 如果已经通知，则跳过当前行
             # 获取原始单号和物流单号
 
-            time.sleep(0.5)
+            # 循环起始等待
+            time.sleep(0.1)
 
             original_number = row['原始单号']
             logistics_number = row['物流单号']
             print(original_number)
             print(logistics_number)
 
+            # original_number=123456789789
+
             app.get_app_screenshot()
 
-            app.move_and_click(750, 500)
-            time.sleep(0.5)
-            
+            # app.move_and_click(750, 500)
+            # time.sleep(0.5)
             # 模拟按下 alt+W 快捷键打开目标软件
             # keyboard.press_and_release('alt+c')
             # 等待软件响应
             # 模拟按下 ctrl+F 打开搜索功能
-            keyboard.press_and_release('ctrl+i')
-            time.sleep(0.5)
-            keyboard.press_and_release('ctrl+f')
+            # keyboard.press_and_release('ctrl+i')
+            # time.sleep(0.5)
+            # keyboard.press_and_release('ctrl+f')
+            # time.sleep(0.5)
 
+            # 容错 点击搜索框
+            app.click_icon('button_search_cus.png',0,0.3,0,0.3)
 
-            # 等待搜索框出现
-            time.sleep(0.5)
+            time.sleep(0.1)
             # 清除
             keyboard.press_and_release('ctrl+a')  
             keyboard.press_and_release('backspace')
-
             # 将 original_number 的内容输入到搜索框中
             # pyautogui.typewrite(original_number)
-
             # 将中文字符串复制到剪贴板
             pyperclip.copy(original_number)
-            time.sleep(0.1)
             keyboard.press_and_release('ctrl+v') 
-            # 等待聊天窗口响应
-            time.sleep(0.7)
-
-
-            _, __, if_find_cus = app.locate_icon('not_find_customer.png')
+            
+            # 等待搜索结果响应
+            time.sleep(0.2)
+            _, __, not_find_cus = app.locate_icon('not_find_customer.png',0, 0.4,0,0.6)
             # 判断搜索结果
-            if not if_find_cus:
+            if not_find_cus:
                 print(f"未搜索到结果，跳过 {original_number}")
                 df.at[index, '是否通知'] = 0
                 continue  # 未搜索到直接continue下一个
+            else:
+              print('搜索到指定用户，即将发送通知...')
             
-            time.sleep(0.7)
             # 模拟按下回车键进入指定用户的聊天窗口
             keyboard.press_and_release('enter')
+            time.sleep(0.2)
+
             # 按下 ctrl+J 定位到输入框中
             keyboard.press_and_release('ctrl+i')
+            time.sleep(0.2)
 
             # 调用 app.locate_icon 传入图片名称，找到是否有某个图片存在
             # x, y, is_find = app.locate_icon('input_box_icon.png')
@@ -232,34 +242,29 @@ def notification_reissue(window_name, table_name, form_folder = './form'):
             # 如果为 True，则相对向下移动 200 个像素后点击
             # app.remove_and_click(x, y + 200)
 
-            time.sleep(0.5)
             # 清除
             keyboard.press_and_release('ctrl+a')  
             keyboard.press_and_release('backspace')
-            time.sleep(0.5)
+            time.sleep(0.2)
             # 将 亲 + logistics_number + 这是您的补发单号 请注意查收 这段内容输入到输入框中
             message = f"亲 {logistics_number} 这是您的补发单号 请注意查收"
-            print(message)
-            time.sleep(0.5)
-
             # 将中文字符串复制到剪贴板
             pyperclip.copy(message)
-            time.sleep(0.5)
             # 使用 pyautogui.typewrite 粘贴剪贴板内容
-            # keyboard.press_and_release('ctrl+v')  
-
+            keyboard.press_and_release('ctrl+v')  
             # pyautogui.typewrite(message, paste=True)
-            # time.sleep(0.2)
+            time.sleep(0.2)
 
             # 模拟按下回车发送消息
             # keyboard.press_and_release('enter')
-
             # 将当前行的"是否通知"标记为1
-            # df.at[index, '是否通知'] = 1
+            df.at[index, '是否通知'] = 1
 
             # 将更改写回 Excel 文件
-            # with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-                # df.to_excel(writer, index=False)
+            with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+                df.to_excel(writer, index=False)
+                
+            # 循环结束暂停
             time.sleep(0.3)
     except Exception as err:
         logger.info(err)
