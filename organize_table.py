@@ -69,13 +69,15 @@ def process_original_number(input_filename, shop_name, form_folder = './form'):
     if df is None:
         raise UnicodeDecodeError("都无法读取文件，请检查文件编码")
 
+    # 填充空值
+    df["原始单号"].fillna('', inplace=True)
     # 清理“原始单号”列
     df["原始单号"] = (
         df["原始单号"]
         .astype(str)  # 转为字符串类型
-        .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
         .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
         .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
+        .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
         .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
     )
     # 转换 "物流单号" 列为整数类型，保证无科学计数法和小数点
@@ -120,5 +122,5 @@ if __name__ == '__main__':
 
     # 二次处理 ERP导出表格 清洗新表格的原始单号 结果文件执行自动化操作
     # 有多少个店铺 就调用多少次 
-    processed_df = process_original_number('2024-11-07_余猫_ERP二次导出表格.csv','余猫') # 日期_店铺_ERP二次导出表格
-    processed_df = process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv','潮洁') # 日期_店铺_ERP二次导出表格
+    # processed_df = process_original_number('2024-11-07_余猫_ERP二次导出表格 - test.csv','余猫') # 日期_店铺_ERP二次导出表格
+    # processed_df = process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv','潮洁') # 日期_店铺_ERP二次导出表格
