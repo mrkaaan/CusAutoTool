@@ -39,9 +39,9 @@ if __name__ == "__main__":
     '''
     # auto_key()
     hotkey_actions = [
-        {'key': 'ctrl+r', 'func': ut.open_sof, 'args': ['旺店通ERP',394854,1]}
+        {'key': 'ctrl+r', 'func': ut.open_sof, 'args': ['旺店通ERP',394853,1,'CoolWindow']}
     ]
-    ut.auto_key(hotkey_actions)
+    ut.auto_key_with_threads(hotkey_actions)
 
     # ---------- 测试 -------------
     # au.run_test(window_name)

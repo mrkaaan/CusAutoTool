@@ -42,29 +42,43 @@ def load_handles():
         return {}
 
 # 打开指定软件
-def open_sof(name, handle=None, manual=0):
+def open_sof(name, handle=None, manual=0, class_name=None):
+    """
+    打开指定软件窗口。
+    :param name: 窗口名称
+    :param handle: 句柄 (可选，手动模式下传入)
+    :param manual: 手动模式标志 (0: 自动模式, 1: 手动模式)
+    :param class_name: 窗口类名 (可选，作为备用查找方法)
+    """
     if manual:
         # 手动模式启用，直接使用传入的句柄
         if not handle:
             print("手动模式下未提供句柄！")
             return None
         if not win32gui.IsWindow(handle):
-            print(f"提供的句柄 {handle} 无效！")
-            return None
-        print(f"手动模式启用，使用指定句柄 {handle}。")
+            print(f"手动模式下提供的句柄 {handle} 无效，切换到自动模式...")
+            manual = 0  # 自动切换到自动模式
+        print(f"手动模式，指定句柄 {handle}。")
         save_handle(name, handle)  # 保存句柄到文件
-    else:
-        # 自动模式：从文件或窗口名称中查找句柄
-        handle = load_handle(name)  # 尝试从文件读取句柄
-        if not handle:
-            print(f'文件中未找到句柄，尝试通过窗口名称 {name} 查找...')
-            handle = win32gui.FindWindow(0, name)
-            if handle == 0:
-                print(f'未找到窗口 {name}')
-                return None
-            save_handle(name, handle)  # 保存句柄到文件
+        
+    if not manual:
+        # 自动模式：尝试通过文件加载或窗口名称查找句柄
+        handle = load_handle(name)  # 从文件加载句柄
+        if not handle or not win32gui.IsWindow(handle):
+            print(f"文件中未找到有效句柄，尝试通过窗口名称 {name} 查找...")
+            handle = win32gui.FindWindow(None, name)  # 通过窗口标题查找句柄
+            if not handle and class_name:
+                print(f"未通过窗口名称找到句柄，尝试使用类名 {class_name} 查找...")
+                handle = win32gui.FindWindow(class_name, None)  # 通过类名查找句柄
+            
+            if not handle:
+                print(f"未找到有效的窗口句柄，操作终止。")
+                return None  # 所有查找方式均失败，终止运行
+            
+            save_handle(name, handle)  # 保存新找到的句柄
         else:
-            print(f'文件中找到句柄 {name}：{handle}')
+            print(f"文件中找到有效句柄：{handle}")
+
     try:
         win32gui.SendMessage(handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)  # 发送消息以确保窗口恢复显示
         time.sleep(0.2) # 延迟1秒，等待窗口恢复
@@ -80,18 +94,15 @@ def open_sof(name, handle=None, manual=0):
     # pos = win32gui.GetWindowRect(handle) # 窗口位置
     # print(f'窗口位置 {pos}') # 打印窗口位置
 
-def auto_key(hotkeys):
+def auto_key_with_threads(hotkeys):
     # 去除空格并移除重复的快捷键
     seen_keys = set()
     filtered_hotkeys = []
     for hotkey in hotkeys:
-        # 去掉快捷键中多余的空格
-        clean_key = hotkey['key'].replace(" ", "")
-        
+        clean_key = hotkey['key'].replace(" ", "")  # 去掉快捷键中多余的空格
         if clean_key in seen_keys:
             print(f"发现重复快捷键 {clean_key}，保留第一个绑定，移除后续重复绑定。")
             continue  # 跳过重复的快捷键
-        
         seen_keys.add(clean_key)
         filtered_hotkeys.append({
             "key": clean_key,
@@ -100,18 +111,27 @@ def auto_key(hotkeys):
         })
     
     # 绑定快捷键
+    def threaded_function(func, args):
+        # 在独立线程中执行功能
+        try:
+            thread = threading.Thread(target=func, args=args)
+            thread.daemon = True  # 守护线程，主线程结束后自动清理
+            thread.start()
+        except Exception as e:
+            print(f"快捷键功能执行出错：{e}")
+    
     for hotkey in filtered_hotkeys:
-        keyboard.add_hotkey(hotkey['key'], lambda *args, f=hotkey['func'], a=hotkey['args']: f(*a))
-    
-    # for hotkey in hotkeys:
-    #     keyboard.add_hotkey(hotkey['key'], lambda *args, f=hotkey['func'], a=hotkey.get('args', []): f(*a))
-    # keyboard.add_hotkey('ctrl+r', lambda: open_sof('旺店通ERP',394854,1))
-    
+        keyboard.add_hotkey(
+            hotkey['key'],
+            lambda *args, f=hotkey['func'], a=hotkey['args']: threaded_function(f, a)
+        )
+
     try:
         # 保持脚本运行，直到按下退出快捷键
-        keyboard.wait('shift+ctrl+e')  # 按下 Esc 退出监听
+        print("快捷键监听已启动，按下 Shift+Ctrl+E 退出。")
+        keyboard.wait('shift+ctrl+e')  # 按下 Shift+Ctrl+E 退出监听
     finally:
-        # 无论是否按下 shift+ctrl+e 都移除所有快捷键监听
+        # 无论是否按下 Shift+Ctrl+E 都移除所有快捷键监听
         keyboard.unhook_all()
         # 清空句柄文件
         if os.path.exists('handles.json'):
