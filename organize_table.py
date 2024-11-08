@@ -80,6 +80,15 @@ def process_original_number(input_filename, shop_name, form_folder = './form'):
         .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
         .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
     )
+
+    df["物流单号"] = (
+        df["物流单号"]
+        .astype(str)  # 转为字符串类型
+        .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
+        .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
+        .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
+        .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
+    )
     # 转换 "物流单号" 列为整数类型，保证无科学计数法和小数点
     # df['物流单号'] = df['物流单号'].apply(lambda x: str(int(x)) if pd.notnull(x) else x)
 

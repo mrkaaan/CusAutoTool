@@ -38,9 +38,9 @@ if __name__ == "__main__":
         按下 shift+ctrl+1 添加备注
     '''
     # auto_key()
-    # hotkey_actions = [
-    #     {'key': 'ctrl+r', 'func': ut.open_sof, 'args': ['旺店通ERP',394853,1,'CoolWindow']}
-    # ]
+    hotkey_actions = [
+        {'key': 'ctrl+r', 'func': ut.open_sof, 'args': ['旺店通ERP',459486,1,'CoolWindow']}
+    ]
     # ut.auto_key_with_threads(hotkey_actions)
 
     # ---------- 测试 -------------
@@ -65,13 +65,13 @@ if __name__ == "__main__":
             避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
 
     '''
-    au.notification_reissue(window_name, '2024-11-08_140753_余猫_补发单号 - test.xlsx')
+    au.notification_reissue(window_name, '2024-11-08_230302_余猫_补发单号.xlsx')
 
     # ---------- 表格处理 -------------
     # 首次处理 群中表格 筛选制定店铺名称的物流单号 一个表有两个sheet 结果文件拿去ERP搜索后导出为新的表格
-    # tb.process_original_table('11月6日补发单号.csv')
+    # tb.process_original_table('11月8日天猫补发单号.csv')
 
     # 二次处理 ERP导出表格 清洗新表格的原始单号 结果文件执行自动化操作
     # 有多少个店铺 就调用多少次 
-    # tb.process_original_number('2024-11-07_余猫_ERP二次导出表格 - test.csv','余猫') # 日期_店铺_ERP二次导出表格
+    # tb.process_original_number('2024-11-08_余猫_ERP二次导出表格.csv','余猫') # 日期_店铺_ERP二次导出表格
     # tb.process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv','潮洁') # 日期_店铺_ERP二次导出表格

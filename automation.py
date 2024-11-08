@@ -164,10 +164,9 @@ def notification_reissue(window_name, table_name, shop_name=None, form_folder = 
         keyboard.on_press(on_key_event)  # 设置按键监听
 
         # 限制 DataFrame 到前两行
-        df_subset = df.iloc[:3]
-        
+        # df_subset = df.iloc
         # 逐行处理DataFrame
-        for index, row in df_subset.iterrows():
+        for index, row in df.iterrows():
             if exit_flag:
                 break  # 如果接收到退出信号，则终止循环
                 
@@ -256,7 +255,7 @@ def notification_reissue(window_name, table_name, shop_name=None, form_folder = 
             time.sleep(0.2)
 
             # 模拟按下回车发送消息
-            # keyboard.press_and_release('enter')
+            keyboard.press_and_release('enter')
             # 将当前行的"是否通知"标记为1
             df.at[index, '是否通知'] = 1
 
