@@ -10,7 +10,9 @@ import shutil
 from organize_table import process_original_table, process_original_number
 
 file_path_or = ''
+file_name_or = ''
 file_path_erp = ''
+file_name_erp = ''
 
 # 线程化的函数，避免界面冻结
 def run_in_thread(func, *args):
@@ -19,6 +21,7 @@ def run_in_thread(func, *args):
 # 选择原始表格
 def choose_original_table(enter):
     global file_path_or
+    global file_name_or
 
     # 设置默认打开目录为桌面
     desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
@@ -34,11 +37,12 @@ def choose_original_table(enter):
         # current_text = or_entry.get()  # 获取当前的文本
         enter.delete(0, tk.END)  # 清除输入框中的所有文本
         file_path_or = file_path_temp
+        file_name_or = os.path.basename(file_path_temp)
         enter.insert(0, file_path_or)  # 插入新的组合文本
 
         # 获取当前日期的年月日
-        today = datetime.date.today()
-        target_dir = f"./form/{today.year}-{today.month:02d}-{today.day:02d}"
+        today = datetime.now().strftime('%Y-%m-%d')
+        target_dir = f"./form/{today}"
 
         # 如果目标目录不存在，则创建
         if not os.path.exists(target_dir):
@@ -58,10 +62,11 @@ def choose_original_table(enter):
 # 选择ERP导出表格
 def choose_erp_export_table(enter):
     global file_path_erp
+    global file_name_erp
 
     # 获取当前日期的年月日
-    today = datetime.date.today()
-    default_dir = f"./form/{today.year}-{today.month:02d}-{today.day:02d}"
+    today = datetime.now().strftime('%Y-%m-%d')
+    default_dir = f"./form/{today}"
     
     # 如果目录不存在，则创建
     if not os.path.exists(default_dir):
@@ -79,6 +84,7 @@ def choose_erp_export_table(enter):
         # current_text = or_entry.get()  # 获取当前的文本
         enter.delete(0, tk.END)  # 清除输入框中的所有文本
         file_path_erp = file_path_temp
+        file_name_erp = os.path.basename(file_path_temp)
         enter.insert(0, file_path_erp)  # 插入新的组合文本
 
 # 复制ERP导出表格表明
@@ -109,7 +115,9 @@ def main():    # 主窗口
     root.title("补发表格处理")
 
     global file_path_or
+    global file_name_or
     global file_path_erp
+    global file_name_erp
 
     # 参数设置
     # 窗口大小
@@ -150,7 +158,7 @@ def main():    # 主窗口
     or_button_choose = tk.Button(root, cursor="hand2", text="选择文件", command=lambda:choose_original_table(or_entry))
     or_button_choose.place(x=180, y=70)
     # 开始处理按钮
-    or_button_sure = tk.Button(root, state="disabled", text="开始处理", command=lambda:run_in_thread(process_original_table, './form'))
+    or_button_sure = tk.Button(root, state="disabled", text="开始处理", command=lambda:run_in_thread(process_original_table, file_name_or))
     or_button_sure.place(x=270, y=70)
     # 监控输入框的变化，并更新按钮状态
     or_entry_var.trace("w", lambda *args: update_button_state(or_entry, or_button_sure, *args))
@@ -177,7 +185,7 @@ def main():    # 主窗口
     erp_button_choose = tk.Button(root, cursor="hand2", text="选择文件", command=lambda:choose_erp_export_table(erp_entry))
     erp_button_choose.place(x=180, y=190)
     # 处理按钮
-    erp_button_sure = tk.Button(root, state="disabled", text="开始处理", command=lambda:run_in_thread(process_original_number, './form'))
+    erp_button_sure = tk.Button(root, state="disabled", text="开始处理", command=lambda:run_in_thread(process_original_number, file_name_erp))
     erp_button_sure.place(x=270, y=190)
     # 监控输入框的变化，并更新按钮状态
     erp_entry_var.trace("w", lambda *args: update_button_state(or_entry, erp_button_sure, *args))
