@@ -9,11 +9,10 @@ def process_original_table(
 ):
     # 精确日期文件名
     output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_补发物流单号.xlsx"
-
+    form_folder += f"/{datetime.now().strftime('%Y-%m-%d')}"
     # 使用 os.path.join 组合路径和文件名
     input_file = os.path.join(form_folder, input_filename)
     output_file = os.path.join(form_folder, output_filename)
-
     # 读取表格
     encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
     for encoding in encodings:
@@ -48,13 +47,24 @@ def process_original_table(
 
 # 二次处理表格 清洗原始单号
 # input_filename = 'ERP二次导出表格.csv'
-def process_original_number(input_filename, shop_name, form_folder = './form'):
+def process_original_number(input_filename, form_folder = './form'):
+    # 定义两个合法的店铺名称
+    valid_shop_names = ['潮洁', '余猫']
+    
+    # 从文件名中提取店铺名称
+    shop_name = input_filename.split('_')[1]  # 假设文件名格式为 在第二个下划线之后提取店铺名称
+
+    # 检查店铺名称是否有效
+    if shop_name not in valid_shop_names:
+        print(f"无效的店铺名称：{shop_name}。程序退出。")
+        return  # 退出函数
+
     output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_{shop_name}_补发单号.xlsx"
-  
+    form_folder += f"/{datetime.now().strftime('%Y-%m-%d')}"
     # 使用 os.path.join 组合路径和文件名
     input_file = os.path.join(form_folder, input_filename)
     output_file = os.path.join(form_folder, output_filename)
-
+    
     # 读取表格
     encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
     df = None
@@ -131,5 +141,7 @@ if __name__ == '__main__':
 
     # 二次处理 ERP导出表格 清洗新表格的原始单号 结果文件执行自动化操作
     # 有多少个店铺 就调用多少次 
-    # processed_df = process_original_number('2024-11-07_余猫_ERP二次导出表格 - test.csv','余猫') # 日期_店铺_ERP二次导出表格
-    # processed_df = process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv','潮洁') # 日期_店铺_ERP二次导出表格
+    # processed_df = process_original_number('2024-11-07_余猫_ERP二次导出表格 - test.csv') # 日期_店铺_ERP二次导出表格
+    # processed_df = process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
+
+    # process_original_table('11月6日补发单号.csv')

@@ -73,5 +73,5 @@ if __name__ == "__main__":
 
     # 二次处理 ERP导出表格 清洗新表格的原始单号 结果文件执行自动化操作
     # 有多少个店铺 就调用多少次 
-    # tb.process_original_number('2024-11-08_余猫_ERP二次导出表格.csv','余猫') # 日期_店铺_ERP二次导出表格
-    # tb.process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv','潮洁') # 日期_店铺_ERP二次导出表格
+    # tb.process_original_number('2024-11-08_余猫_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
+    # tb.process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
