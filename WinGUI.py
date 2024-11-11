@@ -264,8 +264,8 @@ class WinGUI:
         )
         # 如果坐标无效，则返回未找到状态
         if x < 0 or y < 0:
-            return False, x, y
-        return True, x, y
+            return False
+        return True
 
 # 需要窗口名称 从而获取窗口位置和句柄
 def get_window_pos(name):

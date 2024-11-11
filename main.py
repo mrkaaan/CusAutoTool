@@ -43,11 +43,12 @@ if __name__ == "__main__":
         {'key': 'ctrl+1', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]},
         {'key': 'ctrl+2', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}
     ]
-    ut.auto_key_with_threads(hotkey_actions)
+    # ut.auto_key_with_threads(hotkey_actions)
 
     # ---------- 测试 -------------
     # au.run_test(window_name)
     # ut.open_sof('ToDesk')
+    au.run_once_by_erp(window_name)
 
     # ---------- 通知补发单号 -------------
     '''
@@ -79,6 +80,5 @@ if __name__ == "__main__":
     # tb.process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
 
     # ---------- 取消备注 -------------
-
     # au.run_once_remarks_by_qianniu(window_name)
 

@@ -46,7 +46,7 @@ def running_loop(window_name, cycle_number=-1):
     cycle_count = 0 # 初始化循环计数器
     while not exit_flag:
         try:
-            if is_loop_over(app): # 检测是否结束
+            if is_loop_over(app, 'icon.png'): # 检测是否结束
                 logger.info(f"Cycle {cycle_count} is finished")  # 记录当前循环结束
                 if cycle_number > 0 and cycle_count >= cycle_number:  # 检查是否达到设定的循环次数
                     logger.info(f"finished {cycle_count} cycles!")  # 记录完成循环次数
@@ -61,18 +61,15 @@ def running_loop(window_name, cycle_number=-1):
         time.sleep(0.5)   # 每次循环暂停1秒
 
 # 判断循环是否结束 需要修改
-def is_loop_over(app):
+def is_loop_over(app, icon):
     """
     检测指定图标是否出现在窗口中，以判断循环是否结束
     
     :param app: WinGUI 实例，提供窗口和图标检测功能
     :return: 如果测试结束则返回 True，否则返回 False
     """
-    valid1, _, _ = app.check_icon("running_1.png")  # 检测标志
-    if valid1:
-        return False
-    
-    return not valid1   # 如果标志不存在，返回 True 表示测试结束
+    valid = app.check_icon(icon)  # 检测标志
+    return valid
 
 # 千牛 执行一次备注操作
 def run_once_remarks_by_qianniu(window_name):
@@ -140,29 +137,103 @@ def run_once_unmark_by_qianniu(window_name):
         logger.info(err)  # 记录异常信息
 
 # 万店通
-def run_once_by_erp():
-    # 订单管理界面
-    # 历史订单界面
-    # 手工建单界面
+# 订单管理界面 order_management_interface
+# 历史订单界面 historical_order_interface
+# 手工建单界面 manual_order_creation_interface
 
-    # 选中的订单
-    # 复制补发订单
-    # 重复创建确认
-    # 是
+# 选中的订单    current_order
+# 复制补发订单   copy_reissue_order
+# 重复创建确认   repeat_creation_confirmation
+# 是    repeat_creation_confirmation_yes
 
-    # 成交日期
-    # 向右 向右下角
+# 成交日期       transaction_date
 
-    # 1
-    # 删除
+# 已有订单   existing_orders
 
-    # 添加单品
-    # 货品名称
-    # 编码
-    # 保存
+# 添加单品   add_single_item
+# 货品名称    goods_name
+# 编码    goods_code
+# 保存   save_add_item 
 
-    # 客服备注
-    pass
+# 客服备注   customer_service_remarks
+def run_once_by_erp(window_name):
+    app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+    try:
+        # 点击订单管理
+        app.click_icon('order_management_interface.png',0.5,1.0,0.5,1.0)
+        # 右键选中订单
+        app.click_icon('current_order.png',0.5,1.0,0.5,1.0,'right')
+        # 选择复制补发订单
+        app.click_icon('copy_reissue_order.png',0.5,1.0,0.5,1.0)
+        # 判断是否提示
+        is_find = app.check_icon('repeat_creation_confirmation.png',0.5,1.0,0.5,1.0)
+        if is_find:
+            # 点击是
+            app.click_icon('repeat_creation_confirmation_yes.png',0.5,1.0,0.5,1.0)
+        # 延迟
+        time.sleep(0.5)
+
+        # 子窗口-创建补发订单
+        child_window_reissue_order = WinGUI('创建补发订单')
+        # 设置今天日期
+        trans_data_icon_local_x, trans_data_icon_local_y, trans_data_icon_is_find = child_window_reissue_order.locate_icon('transaction_date.png',0.5,1.0,0.5,1.0)
+        if trans_data_icon_is_find:
+            # 向右移动并点击呼出日期下拉框
+            child_window_reissue_order.move_and_click(trans_data_icon_local_x+50, trans_data_icon_local_y)
+            # 相对向右下角移动点击今天
+            child_window_reissue_order.rel_remove_and_click(50, 50)
+
+        # 循环检测指定位置是否有1来判断是否已经存在商品 有则向右轻微移动到商品条目 双击删除商品 保证删除至没有商品
+        while True:
+            existence_orders_local_x, existing_orders_local_y, is_find_existence = child_window_reissue_order.locate_icon('existing_orders.png',0.5,1.0,0.5,1.0)
+            if is_find_existence:
+                # 向右轻微移动到商品条目 双击删除商品
+                child_window_reissue_order.move_and_click(existence_orders_local_x+10, existing_orders_local_y)
+                child_window_reissue_order.move_and_click(existence_orders_local_x+10, existing_orders_local_y)
+                # 延迟
+                time.sleep(0.5)
+            else:
+                break
+        
+        # 点击添加单品
+        child_window_reissue_order.click_icon('add_single_item.png',0.5,1.0,0.5,1.0)
+        # 子窗口-添加单品
+        child_window_add_single_item = WinGUI('添加单品')
+        # 定位到货品名称 并移动到输入框
+        goods_name_local_x, goods_name_local_y, goods_name_local_is_find = child_window_add_single_item.locate_icon('goods_name.png',0.5,1.0,0.5,1.0)
+        if goods_name_local_is_find:
+            # 向下移动并点击输入框
+            child_window_add_single_item.rel_remove_and_click(goods_name_local_x, goods_name_local_y+8)
+            # 输入货品名称 备注
+            keyboard.write('备注')
+            # 回车
+            keyboard.press_and_release('enter')
+
+            # 双击指定编码商品添加
+            goods_code_local_x, goods_code_local_y, goods_code_local_is_find = child_window_add_single_item.locate_icon('goods_code.png',0.5,1.0,0.5,1.0)
+            if goods_code_local_is_find:
+                # 双击商品名添加
+                child_window_add_single_item.move_and_click(goods_code_local_x, goods_code_local_y)
+                child_window_add_single_item.move_and_click(goods_code_local_x, goods_code_local_y)
+                # 延迟
+                time.sleep(0.5)
+            
+            # 点击保存
+            child_window_add_single_item.click_icon('save_add_item.png',0.5,1.0,0.5,1.0)
+
+        # 回到 子窗口-创建补发订单
+        # 定位到客服备注 并移动到输入框
+        customer_service_remarks_local_x, customer_service_remarks_local_y, customer_service_remarks_local_is_find = child_window_reissue_order.locate_icon('customer_service_remarks.png',0.5,1.0,0.5,1.0)
+        if customer_service_remarks_local_is_find:
+            # 向右移动点击输入框
+            child_window_reissue_order.move_and_click(customer_service_remarks_local_x+10, customer_service_remarks_local_y)
+            # 输入客服备注：补发
+            keyboard.write('补发')
+    except Exception as err:
+        logger.info(err)
+
+
 
 # 测试
 def run_test(window_name):
