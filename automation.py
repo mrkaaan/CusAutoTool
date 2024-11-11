@@ -90,30 +90,30 @@ def run_once_remarks_by_qianniu(window_name):
         app.click_icon('Button_RedFlag.png',0.4,1.0,0.4,1.0)
         # 向下移动到输入框并点击
         app.rel_remove_and_click(0, 150)
-
+        time.sleep(0.1)
         # 获取输入框当前的内容
         keyboard.press_and_release('ctrl+a')  
         keyboard.press_and_release('ctrl+c')  # 模拟按下并释放
         current_text = pyperclip.paste()      # 获取剪贴板中的文本
-
+        time.sleep(0.1)
         entry_text = ''
         # 判断输入框是否有内容
         print('------')
         print(current_text)
         if current_text.strip():  # 如果字符串不为空
-            entry_text = '已登记补发' if '已登记' in current_text else f"{current_text}\n已登记补发"
+            entry_text = f'{current_text}\n已登记补发' if '已登记' in current_text else '已登记补发'
         else:
             entry_text = '已登记补发'
-        # print(entry_text)
+        print(entry_text)
         # 判断有无按下附加信息按钮
         # app.check_icon('button_additional_information.png'):
-
+        time.sleep(0.1)
         # 输入
         keyboard.write(entry_text)
         # 点击确认
         # app.click_icon('Button_Confirm_Remarks.png',0.8,1.0,0.8,1.0)
         # 点击取消
-        app.click_icon('Button_Cancel_Remarks.png',0.8,1.0,0.8,1.0)
+        # app.click_icon('Button_Cancel_Remarks.png',0.8,1.0,0.8,1.0)
 
         # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
     except Exception as err:
@@ -130,7 +130,7 @@ def run_once_unmark_by_qianniu(window_name):
         local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.4,0,1.0)
         if is_find:
             app.move_and_click(local_x, local_y, 'right')
-            time.sleep(0.5)
+            time.sleep(0.1)
             app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
         else:
             logger.info(f"END | not find button_selected_session_annotation.png, windoe name: {window_name}") # 停止记录
@@ -139,6 +139,30 @@ def run_once_unmark_by_qianniu(window_name):
     except Exception as err:
         logger.info(err)  # 记录异常信息
 
+# 万店通
+def run_once_by_erp():
+    # 订单管理界面
+    # 历史订单界面
+    # 手工建单界面
+
+    # 选中的订单
+    # 复制补发订单
+    # 重复创建确认
+    # 是
+
+    # 成交日期
+    # 向右 向右下角
+
+    # 1
+    # 删除
+
+    # 添加单品
+    # 货品名称
+    # 编码
+    # 保存
+
+    # 客服备注
+    pass
 
 # 测试
 def run_test(window_name):
