@@ -65,7 +65,7 @@ if __name__ == "__main__":
             避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
 
     '''
-    au.notification_reissue(window_name, '2024-11-08_230302_余猫_补发单号.xlsx')
+    # au.notification_reissue(window_name, '2024-11-08_230302_余猫_补发单号.xlsx')
 
     # ---------- 表格处理 -------------
     # 首次处理 群中表格 筛选制定店铺名称的物流单号 一个表有两个sheet 结果文件拿去ERP搜索后导出为新的表格
@@ -75,3 +75,8 @@ if __name__ == "__main__":
     # 有多少个店铺 就调用多少次 
     # tb.process_original_number('2024-11-08_余猫_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
     # tb.process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
+
+    # ---------- 取消备注 -------------
+
+    au.run_once_beizhu(window_name)
+

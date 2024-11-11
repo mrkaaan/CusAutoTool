@@ -99,32 +99,34 @@ def run_once_beizhu(window_name):
         keyboard.press_and_release('ctrl+c')  # 模拟按下并释放
         current_text = pyperclip.paste()      # 获取剪贴板中的文本
 
+        entry_text = ''
         # 判断输入框是否有内容
         print('------')
         print(current_text)
         if current_text.strip():  # 如果字符串不为空
-            if '已登记' in current_text:  # 如果内容包含“已登记”
-                pyautogui.typewrite(['right'])  # 回车后输入
-                pyautogui.typewrite(['enter'])  # 回车后输入
-            else:  # 如果内容不包含“已登记”
-                keyboard.press_and_release('ctrl+a')  
-                keyboard.press_and_release('backspace')
-        else:  # 如果无内容
-            pass  # 不需要做任何操作，直接输入
+            entry_text = '已登记补发' if '已登记' in current_text else f"{current_text}\n已登记补发"
         
+        print(entry_text)
         # 判断有无按下附加信息按钮
         # app.check_icon('button_additional_information.png'):
 
         # 输入
-        keyboard.write('已登记补发')
+        keyboard.write(entry_text)
         # 点击确认
-        app.click_icon('Button_Confirm_Remarks.png',0.8,1.0,0.8,1.0)
+        # app.click_icon('Button_Confirm_Remarks.png',0.8,1.0,0.8,1.0)
+        # 点击取消
+        app.click_icon('Button_Cancel_Remarks.png',0.8,1.0,0.8,1.0)
 
-        # 取消标记位置
-        app.click_icon('button_selected_session_annotation.png',0,0.4,0.2,1.0,'right')
-        app.click_icon('button_cancel_annotations.png',0,0.5,0.2,1.0)
+        # 取消标记
+        local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.4,0,1.0)
+        if is_find:
+            app.move_and_click(local_x, local_y, 'right')
+            time.sleep(0.5)
+            app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+        else:
+            print('not find')
 
-        logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
+        # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
     except Exception as err:
         logger.info(err)  # 记录异常信息
 
