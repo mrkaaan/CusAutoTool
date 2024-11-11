@@ -74,21 +74,18 @@ def is_loop_over(app):
     
     return not valid1   # 如果标志不存在，返回 True 表示测试结束
 
-# 执行一次备注操作
-def run_once_beizhu(window_name):
-    """
-    执行自动化程序：检测窗口状态，执行操作。
-    
-    :param window_name: 应用窗口的名称
-    """
-
+# 千牛 执行一次备注操作
+def run_once_remarks_by_qianniu(window_name):
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
-    logger.info(f'START | window name: {window_name}')  # 记录窗口名称
+    # logger.info(f'START | window name: {window_name}')  # 记录窗口名称
 
     try:
         # app.get_app_screenshot()
         # 点击备注
         find_button_remarks = app.click_icon('Button_Remarks.png',0.5,1.0,0.4,1.0)
+        if not find_button_remarks:
+            logger.info(f"END | not find Button_Remarks.png, windoe name: {window_name}") # 停止记录
+            return
         # 点击红色备注
         app.click_icon('Button_RedFlag.png',0.4,1.0,0.4,1.0)
         # 向下移动到输入框并点击
@@ -105,8 +102,9 @@ def run_once_beizhu(window_name):
         print(current_text)
         if current_text.strip():  # 如果字符串不为空
             entry_text = '已登记补发' if '已登记' in current_text else f"{current_text}\n已登记补发"
-        
-        print(entry_text)
+        else:
+            entry_text = '已登记补发'
+        # print(entry_text)
         # 判断有无按下附加信息按钮
         # app.check_icon('button_additional_information.png'):
 
@@ -117,6 +115,17 @@ def run_once_beizhu(window_name):
         # 点击取消
         app.click_icon('Button_Cancel_Remarks.png',0.8,1.0,0.8,1.0)
 
+        # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
+    except Exception as err:
+        logger.info(err)  # 记录异常信息
+
+# 千牛 执行一次取消标记操作
+def run_once_unmark_by_qianniu(window_name):
+    app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+    # logger.info(f'START | window name: {window_name}')  # 记录窗口名称
+
+    try:
+        # app.get_app_screenshot()
         # 取消标记
         local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.4,0,1.0)
         if is_find:
@@ -124,11 +133,12 @@ def run_once_beizhu(window_name):
             time.sleep(0.5)
             app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
         else:
-            print('not find')
+            logger.info(f"END | not find button_selected_session_annotation.png, windoe name: {window_name}") # 停止记录
 
         # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
     except Exception as err:
         logger.info(err)  # 记录异常信息
+
 
 # 测试
 def run_test(window_name):
