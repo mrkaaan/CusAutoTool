@@ -160,8 +160,13 @@ def run_once_by_erp(window_name):
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
     try:
+        # 判断是否未选中 订单管理 是则选中
+        order_manage_x, order_manage_y, is_find_not_current_order_management = app.locate_icon('erp/order_management_interface_not_current.png',0,0.3,0,0.4)
+        if is_find_not_current_order_management:
+            app.move_and_click(order_manage_x, order_manage_y)
         # 点击订单管理
-        app.click_icon('order_management_interface.png',0.5,1.0,0.5,1.0)
+        # app.click_icon('erp/order_management_interface.png',0,0.3,0,0.4)
+        '''
         # 右键选中订单
         app.click_icon('current_order.png',0.5,1.0,0.5,1.0,'right')
         # 选择复制补发订单
@@ -230,6 +235,7 @@ def run_once_by_erp(window_name):
             child_window_reissue_order.move_and_click(customer_service_remarks_local_x+10, customer_service_remarks_local_y)
             # 输入客服备注：补发
             keyboard.write('补发')
+        '''
     except Exception as err:
         logger.info(err)
 

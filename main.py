@@ -31,6 +31,7 @@ if __name__ == "__main__":
     # suffix_list = []  # 要移动的文件后缀列表
     # cycle_number = -1  # 循环次数，-1 表示无限循环
     window_name = r"千牛接待台"  # 窗口名称
+    window_name_erp = r"旺店通ERP"
     
     # ---------- 快捷键启动 -------------
     '''
@@ -48,7 +49,7 @@ if __name__ == "__main__":
     # ---------- 测试 -------------
     # au.run_test(window_name)
     # ut.open_sof('ToDesk')
-    au.run_once_by_erp(window_name)
+    au.run_once_by_erp(window_name_erp)
 
     # ---------- 通知补发单号 -------------
     '''
