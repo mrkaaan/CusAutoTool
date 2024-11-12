@@ -87,12 +87,12 @@ def run_once_remarks_by_qianniu(window_name):
         app.click_icon('Button_RedFlag.png',0.4,1.0,0.4,1.0)
         # 向下移动到输入框并点击
         app.rel_remove_and_click(0, 150)
-        time.sleep(0.1)
+        time.sleep(0.2)
         # 获取输入框当前的内容
         keyboard.press_and_release('ctrl+a')  
         keyboard.press_and_release('ctrl+c')  # 模拟按下并释放
         current_text = pyperclip.paste()      # 获取剪贴板中的文本
-        time.sleep(0.1)
+        time.sleep(0.2)
         entry_text = ''
         # 判断输入框是否有内容
         print('------')
@@ -104,11 +104,11 @@ def run_once_remarks_by_qianniu(window_name):
         print(entry_text)
         # 判断有无按下附加信息按钮
         # app.check_icon('button_additional_information.png'):
-        time.sleep(0.1)
+        time.sleep(0.2)
         # 输入
         keyboard.write(entry_text)
         # 点击确认
-        # app.click_icon('Button_Confirm_Remarks.png',0.8,1.0,0.8,1.0)
+        app.click_icon('Button_Confirm_Remarks.png',0.8,1.0,0.8,1.0)
         # 点击取消
         # app.click_icon('Button_Cancel_Remarks.png',0.8,1.0,0.8,1.0)
 

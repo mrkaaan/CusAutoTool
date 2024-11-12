@@ -40,16 +40,16 @@ if __name__ == "__main__":
     '''
     # auto_key()
     hotkey_actions = [
-        {'key': 'ctrl+l', 'func': ut.open_sof, 'args': ['旺店通ERP',459486,1,'CoolWindow']},
-        {'key': 'ctrl+1', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]},
-        {'key': 'ctrl+2', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}
+        {'key': 'alt+a', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
+        {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]},
+        {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}
     ]
-    # ut.auto_key_with_threads(hotkey_actions)
+    ut.auto_key_with_threads(hotkey_actions)
 
     # ---------- 测试 -------------
     # au.run_test(window_name)
     # ut.open_sof('ToDesk')
-    au.run_once_by_erp(window_name_erp)
+    # au.run_once_by_erp(window_name_erp)
 
     # ---------- 通知补发单号 -------------
     '''
