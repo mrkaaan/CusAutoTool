@@ -2,14 +2,19 @@ import pyperclip
 from pynput import keyboard
 import subprocess
 import threading
+import re
+import json
 
 bat_file_path = r'D:\project\auto_customer\auto_file.bat'
 
 # 定义要监听的热字符串及其对应的批处理文件路径
-hotstrings = {
-    'test1': 'D:\\test.png',
-    'test2': r'C:\Users\Kan\Documents\Captura\2024-11-15-11-50-10.mp4'
-}
+# hotstrings = {
+#     'test1': 'D:\\test.png',
+#     'test2': r'C:\Users\Kan\Documents\Captura\2024-11-15-11-50-10.mp4'
+# }
+# 读取 JSON 文件
+with open('hotstrings.json', 'r', encoding='utf-8') as f:
+    hotstrings = json.load(f)
 
 # 用于跟踪按键状态的字典 用于函数 on_press_clipboard 和 on_release_combination
 keys_pressed = {
@@ -42,31 +47,48 @@ def on_press_clipboard(key):
     if key in keys_pressed:
         keys_pressed[key] = True
 
-# 定义一个函数来处理热字符串
 def on_press_entry(key):
     global user_input
     try:
-        # 将按键添加到用户输入字符串
         if key == keyboard.Key.space:
-            # 获取当前输入的文本
-            current_text = ''.join(user_input)
-            # 检查当前输入的文本是否是热字符串
+            current_text = ''.join(user_input).strip()  # 去除前后空格
+            print(f"Space pressed\nCurrent input: '{current_text}' (Length: {len(current_text)})")
+            
             for hotstring, file_path in hotstrings.items():
-                if current_text == hotstring:
-                    # 执行对应的批处理文件
+                cleaned_hotstring = re.sub(r'\s+', '', hotstring)  # 去除热字符串中的所有空白字符
+                cleaned_current_text = re.sub(r'\s+', '', current_text)  # 去除当前输入中的所有空白字符
+                print(f"Checking against: '{cleaned_hotstring}' (Length: {len(cleaned_hotstring)})")
+                if cleaned_current_text == cleaned_hotstring:
                     subprocess.run([bat_file_path, file_path], check=True)
                     print(f"Executed {file_path}")
-                    # 清空用户输入
-                    user_input = []
-                    break
+                    user_input = []  # 清空用户输入
+                    break  # 找到匹配的热字符串后跳出循环
+            
+            user_input = []  # 确保无论是否找到匹配的热字符串都清空输入
         elif hasattr(key, 'char') and key.char is not None:
-            user_input.append(key.char)
+            # 检查是否有修饰键（如 Ctrl、Alt、Shift）被按下
+            if any(keys_pressed.get(modifier_key, False) for modifier_key in [keyboard.Key.ctrl_l, keyboard.Key.ctrl_r]):
+                print(f"Ignored key event due to modifier: {key}")
+            else:
+                user_input.append(key.char)
+                print(f"Key pressed: '{key.char}'")  # 打印每个按键事件
+        else:
+            print(f"Ignored key event: {key}")  # 打印忽略的按键事件
+        
+        # 跟踪按键状态
+        if key in keys_pressed:
+            keys_pressed[key] = True
+            
     except AttributeError:
         pass
 
 def on_release_combination(key):
     if key in keys_pressed:
         keys_pressed[key] = False
+    # 检查特定组合键是否被释放
+    if all(keys_pressed.values()):
+        print('特定组合键释放，退出监听')
+        return False
 
 def on_release_esc(key):
     if key == keyboard.Key.esc:
@@ -78,24 +100,27 @@ def execute_bat(bat_file_path, file_path):
     # 执行对应的批处理文件
     subprocess.run([bat_file_path, file_path], check=True)
 
-# 监听键盘
-# with keyboard.Listener(on_press=on_press_clipboard, on_release=on_release_combination) as listener:
+listener = None
+
 def start_listener():
+    global listener
     print('Start listener')
-    with keyboard.Listener(on_press=on_press_entry, on_release=on_release_combination) as listener:
+    listener = keyboard.Listener(on_press=on_press_clipboard, on_release=on_release_combination)
+    listener.start()
+
+def stop_listener():
+    global listener
+    if listener:
+        listener.stop()
         listener.join()
+        print('Listener stopped')
 
-
-# # 在独立线程中启动监听
-# listener_thread = threading.Thread(target=start_listener)
-# listener_thread.start()
-
-# # 保持主线程运行，以便可以响应 Ctrl+C
-# try:
-#     while listener_thread.is_alive():
-#         pass
-# except KeyboardInterrupt:
-#     print('退出监听')
-#     listener_thread.join()
-
-start_listener()
+if __name__ == '__main__':
+    try:
+        start_listener()
+        while True:
+            pass
+    except KeyboardInterrupt:
+        print('Exiting...')
+    finally:
+        stop_listener()
