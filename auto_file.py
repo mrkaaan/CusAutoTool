@@ -18,12 +18,15 @@ bat_file_path = config['default']['BAT_FILE_PATH']
 with open('hotstrings.json', 'r', encoding='utf-8') as f:
     hotstrings = json.load(f)
 
+# 将热字符串存储在一个集合中，以便更快地查找匹配项
+hotstring_set = set(hotstrings.keys())
+
 # 用于跟踪按键状态的字典
-keys_pressed = {
-    keyboard.Key.shift_l: False,
-    keyboard.Key.ctrl_r: False,
-    keyboard.KeyCode.from_char('e'): False
-}
+# keys_pressed = {
+#     keyboard.Key.shift_l: False,
+#     keyboard.Key.ctrl_r: False,
+#     keyboard.KeyCode.from_char('e'): False
+# }
 
 last_checked_time = 0
 CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
@@ -44,20 +47,20 @@ def on_press_clipboard(key):
                 # 获取当前复制的文本
                 current_text = pyperclip.paste()
                 # 检查当前输入的文本是否是热字符串
-                for hotstring, file_path in hotstrings.items():
+                for hotstring in hotstring_set:
                     if current_text.endswith(hotstring):
                         # 在独立线程中执行批处理文件
                         # threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
-
-                        execute_bat(bat_file_path, file_path)
                         # subprocess.run([bat_file_path, file_path], check=True)
+                        file_path = hotstrings[hotstring]
+                        execute_bat(bat_file_path, file_path)
                         print(f"Executed {file_path}")
     except AttributeError:
         pass
 
     # 跟踪按键状态
-    if key in keys_pressed:
-        keys_pressed[key] = True
+    # if key in keys_pressed:
+    #     keys_pressed[key] = True
 
 def on_press_entry(key):
     global user_input
