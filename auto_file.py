@@ -4,42 +4,54 @@ import subprocess
 import threading
 import re
 import json
+import time
+import configparser
+import os
 
-bat_file_path = r'D:\project\auto_customer\auto_file.bat'
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+# 访问环境变量
+bat_file_path = config['default']['BAT_FILE_PATH']
 
 # 定义要监听的热字符串及其对应的批处理文件路径
-# hotstrings = {
-#     'test1': 'D:\\test.png',
-#     'test2': r'C:\Users\Kan\Documents\Captura\2024-11-15-11-50-10.mp4'
-# }
-# 读取 JSON 文件
 with open('hotstrings.json', 'r', encoding='utf-8') as f:
     hotstrings = json.load(f)
 
-# 用于跟踪按键状态的字典 用于函数 on_press_clipboard 和 on_release_combination
+# 用于跟踪按键状态的字典
 keys_pressed = {
     keyboard.Key.shift_l: False,
     keyboard.Key.ctrl_r: False,
     keyboard.KeyCode.from_char('e'): False
 }
 
-# 用于构建用户输入的字符串 用户函数 on_press_entry
+last_checked_time = 0
+CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
+
+# 用于构建用户输入的字符串
 user_input = []
 
 # 定义一个函数来处理热字符串
 def on_press_clipboard(key):
     try:
+        global last_checked_time
+
         # 检查是否按下了空格键
         if key == keyboard.Key.space:
-            # 获取当前复制的文本
-            current_text = pyperclip.paste()
-            # 检查当前输入的文本是否是热字符串
-            for hotstring, file_path in hotstrings.items():
-                if current_text.endswith(hotstring):
-                    # 在独立线程中执行批处理文件
-                    threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
-                    # subprocess.run([bat_file_path, file_path], check=True)
-                    print(f"Executed {file_path}")
+            current_time = time.time()
+            if current_time - last_checked_time > CHECK_INTERVAL:
+                last_checked_time = current_time
+                # 获取当前复制的文本
+                current_text = pyperclip.paste()
+                # 检查当前输入的文本是否是热字符串
+                for hotstring, file_path in hotstrings.items():
+                    if current_text.endswith(hotstring):
+                        # 在独立线程中执行批处理文件
+                        # threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
+
+                        execute_bat(bat_file_path, file_path)
+                        # subprocess.run([bat_file_path, file_path], check=True)
+                        print(f"Executed {file_path}")
     except AttributeError:
         pass
 
@@ -86,7 +98,7 @@ def on_release_combination(key):
     if key in keys_pressed:
         keys_pressed[key] = False
     # 检查特定组合键是否被释放
-    if all(keys_pressed.values()):
+    if all(not value for value in keys_pressed.values()):
         print('特定组合键释放，退出监听')
         return False
 
