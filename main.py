@@ -2,7 +2,6 @@ from WinGUI import WinGUI
 import organize_table as tb
 import automation as au
 import utils as ut
-import auto_file as af
 
 # 标准库
 import math       # 提供数学函数，例如三角函数、对数、幂运算等
@@ -84,12 +83,3 @@ if __name__ == "__main__":
     # ---------- 取消备注 -------------
     # au.run_once_remarks_by_qianniu(window_name)
     
-    # ---------- 快捷启动文件 -------------
-    try:
-        af.start_listener()
-        while True:
-            pass
-    except KeyboardInterrupt:
-        print('Exiting...')
-    finally:
-        af.stop_listener()

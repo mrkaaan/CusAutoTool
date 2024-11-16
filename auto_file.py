@@ -117,7 +117,8 @@ listener = None
 def start_listener():
     global listener
     print('Start listener')
-    listener = keyboard.Listener(on_press=on_press_clipboard, on_release=on_release_combination)
+    # listener = keyboard.Listener(on_press=on_press_clipboard, on_release=on_release_combination)
+    listener = keyboard.Listener(on_press=on_press_clipboard)
     listener.start()
 
 def stop_listener():
