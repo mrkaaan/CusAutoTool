@@ -29,3 +29,5 @@ image/
 temp/
 handles.json
 config.ini
+auto_file/*.exe
+.vscode/c_cpp_properties.json
