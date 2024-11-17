@@ -41,7 +41,7 @@ if __name__ == "__main__":
     # auto_key()
     hotkey_actions = [
         # {'key': 'alt+a', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
-        {'key': 'alt+a', 'func': ut.open_sof, 'args': ['旺店通ERP']},
+        {'key': 'alt+s', 'func': ut.open_sof, 'args': ['旺店通ERP']},
         {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]},
         {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}
     ]
