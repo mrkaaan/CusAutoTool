@@ -46,16 +46,19 @@ def on_press_clipboard(key):
                     for hotstring in hotstring_set:
                         if current_text.endswith(hotstring):
                             file_path = hotstrings[hotstring]
-                            execute_bat(bat_file_path, file_path)
+                            # execute_bat(bat_file_path, file_path)
                             # 在独立线程中执行批处理文件
-                            # threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
+                            threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
                             print(f"Executed {file_path}")
     except AttributeError:
         pass
 
 def execute_bat(bat_file_path, file_path):
-    # 执行对应的批处理文件
-    subprocess.run([bat_file_path, file_path], check=True)
+    try:
+        result = subprocess.run([bat_file_path, file_path], check=True, capture_output=True, text=True)
+        print(f"Batch file executed successfully: {result.stdout}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing batch file: {e}, Output: {e.output}")
 
 def on_release(key):
     global ctrl_pressed
