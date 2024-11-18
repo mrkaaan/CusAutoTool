@@ -42,26 +42,22 @@ def load_handles():
         return {}
 
 # 打开指定软件
-def open_sof(name, handle=None, manual=0, class_name=None):
+def open_sof(name, handle=None, class_name=None):
     """
     打开指定软件窗口。
     :param name: 窗口名称
     :param handle: 句柄 (可选，手动模式下传入)
-    :param manual: 手动模式标志 (0: 自动模式, 1: 手动模式)
     :param class_name: 窗口类名 (可选，作为备用查找方法)
     """
-    if manual:
+    if handle:
         # 手动模式启用，直接使用传入的句柄
-        if not handle:
-            print("手动模式下未提供句柄！")
-            return None
         if not win32gui.IsWindow(handle):
             print(f"手动模式下提供的句柄 {handle} 无效，切换到自动模式...")
-            manual = 0  # 自动切换到自动模式
+            handle = None  # 自动切换到自动模式
         print(f"手动模式，指定句柄 {handle}。")
         save_handle(name, handle)  # 保存句柄到文件
         
-    if not manual:
+    if not handle:
         # 自动模式：尝试通过文件加载或窗口名称查找句柄
         handle = load_handle(name)  # 从文件加载句柄
         if not handle or not win32gui.IsWindow(handle):
@@ -80,13 +76,21 @@ def open_sof(name, handle=None, manual=0, class_name=None):
             print(f"文件中找到有效句柄：{handle}")
 
     try:
-        win32gui.SendMessage(handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)  # 发送消息以确保窗口恢复显示
-        time.sleep(0.2) # 延迟1秒，等待窗口恢复
+         # 确保窗口恢复显示
+        win32gui.SendMessage(handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
+        time.sleep(0.2)  # 延迟0.2秒，等待窗口恢复
 
-        win32gui.ShowWindow(handle, True)          # 使用win32gui库使窗口可见
-        win32gui.SetForegroundWindow(handle)       # 使用win32gui库将窗口置于前台(焦点)
-        win32gui.SendMessage(handle, win32con.SC_MAXIMIZE, 0) # 最大化窗口
-        time.sleep(0.2)                              # 使用time库延迟1秒
+        # 使窗口可见
+        win32gui.ShowWindow(handle, win32con.SW_SHOW)
+        time.sleep(0.1)  # 延迟0.1秒
+
+        # 将窗口置于前台
+        win32gui.SetForegroundWindow(handle)
+        time.sleep(0.1)  # 延迟0.1秒
+
+        # 最大化窗口
+        win32gui.ShowWindow(handle, win32con.SW_MAXIMIZE)
+        time.sleep(0.1)  # 延迟0.1秒
     except Exception as e:
         print(f"无法设置窗口为前台，错误信息：{e}")
         return None

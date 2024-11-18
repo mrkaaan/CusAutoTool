@@ -156,7 +156,7 @@ def run_once_unmark_by_qianniu(window_name):
 # 编码    goods_code
 # 保存   save_add_item 
 
-# 客服备注   customer_service_remarks
+# 补发   customer_service_remarks
 def run_once_by_erp(window_name):
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 

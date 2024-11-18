@@ -2,6 +2,7 @@ from WinGUI import WinGUI
 import organize_table as tb
 import automation as au
 import utils as ut
+from auto_file.auto_file import auto_file as af
 
 # 标准库
 import math       # 提供数学函数，例如三角函数、对数、幂运算等
@@ -45,7 +46,16 @@ if __name__ == "__main__":
         {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]},
         {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}
     ]
-    ut.auto_key_with_threads(hotkey_actions)
+    # ut.auto_key_with_threads(hotkey_actions)
+
+    try:
+        af.start_listener()
+        while True:
+            pass
+    except KeyboardInterrupt:
+        print('Exiting...')
+    finally:
+        af.stop_listener()
 
     # ---------- 测试 -------------
     # au.run_test(window_name)
