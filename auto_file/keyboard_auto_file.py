@@ -13,6 +13,9 @@ config.read('config.ini')
 bat_file_path = config['default']['BAT_FILE_PATH']
 hotstrings_file_name = config['default']['HOT_FILE_NAME']
 
+print(f"Batch file path: {bat_file_path}")  # 打印批处理文件路径
+print(f"Hotstrings file name: {hotstrings_file_name}")  # 打印热字符串文件名
+
 # 定义要监听的热字符串及其对应的批处理文件路径
 with open(hotstrings_file_name, 'r', encoding='utf-8') as f:
     hotstrings = json.load(f)
@@ -40,14 +43,16 @@ def on_press_clipboard():
             for hotstring in hotstring_set:
                 if current_text.endswith(hotstring):
                     file_path = hotstrings[hotstring]
+                    print(f"Found hotstring: {hotstring}, executing batch file with argument: {file_path}")
                     # 在独立线程中执行批处理文件
                     threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
-                    print(f"Executed {file_path}")
 
 def execute_bat(bat_file_path, file_path):
     try:
         result = subprocess.run([bat_file_path, file_path], check=True, capture_output=True, text=True)
         print(f"Batch file executed successfully: {result.stdout}")
+    except FileNotFoundError:
+        print(f"Error: The batch file was not found at {bat_file_path}.")
     except subprocess.CalledProcessError as e:
         print(f"Error executing batch file: {e}, Output: {e.output}")
 
