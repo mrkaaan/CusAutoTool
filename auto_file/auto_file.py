@@ -11,10 +11,12 @@ config.read('config.ini')
 
 # 访问环境变量
 bat_file_path = config['default']['BAT_FILE_PATH']
+hotstrings_file_name = config['default']['HOT_FILE_NAME']
 
 # 定义要监听的热字符串及其对应的批处理文件路径
-with open('hotstrings.json', 'r', encoding='utf-8') as f:
+with open(hotstrings_file_name, 'r', encoding='utf-8') as f:
     hotstrings = json.load(f)
+
 
 # 将热字符串存储在一个集合中，以便更快地查找匹配项
 hotstring_set = set(hotstrings.keys())
@@ -25,15 +27,22 @@ CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
 
 previous_clipboard_content = ""
 ctrl_pressed = False
+shift_pressed = False  # 检测Shift键是否被按下
 
 # 定义一个函数来处理热字符串
 def on_press_clipboard(key):
     try:
-        global last_checked_time, previous_clipboard_content, ctrl_pressed
+        global last_checked_time, previous_clipboard_content, ctrl_pressed, shift_pressed
 
-        # 检查是否按下了空格键
+        # 检查是否按下了Ctrl或Shift键
         if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
             ctrl_pressed = True
+        elif key == keyboard.Key.shift or key == keyboard.Key.shift_r:
+            shift_pressed = True
+        elif key == keyboard.Key.space and ctrl_pressed and shift_pressed:
+            # 清除previous_clipboard_content变量
+            previous_clipboard_content = ""
+            print("Clipboard content cleared.")
         elif key == keyboard.Key.space and ctrl_pressed:
             current_time = time.time()
             if current_time - last_checked_time > CHECK_INTERVAL:
@@ -61,10 +70,12 @@ def execute_bat(bat_file_path, file_path):
         print(f"Error executing batch file: {e}, Output: {e.output}")
 
 def on_release(key):
-    global ctrl_pressed
+    global ctrl_pressed, shift_pressed
 
     if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
         ctrl_pressed = False
+    elif key == keyboard.Key.shift or key == keyboard.Key.shift_r:
+        shift_pressed = False
 
 listener = None
 
