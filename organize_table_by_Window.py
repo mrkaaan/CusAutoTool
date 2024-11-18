@@ -14,10 +14,6 @@ file_name_or = ''
 file_path_erp = ''
 file_name_erp = ''
 
-# 线程化的函数，避免界面冻结
-def run_in_thread(func, *args):
-    threading.Thread(target=func, args=args).start()
-
 # 选择原始表格
 def choose_original_table(enter):
     global file_path_or
@@ -110,6 +106,7 @@ def update_button_state(entry_var, button, *args):
     else:
         button.config(state='normal', cursor="hand2")
 
+
 def main():    # 主窗口
     root = tk.Tk()
     root.title("补发表格处理")
@@ -118,6 +115,52 @@ def main():    # 主窗口
     global file_name_or
     global file_path_erp
     global file_name_erp
+
+    # 线程化的函数，避免界面冻结
+    # def run_in_thread(func, *args):
+    #     threading.Thread(target=func, args=args).start()
+
+    def run_in_thread(func, *args):
+        def wrapper():
+            result = func(*args)
+            root.after(0, lambda: handle_result(result))
+        thread = threading.Thread(target=wrapper)
+        thread.start()
+
+    # 处理结果的回调函数
+    def handle_result(result):
+        output_filename, all_order_numbers, shop_order_numbers = result
+        create_buttons(output_filename, all_order_numbers, shop_order_numbers)
+
+    # 动态按钮列表
+    dynamic_buttons = []
+
+    # 创建动态按钮的函数
+    def create_buttons(output_filename, all_order_numbers, shop_order_numbers):
+        # 删除之前的动态按钮
+        for widget in dynamic_buttons:
+            widget.destroy()
+        dynamic_buttons.clear()
+
+        # 创建复制文件名按钮
+        copy_filename_button = tk.Button(root, text="复制文件名", command=lambda: pyperclip.copy(output_filename))
+        copy_filename_button.place(x=10, y=100)
+        dynamic_buttons.append(copy_filename_button)
+
+        # 创建复制全部订单编号按钮
+        copy_all_orders_button = tk.Button(root, text="复制全部订单编号", command=lambda: pyperclip.copy('\n'.join(all_order_numbers)))
+        copy_all_orders_button.place(x=100, y=100)
+        dynamic_buttons.append(copy_all_orders_button)
+
+        # 创建每个店铺的按钮
+        y_offset = 130
+        x_offset = 10
+        for shop, orders in shop_order_numbers.items():
+            shop_name = shop[:4]  # 取店铺名称的前四个字
+            shop_button = tk.Button(root, text=shop_name, command=lambda o='\n'.join(orders): pyperclip.copy(o))
+            shop_button.place(x=x_offset, y=y_offset)
+            dynamic_buttons.append(shop_button)
+            x_offset += 80
 
     # 参数设置
     # 窗口大小
@@ -165,8 +208,8 @@ def main():    # 主窗口
 
     # ERP导出表格处理部分
     # 标题
-    erp_label = tk.Label(root, text="ERP导出表格处理", compound='center', font=f'{label_font_fam} {label_font_size} bold', fg=label_color)
-    erp_label.place(x=10, y=130)
+    # erp_label = tk.Label(root, text="ERP导出表格处理", compound='center', font=f'{label_font_fam} {label_font_size} bold', fg=label_color)
+    # erp_label.place(x=10, y=130)
     # 快捷复制表明
     erp_table_name_1 = tk.Label(root, text="余猫", cursor='hand2',compound='center', font=f'{label_font_fam} {label_font_size-5} bold', fg=label_color)
     erp_table_name_1.place(x=10, y=190)
@@ -185,10 +228,10 @@ def main():    # 主窗口
     erp_button_choose = tk.Button(root, cursor="hand2", text="选择文件", command=lambda:choose_erp_export_table(erp_entry))
     erp_button_choose.place(x=180, y=190)
     # 处理按钮
-    erp_button_sure = tk.Button(root, state="disabled", text="开始处理", command=lambda:run_in_thread(process_original_number, file_name_erp))
+    erp_button_sure = tk.Button(root, text="开始处理", command=lambda:run_in_thread(process_original_number, file_name_erp))
     erp_button_sure.place(x=270, y=190)
     # 监控输入框的变化，并更新按钮状态
-    erp_entry_var.trace("w", lambda *args: update_button_state(or_entry, erp_button_sure, *args))
+    # erp_entry_var.trace("w", lambda *args: update_button_state(or_entry, erp_button_sure, *args))
 
     root.mainloop()
 

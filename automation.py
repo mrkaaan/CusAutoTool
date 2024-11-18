@@ -255,7 +255,7 @@ def notification_reissue(window_name, table_name, shop_name=None, form_folder = 
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
     try:
         table_file = os.path.join(form_folder, table_name)
-        df = pd.read_excel(table_file, dtype={'原始单号': str})
+        df = pd.read_excel(table_file, dtype={'原始单号': str, '物流单号': str})
         column_names = df.columns.tolist()  # 获取列名列表
         # 检查是否存在"是否通知"列，如果不存在则添加
         if '是否通知' not in column_names:

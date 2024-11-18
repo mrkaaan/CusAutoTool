@@ -1,86 +1,102 @@
 import pandas as pd
 from datetime import datetime
 import os
+import pyperclip
 
-# 原始表格处理 筛选制定店铺名称的物流单号
+# 修改后的表格处理函数
 def process_original_table(
-    input_filename, # 处理表格名称
-    form_folder='./form',    # 表格路径设置
+    input_filename,  # 处理表格名称
+    form_folder='./form'  # 表格路径设置
 ):
-    # 精确日期文件名
-    output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_补发物流单号.xlsx"
+    # 生成精确日期的文件名
+    output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_首次处理.xlsx"
     form_folder += f"/{datetime.now().strftime('%Y-%m-%d')}"
+
+    # 创建文件夹（如果不存在）
+    if not os.path.exists(form_folder):
+        os.makedirs(form_folder)
+
     # 使用 os.path.join 组合路径和文件名
     input_file = os.path.join(form_folder, input_filename)
     output_file = os.path.join(form_folder, output_filename)
-    # 读取表格
-    encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
-    for encoding in encodings:
-        try:
-            df = pd.read_csv(input_file, encoding=encoding)
-            break  # 如果成功读取，跳出循环
-        except UnicodeDecodeError:
-            continue  # 如果读取失败，尝试下一个编码
 
-    # 确保 df 不是 None，如果所有编码都失败，则抛出异常
-    if df is None:
-        raise UnicodeDecodeError("都无法读取文件，请检查文件编码")
-
-    # 转换 "物流单号" 列为整数类型，保证无科学计数法和小数点
-    df['物流单号'] = df['物流单号'].apply(lambda x: str(int(x)) if pd.notnull(x) else x)
-
-    # 筛选两种店铺名称
-    shop1 = '余猫旗舰店-天猫'
-    shop2 = '潮洁居家日用旗舰店-天猫'
-
-    df_shop1 = df[df['店铺名称'] == shop1][['物流单号', '店铺名称']]
-    df_shop2 = df[df['店铺名称'] == shop2][['物流单号', '店铺名称']]
-
-    # 将筛选结果写入新的 Excel 文件
-    with pd.ExcelWriter(output_file) as writer:
-        df_shop1.to_excel(writer, sheet_name=shop1, index=False)
-        df_shop2.to_excel(writer, sheet_name=shop2, index=False)
-
-    print(f"文件已成功创建：{output_file}")
-    return output_filename
-
-
-# 二次处理表格 清洗原始单号
-# input_filename = 'ERP二次导出表格.csv'
-def process_original_number(input_filename, form_folder = './form'):
-    # 定义两个合法的店铺名称
-    valid_shop_names = ['潮洁', '余猫']
-    
-    # 从文件名中提取店铺名称
-    shop_name = input_filename.split('_')[1]  # 假设文件名格式为 在第二个下划线之后提取店铺名称
-
-    # 检查店铺名称是否有效
-    if shop_name not in valid_shop_names:
-        print(f"无效的店铺名称：{shop_name}。程序退出。")
-        return  # 退出函数
-
-    output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_{shop_name}_补发单号.xlsx"
-    form_folder += f"/{datetime.now().strftime('%Y-%m-%d')}"
-    # 使用 os.path.join 组合路径和文件名
-    input_file = os.path.join(form_folder, input_filename)
-    output_file = os.path.join(form_folder, output_filename)
-    
-    # 读取表格
+    # 读取表格，尝试多种编码
     encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
     df = None
     for encoding in encodings:
         try:
             df = pd.read_csv(input_file, encoding=encoding)
-            break  # 如果成功读取，跳出循环
+            break  # 成功读取后跳出循环
         except UnicodeDecodeError:
-            continue  # 如果读取失败，尝试下一个编码
+            continue  # 尝试下一个编码
 
-    # 确保 df 不是 None，如果所有编码都失败，则抛出异常
+    # 确保 df 不是 None
     if df is None:
-        raise UnicodeDecodeError("都无法读取文件，请检查文件编码")
+        raise UnicodeDecodeError("无法读取文件，请检查文件编码")
+
+    # 获取所有的店铺名称
+    shops = df['店铺名称'].unique()
+
+    # 存储所有订单编号
+    all_order_numbers = []
+
+    # 存储每个店铺的订单编号
+    shop_order_numbers = {}
+
+    # 将每个店铺的数据写入单独的工作表
+    with pd.ExcelWriter(output_file) as writer:
+        for shop in shops:
+            # 选择当前店铺的数据
+            df_shop = df[df['店铺名称'] == shop]
+            # 写入工作表，工作表名为店铺名称
+            df_shop.to_excel(writer, sheet_name=shop, index=False)
+            
+            # 提取当前店铺的订单编号
+            shop_orders = df_shop['订单编号'].dropna().astype(str).tolist()
+            shop_order_numbers[shop] = shop_orders
+            all_order_numbers.extend(shop_orders)
+
+    # 将所有订单编号放入剪贴板中，保留换行符
+    all_order_numbers_str = '\n'.join(all_order_numbers)
+    pyperclip.copy(all_order_numbers_str)
+
+    print(f"文件已成功创建：{output_file}")
+    print(f"所有订单编号已复制到剪贴板：\n{all_order_numbers_str}")
+
+    return output_filename, all_order_numbers, shop_order_numbers
+
+# 二次处理表格 清洗原始单号
+def process_original_number(input_filename, form_folder='./form'):
+    # 生成精确日期的文件名
+    output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_补发单号.xlsx"
+    form_folder += f"/{datetime.now().strftime('%Y-%m-%d')}"
+
+    # 创建文件夹（如果不存在）
+    if not os.path.exists(form_folder):
+        os.makedirs(form_folder)
+
+    # 使用 os.path.join 组合路径和文件名
+    input_file = os.path.join(form_folder, input_filename)
+    output_file = os.path.join(form_folder, output_filename)
+
+    # 读取表格，尝试多种编码
+    encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
+    df = None
+    for encoding in encodings:
+        try:
+            df = pd.read_csv(input_file, encoding=encoding)
+            break  # 成功读取后跳出循环
+        except UnicodeDecodeError:
+            continue  # 尝试下一个编码
+
+    # 确保 df 不是 None
+    if df is None:
+        raise UnicodeDecodeError("无法读取文件，请检查文件编码")
 
     # 填充空值
     df["原始单号"].fillna('', inplace=True)
+    df["物流单号"].fillna('', inplace=True)
+
     # 清理“原始单号”列
     df["原始单号"] = (
         df["原始单号"]
@@ -88,23 +104,36 @@ def process_original_number(input_filename, form_folder = './form'):
         .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
         .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
         .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
-        .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
+        # .apply(lambda x: re.sub(r"\.0$", "", x))  # 去除小数点后的0
     )
 
+    # 清理“物流单号”列
     df["物流单号"] = (
         df["物流单号"]
         .astype(str)  # 转为字符串类型
         .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
         .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
         .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
-        .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
+        # .apply(lambda x: re.sub(r"\.0$", "", x))  # 去除小数点后的0
+        #  .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
     )
+    
     # 转换 "物流单号" 列为整数类型，保证无科学计数法和小数点
     # df['物流单号'] = df['物流单号'].apply(lambda x: str(int(x)) if pd.notnull(x) else x)
 
-    # 将处理后的结果写入新的 Excel 文件
+    # 获取所有的店铺名称
+    shops = df['店铺名称'].unique()
+
+    # 将每个店铺的数据写入单独的工作表
     with pd.ExcelWriter(output_file) as writer:
-        df.to_excel(writer, index=False)
+        if len(shops) == 1:
+            # 如果只有一个店铺，使用默认的 sheet 名
+            df.to_excel(writer, sheet_name='Sheet1', index=False)
+        else:
+            # 如果有多个店铺，使用不同的 sheet 名来区分不同店铺的数据
+            for shop in shops:
+                df_shop = df[df['店铺名称'] == shop]
+                df_shop.to_excel(writer, sheet_name=shop, index=False)
 
     print(f"文件已成功创建：{output_file}")
     return output_filename
