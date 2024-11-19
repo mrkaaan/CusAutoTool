@@ -46,7 +46,7 @@ def on_press_clipboard(check_interval=None, check_duplicate=None):
     if not check_interval or current_time - last_checked_time > CHECK_INTERVAL:
         last_checked_time = current_time
         # 获取当前复制的文本
-        current_text = pyperclip.paste()
+        current_text = pyperclip.paste().replace(" ", "")  # 去掉多余的空格
         if not check_duplicate or current_text != previous_clipboard_content:
             previous_clipboard_content = current_text
             # 检查当前输入的文本是否是热字符串

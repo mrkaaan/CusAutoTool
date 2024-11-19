@@ -251,7 +251,8 @@ def run_test(window_name):
         logger.info(err)  # 记录异常信息
 
 # 通知补发单号
-def notification_reissue(window_name, table_name, shop_name=None, form_folder = './form'):
+# mode1 使用输入框通知 mode2 使用补发窗口通知
+def notification_reissue(window_name, table_name, mode=1, shop_name=None, form_folder = './form'):
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
     try:
         table_file = os.path.join(form_folder, table_name)
@@ -329,11 +330,11 @@ def notification_reissue(window_name, table_name, shop_name=None, form_folder = 
             
             # 等待搜索结果响应
             time.sleep(0.2)
-            _, __, not_find_cus = app.locate_icon('not_find_customer.png',0, 0.4,0,0.6)
+            _, __, not_find_cus = app.locate_icon('not_find_customer.png',0, 0.4, 0, 0.6)
             # 判断搜索结果
             if not_find_cus:
                 print(f"未搜索到结果，跳过 {original_number}")
-                df.at[index, '是否通知'] = 0
+                # df.at[index, '是否通知'] = 0
                 continue  # 未搜索到直接continue下一个
             else:
               print('搜索到指定用户，即将发送通知...')
@@ -341,35 +342,87 @@ def notification_reissue(window_name, table_name, shop_name=None, form_folder = 
             # 模拟按下回车键进入指定用户的聊天窗口
             keyboard.press_and_release('enter')
             time.sleep(0.2)
+            
+            if mode == 1:
+                # 按下 ctrl+J 定位到输入框中
+                keyboard.press_and_release('ctrl+i')
+                time.sleep(0.2)
 
-            # 按下 ctrl+J 定位到输入框中
-            keyboard.press_and_release('ctrl+i')
-            time.sleep(0.2)
+                # 调用 app.locate_icon 传入图片名称，找到是否有某个图片存在
+                # x, y, is_find = app.locate_icon('input_box_icon.png')
+                # 判断 is_find 是否为 True
+                # if not is_find:
+                #     logger.err("无法定位到输入框，程序终止")
+                #     break  # 无法定位到直接终止程序
+                # 如果为 True，则相对向下移动 200 个像素后点击
+                # app.remove_and_click(x, y + 200)
 
-            # 调用 app.locate_icon 传入图片名称，找到是否有某个图片存在
-            # x, y, is_find = app.locate_icon('input_box_icon.png')
-            # 判断 is_find 是否为 True
-            # if not is_find:
-            #     logger.err("无法定位到输入框，程序终止")
-            #     break  # 无法定位到直接终止程序
-            # 如果为 True，则相对向下移动 200 个像素后点击
-            # app.remove_and_click(x, y + 200)
+                # 清除
+                keyboard.press_and_release('ctrl+a')  
+                keyboard.press_and_release('backspace')
+                time.sleep(0.2)
+                # 将 亲 + logistics_number + 这是您的补发单号 请注意查收 这段内容输入到输入框中
+                message = f"亲 {logistics_number} 这是您的补发单号 请注意查收"
+                # 将中文字符串复制到剪贴板
+                pyperclip.copy(message)
+                # 使用 pyautogui.typewrite 粘贴剪贴板内容
+                keyboard.press_and_release('ctrl+v')  
+                # pyautogui.typewrite(message, paste=True)
+                time.sleep(0.2)
 
-            # 清除
-            keyboard.press_and_release('ctrl+a')  
-            keyboard.press_and_release('backspace')
-            time.sleep(0.2)
-            # 将 亲 + logistics_number + 这是您的补发单号 请注意查收 这段内容输入到输入框中
-            message = f"亲 {logistics_number} 这是您的补发单号 请注意查收"
-            # 将中文字符串复制到剪贴板
-            pyperclip.copy(message)
-            # 使用 pyautogui.typewrite 粘贴剪贴板内容
-            keyboard.press_and_release('ctrl+v')  
-            # pyautogui.typewrite(message, paste=True)
-            time.sleep(0.2)
+                # 模拟按下回车发送消息
+                keyboard.press_and_release('enter')
+            elif mode == 2:
+                # 点击搜索订单按钮
+                is_find_search_button, search_button_x, search_button_y = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
+                if not is_find_search_button:
+                    print(f'未找到搜索订单按钮，跳过{original_number}')
+                    continue
+                time.sleep(0.2)
 
-            # 模拟按下回车发送消息
-            keyboard.press_and_release('enter')
+                # 向下移动到订单输入框
+                app.move_and_click(search_button_x, search_button_y+55)
+                # 输入订单号
+                pyperclip.copy(original_number)
+                keyboard.press_and_release('ctrl+v') 
+                time.sleep(0.1)
+
+                # 模拟按下回车搜索
+                keyboard.press_and_release('enter')
+                time.sleep(0.4)
+
+                # 点击补发按钮
+                is_find_reissue_button = app.click_icon('reissue_button.png', 0.6, 1, 0.2, 1)
+                if not is_find_reissue_button:
+                    print(f'未找到补发按钮，跳过{original_number}')
+                    continue
+                time.sleep(0.4)
+
+                # 点击添加物流单号的提示文字
+                is_find_add_logistics_number, add_logistics_number_x, add_logistics_number_y = app.locate_icon('add_logistics_number.png', 0.6, 1, 0.2, 1)
+                if not is_find_add_logistics_number:
+                    print(f'未找到添加物流单号提示文字，跳过{original_number}')
+                    continue
+                app.move_and_click(add_logistics_number_x, add_logistics_number_y)
+
+                # 将中文字符串复制到剪贴板
+                pyperclip.copy(logistics_number)
+                keyboard.press_and_release('ctrl+v') 
+                time.sleep(0.3)
+
+                # 点击上面自动提示的物流公司
+                app.move_and_click(add_logistics_number_x, add_logistics_number_y-35)
+                # change 加一个自动识别无论公司的函数
+                time.sleep(0.1)
+
+                # 点击确认补发按钮 这个按钮如果没有填入物流公司则是灰色的搜不到
+                is_find_confirm_button, confirm_button_x, confirm_button_y = app.locate_icon('confirm_button.png', 0.6, 1, 0.2, 1)
+                if not is_find_confirm_button:
+                    print(f'未找到确认补发按钮，跳过{original_number}')
+                    continue
+                app.move_and_click(confirm_button_x, confirm_button_y)
+
+                
             # 将当前行的"是否通知"标记为1
             df.at[index, '是否通知'] = 1
 
