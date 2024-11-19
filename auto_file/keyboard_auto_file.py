@@ -5,7 +5,7 @@ import json
 import time
 import configparser
 import keyboard
-from win10toast import ToastNotifier
+from plyer import notification
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -29,10 +29,14 @@ CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
 
 previous_clipboard_content = ""
 
-toaster = ToastNotifier()
-
-def show_toast(message):
-    toaster.show_toast("提醒", message, duration=1, threaded=True)
+def show_toast(title, message, timeout=1):
+    notification.notify(
+        title=title,
+        message=message,
+        app_name="提醒",
+        timeout=timeout,
+        toast=True
+    )
 
 # 定义一个函数来处理热字符串
 def on_press_clipboard(check_interval=None, check_duplicate=None):
@@ -51,7 +55,7 @@ def on_press_clipboard(check_interval=None, check_duplicate=None):
                     file_path = hotstrings[hotstring]
                     # 在独立线程中执行批处理文件
                     threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
-                    show_toast(f"已执行 {file_path}")
+                    show_toast("提醒", f"已执行 {file_path}", timeout=0.3)
                     print(f"Found hotstring: {hotstring}, executing batch file with argument: {file_path}")
 
 def execute_bat(bat_file_path, file_path):
@@ -67,14 +71,13 @@ def clear_clipboard_content():
     global previous_clipboard_content
     previous_clipboard_content = ""
     print("Clipboard content cleared.")
-    show_toast("剪贴板内容已清除")
-
+    show_toast("提醒", "剪贴板内容已清除", timeout=0.3)
 
 def start_listener(check_interval=None, check_duplicate=None, clear_on_combo=None):
     # 根据三个形参提示启用关闭了什么功能
     mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\nClear on combo: {clear_on_combo}"
     print(mode_prompt)
-    show_toast(mode_prompt)
+    show_toast("提醒", mode_prompt, timeout=0.3)
 
     # 绑定快捷键 Ctrl + Space
     # keyboard.add_hotkey('ctrl+space', on_press_clipboard())
