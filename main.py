@@ -41,7 +41,7 @@ if __name__ == "__main__":
     # auto_key()
     hotkey_actions = [
         # {'key': 'alt+a', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
-        {'key': 'alt+s', 'func': ut.open_sof, 'args': ['旺店通ERP']},
+        {'key': 'alt+e', 'func': ut.open_sof, 'args': ['旺店通ERP']},
         {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]},
         {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}
     ]
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     '''
     # mode1 使用输入框通知 mode2 使用补发窗口通知
-    au.notification_reissue(window_name, '2024-11-08_230302_余猫_补发单号.xlsx', mode=2)
+    # au.notification_reissue(window_name, '2024-11-17_ERP二次导出表格.csv', 2, './form/2024-11-17')
 
     # ---------- 表格处理 -------------
     # 首次处理 群中表格 筛选制定店铺名称的物流单号 一个表有两个sheet 结果文件拿去ERP搜索后导出为新的表格

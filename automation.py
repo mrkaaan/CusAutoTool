@@ -252,11 +252,23 @@ def run_test(window_name):
 
 # 通知补发单号
 # mode1 使用输入框通知 mode2 使用补发窗口通知
-def notification_reissue(window_name, table_name, mode=1, shop_name=None, form_folder = './form'):
+def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
     try:
         table_file = os.path.join(form_folder, table_name)
-        df = pd.read_excel(table_file, dtype={'原始单号': str, '物流单号': str})
+
+        file_format = table_name.split('.')
+        if 'xls' in file_format[1]:
+            df = pd.read_excel(table_file, dtype={'原始单号': str, '物流单号': str})
+        elif 'csv' in file_format[1]:
+            print(table_file)
+            # df = pd.read_csv(table_file)
+        return
+        # else:
+        #     print('未知格式')
+        #     return
+        # print(df.sheet_names)
+        return
         column_names = df.columns.tolist()  # 获取列名列表
         # 检查是否存在"是否通知"列，如果不存在则添加
         if '是否通知' not in column_names:
