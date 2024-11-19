@@ -5,6 +5,7 @@ import json
 import time
 import configparser
 import keyboard
+from win10toast import ToastNotifier
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -28,24 +29,30 @@ CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
 
 previous_clipboard_content = ""
 
+toaster = ToastNotifier()
+
+def show_toast(message):
+    toaster.show_toast("提醒", message, duration=1, threaded=True)
+
 # 定义一个函数来处理热字符串
-def on_press_clipboard():
+def on_press_clipboard(check_interval=None, check_duplicate=None):
     global last_checked_time, previous_clipboard_content
 
     current_time = time.time()
-    if current_time - last_checked_time > CHECK_INTERVAL:
+    if not check_interval or current_time - last_checked_time > CHECK_INTERVAL:
         last_checked_time = current_time
         # 获取当前复制的文本
         current_text = pyperclip.paste()
-        if current_text != previous_clipboard_content:
+        if not check_duplicate or current_text != previous_clipboard_content:
             previous_clipboard_content = current_text
             # 检查当前输入的文本是否是热字符串
             for hotstring in hotstring_set:
                 if current_text.endswith(hotstring):
                     file_path = hotstrings[hotstring]
-                    print(f"Found hotstring: {hotstring}, executing batch file with argument: {file_path}")
                     # 在独立线程中执行批处理文件
                     threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
+                    show_toast(f"已执行 {file_path}")
+                    print(f"Found hotstring: {hotstring}, executing batch file with argument: {file_path}")
 
 def execute_bat(bat_file_path, file_path):
     try:
@@ -60,13 +67,22 @@ def clear_clipboard_content():
     global previous_clipboard_content
     previous_clipboard_content = ""
     print("Clipboard content cleared.")
+    show_toast("剪贴板内容已清除")
 
-def start_listener():
-    print('Start listener')
+
+def start_listener(check_interval=None, check_duplicate=None, clear_on_combo=None):
+    # 根据三个形参提示启用关闭了什么功能
+    mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\nClear on combo: {clear_on_combo}"
+    print(mode_prompt)
+    show_toast(mode_prompt)
+
     # 绑定快捷键 Ctrl + Space
-    keyboard.add_hotkey('ctrl+space', on_press_clipboard)
+    # keyboard.add_hotkey('ctrl+space', on_press_clipboard())
+    keyboard.add_hotkey('ctrl+space', lambda *args, f=on_press_clipboard, a=[check_interval, check_duplicate]: f(*a))
+
     # 绑定快捷键 Ctrl + Shift + Space
-    keyboard.add_hotkey('ctrl+shift+space', clear_clipboard_content)
+    if clear_on_combo:
+        keyboard.add_hotkey('ctrl+shift+space', clear_clipboard_content)
 
 def stop_listener():
     print('Stopping listener...')

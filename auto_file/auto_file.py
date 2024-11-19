@@ -5,6 +5,7 @@ import threading
 import json
 import time
 import configparser
+from win10toast import ToastNotifier
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -29,36 +30,38 @@ previous_clipboard_content = ""
 ctrl_pressed = False
 shift_pressed = False  # 检测Shift键是否被按下
 
-# 定义一个函数来处理热字符串
-def on_press_clipboard(key):
-    try:
-        global last_checked_time, previous_clipboard_content, ctrl_pressed, shift_pressed
+toaster = ToastNotifier()
 
-        # 检查是否按下了Ctrl或Shift键
+def show_toast(message):
+    toaster.show_toast("提醒", message, duration=1, threaded=True)
+
+# 定义一个函数来处理热字符串
+def on_press_clipboard(key, check_interval=None, check_duplicate=None, clear_on_combo=None):
+    global last_checked_time, previous_clipboard_content, ctrl_pressed, shift_pressed
+
+    try:
         if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
             ctrl_pressed = True
         elif key == keyboard.Key.shift or key == keyboard.Key.shift_r:
             shift_pressed = True
-        elif key == keyboard.Key.space and ctrl_pressed and shift_pressed:
-            # 清除previous_clipboard_content变量
+        elif clear_on_combo is not None and key == keyboard.Key.space and ctrl_pressed and shift_pressed:
             previous_clipboard_content = ""
             print("Clipboard content cleared.")
+            show_toast("剪贴板内容已清除")
         elif key == keyboard.Key.space and ctrl_pressed:
             current_time = time.time()
-            if current_time - last_checked_time > CHECK_INTERVAL:
+            if not check_interval or current_time - last_checked_time > CHECK_INTERVAL:
                 last_checked_time = current_time
-                # 获取当前复制的文本
                 current_text = pyperclip.paste()
-                if current_text != previous_clipboard_content:
+                if not check_duplicate or current_text != previous_clipboard_content:
                     previous_clipboard_content = current_text
-                    # 检查当前输入的文本是否是热字符串
                     for hotstring in hotstring_set:
                         if current_text.endswith(hotstring):
                             file_path = hotstrings[hotstring]
-                            # execute_bat(bat_file_path, file_path)
-                            # 在独立线程中执行批处理文件
                             threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
-                            print(f"Executed {file_path}")
+                            show_toast(f"已执行 {file_path}")
+                            print(f"Found hotstring: {hotstring}, executing batch file with argument: {file_path}")
+
     except AttributeError:
         pass
 
