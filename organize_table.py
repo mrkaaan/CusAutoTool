@@ -3,11 +3,41 @@ from datetime import datetime
 import os
 import pyperclip
 
-# 修改后的表格处理函数
+# 读取csv文件
+def read_csv(input_file):
+    # 读取表格，尝试多种编码
+    encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
+    df = None
+    for encoding in encodings:
+        try:
+            df = pd.read_csv(input_file, encoding=encoding)
+            break
+        except UnicodeDecodeError:
+            pass
+    return df
+
+# 读取excel文件
+def read_excel(input_file, dtype=None):
+    # 读取表格，尝试多种编码
+    encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
+    df = None
+    for encoding in encodings:
+        try:
+            if dtype is not None:
+                df = pd.read_excel(input_file, dtype=dtype, encoding=encoding)
+            else:
+                df = pd.read_excel(input_file, encoding=encoding)
+            break
+        except UnicodeDecodeError:
+            pass
+    return df
+
+# 将同一个sheet按店铺分割，并写入单独的工作表
 def process_original_table(
     input_filename,  # 处理表格名称
     form_folder='./form'  # 表格路径设置
 ):
+    file_format = input_filename.split('.')[-1]
     # 生成精确日期的文件名
     output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_首次处理.xlsx"
     form_folder += f"/{datetime.now().strftime('%Y-%m-%d')}"
@@ -21,14 +51,12 @@ def process_original_table(
     output_file = os.path.join(form_folder, output_filename)
 
     # 读取表格，尝试多种编码
-    encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
-    df = None
-    for encoding in encodings:
-        try:
-            df = pd.read_csv(input_file, encoding=encoding)
-            break  # 成功读取后跳出循环
-        except UnicodeDecodeError:
-            continue  # 尝试下一个编码
+    if file_format == 'csv':
+        df = read_csv(input_file)
+    elif file_format in ['xlsx', 'xls']:
+        df = read_excel(input_file)
+    else:
+        raise ValueError(f"不支持的文件格式：{file_format}")
 
     # 确保 df 不是 None
     if df is None:
@@ -45,6 +73,7 @@ def process_original_table(
 
     # 将每个店铺的数据写入单独的工作表
     with pd.ExcelWriter(output_file) as writer:
+        df.to_excel(writer, sheet_name='所有店铺', index=False)
         for shop in shops:
             # 选择当前店铺的数据
             df_shop = df[df['店铺名称'] == shop]
@@ -61,15 +90,15 @@ def process_original_table(
     pyperclip.copy(all_order_numbers_str)
 
     print(f"文件已成功创建：{output_file}")
-    print(f"所有订单编号已复制到剪贴板：\n{all_order_numbers_str}")
+    print(f"所有订单编号已复制到剪贴板")
 
     return output_filename, all_order_numbers, shop_order_numbers
 
-# 二次处理表格 清洗原始单号
-def process_original_number(input_filename, form_folder='./form'):
+def secondary_processing_table(input_filename, form_folder='./form'):
+    file_format = input_filename.split('.')[-1]
     # 生成精确日期的文件名
-    output_filename = f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_补发单号.xlsx"
-    form_folder += f"/{datetime.now().strftime('%Y-%m-%d')}"
+    output_filename = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')}_首次处理.xlsx"
+    form_folder += f"/{datetime.datetime.now().strftime('%Y-%m-%d')}"
 
     # 创建文件夹（如果不存在）
     if not os.path.exists(form_folder):
@@ -80,65 +109,100 @@ def process_original_number(input_filename, form_folder='./form'):
     output_file = os.path.join(form_folder, output_filename)
 
     # 读取表格，尝试多种编码
-    encodings = ['utf-8', 'GBK', 'latin1', 'ISO-8859-1']
-    df = None
-    for encoding in encodings:
-        try:
-            df = pd.read_csv(input_file, encoding=encoding)
-            break  # 成功读取后跳出循环
-        except UnicodeDecodeError:
-            continue  # 尝试下一个编码
+    if file_format == 'csv':
+        df = pd.read_csv(input_file)
+    elif file_format in ['xlsx', 'xls']:
+        df = pd.read_excel(input_file, sheet_name=None)
+    else:
+        raise ValueError(f"不支持的文件格式：{file_format}")
 
     # 确保 df 不是 None
     if df is None:
         raise UnicodeDecodeError("无法读取文件，请检查文件编码")
 
-    # 填充空值
-    df["原始单号"].fillna('', inplace=True)
-    df["物流单号"].fillna('', inplace=True)
+    # 初始化存储所有订单编号的列表
+    all_order_numbers = []
+    shop_order_numbers = {}
 
-    # 清理“原始单号”列
-    df["原始单号"] = (
-        df["原始单号"]
-        .astype(str)  # 转为字符串类型
-        .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
-        .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
-        .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
-        # .apply(lambda x: re.sub(r"\.0$", "", x))  # 去除小数点后的0
-    )
-
-    # 清理“物流单号”列
-    df["物流单号"] = (
-        df["物流单号"]
-        .astype(str)  # 转为字符串类型
-        .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
-        .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
-        .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
-        # .apply(lambda x: re.sub(r"\.0$", "", x))  # 去除小数点后的0
-        #  .apply(lambda x: str(int(x)) if x.isdigit() else x)  # 确保只包含数字，去掉无效字符
-    )
-    
-    # 转换 "物流单号" 列为整数类型，保证无科学计数法和小数点
-    # df['物流单号'] = df['物流单号'].apply(lambda x: str(int(x)) if pd.notnull(x) else x)
-
-    # 获取所有的店铺名称
-    shops = df['店铺名称'].unique()
-
-    # 将每个店铺的数据写入单独的工作表
-    with pd.ExcelWriter(output_file) as writer:
-        if len(shops) == 1:
-            # 如果只有一个店铺，使用默认的 sheet 名
-            df.to_excel(writer, sheet_name='Sheet1', index=False)
+    # 创建 ExcelWriter 对象
+    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+        if isinstance(df, pd.DataFrame):
+            # 单个 sheet 的情况
+            sheets = {'Sheet1': df}
         else:
-            # 如果有多个店铺，使用不同的 sheet 名来区分不同店铺的数据
-            for shop in shops:
-                df_shop = df[df['店铺名称'] == shop]
-                df_shop.to_excel(writer, sheet_name=shop, index=False)
+            # 多个 sheet 的情况
+            sheets = df
+
+        # 处理每个 sheet
+        for sheet_name, sheet_df in sheets.items():
+            # 填充空值
+            sheet_df["原始单号"].fillna('', inplace=True)
+            sheet_df["物流单号"].fillna('', inplace=True)
+
+            # 清理“原始单号”列
+            sheet_df["原始单号"] = (
+                sheet_df["原始单号"]
+                .astype(str)  # 转为字符串类型
+                .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
+                .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
+                .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
+            )
+
+            # 清理“物流单号”列
+            sheet_df["物流单号"] = (
+                sheet_df["物流单号"]
+                .astype(str)  # 转为字符串类型
+                .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
+                .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
+                .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
+            )
+
+            # 获取所有的店铺名称
+            shops = sheet_df['店铺名称'].unique()
+
+            # 如果 sheet 名为“全部店铺”，直接写入
+            if sheet_name == '全部店铺':
+                sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
+                continue
+
+            # 如果 sheet 名是店铺名，检查是否有其他店铺的数据
+            if sheet_name in shops:
+                # 检查是否有其他店铺的数据
+                other_shops = [shop for shop in shops if shop != sheet_name]
+                if other_shops:
+                    # 移动其他店铺的数据到正确的 sheet
+                    for other_shop in other_shops:
+                        other_shop_df = sheet_df[sheet_df['店铺名称'] == other_shop]
+                        if other_shop not in sheets:
+                            sheets[other_shop] = other_shop_df
+                        else:
+                            sheets[other_shop] = pd.concat([sheets[other_shop], other_shop_df])
+                        sheet_df = sheet_df[sheet_df['店铺名称'] != other_shop]
+                        shops = sheet_df['店铺名称'].unique()
+
+            # 将当前 sheet 的数据写入
+            sheet_df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+            # 提取当前 sheet 的订单编号
+            sheet_orders = sheet_df['订单编号'].dropna().astype(str).tolist()
+            all_order_numbers.extend(sheet_orders)
+            shop_order_numbers[sheet_name] = sheet_orders
+
+        # 创建“全部店铺”sheet
+        all_shops_df = pd.concat(sheets.values(), ignore_index=True)
+        all_shops_df.to_excel(writer, sheet_name='全部店铺', index=False)
+
+    # 将所有订单编号放入剪贴板中，保留换行符
+    all_order_numbers_str = '\n'.join(all_order_numbers)
+    pyperclip.copy(all_order_numbers_str)
 
     print(f"文件已成功创建：{output_file}")
-    return output_filename
+    print(f"所有订单编号已复制到剪贴板")
 
-if __name__ == '__main__':
+    return output_filename, all_order_numbers, shop_order_numbers
+
+# 测试
+if __name__ == "__main__":
     '''
     表格介绍
 
@@ -174,3 +238,6 @@ if __name__ == '__main__':
     # processed_df = process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
 
     # process_original_table('11月6日补发单号.csv')
+
+    process_original_table('11月17日天猫补发单号.csv')
+    secondary_processing_table('2024-11-22_131051_首次处理.xlsx')
