@@ -2,6 +2,7 @@ from WinGUI import WinGUI
 import organize_table as tb
 import automation as au
 import utils as ut
+import keyboard_auto_file as kf
 
 # 标准库
 import math       # 提供数学函数，例如三角函数、对数、幂运算等
@@ -44,6 +45,7 @@ if __name__ == "__main__":
         {'key': 'alt+e', 'func': ut.open_sof, 'args': ['旺店通ERP']}, # 打开制定软件
         {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]}, # 添加备注 并 取消标记
         {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}, # 取消标记
+        {'key': 'ctrl+space', 'func': kf.on_press_clipboard, 'args': [None, None]}, # 取消标记
     ]
     ut.auto_key_with_threads(hotkey_actions)
 

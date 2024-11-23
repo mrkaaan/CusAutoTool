@@ -124,16 +124,20 @@ def auto_key_with_threads(hotkeys):
         except Exception as e:
             print(f"快捷键功能执行出错：{e}")
     
-    for hotkey in filtered_hotkeys:
-        keyboard.add_hotkey(
-            hotkey['key'],
-            lambda *args, f=hotkey['func'], a=hotkey['args']: threaded_function(f, a)
-        )
 
     try:
+        for hotkey in filtered_hotkeys:
+            keyboard.add_hotkey(
+                hotkey['key'],
+                lambda *args, f=hotkey['func'], a=hotkey['args']: threaded_function(f, a)
+            )
         # 保持脚本运行，直到按下退出快捷键
-        print("快捷键监听已启动，按下 Shift+Ctrl+E 退出。")
+        print("快捷键监听已启动，按下 Shift+Ctrl+E 退出\n")
         keyboard.wait('shift+ctrl+e')  # 按下 Shift+Ctrl+E 退出监听
+    except KeyboardInterrupt:
+        print("检测到 Ctrl+C，正在退出...")
+    except Exception as e:
+        print(f"快捷键监听出错：{e}")
     finally:
         # 无论是否按下 Shift+Ctrl+E 都移除所有快捷键监听
         keyboard.unhook_all()

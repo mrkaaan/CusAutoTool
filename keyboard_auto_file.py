@@ -40,6 +40,10 @@ def show_toast(title, message, timeout=1):
 
 # 定义一个函数来处理热字符串
 def on_press_clipboard(check_interval=None, check_duplicate=None):
+    # mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\n"
+    # print(mode_prompt)
+    # show_toast("提醒", mode_prompt, timeout=0.3)
+
     global last_checked_time, previous_clipboard_content
 
     current_time = time.time()
@@ -61,7 +65,7 @@ def on_press_clipboard(check_interval=None, check_duplicate=None):
 def execute_bat(bat_file_path, file_path):
     try:
         result = subprocess.run([bat_file_path, file_path], check=True, capture_output=True, text=True)
-        print(f"Batch file executed successfully: {result.stdout}")
+        # print(f"Batch file executed successfully: {result.stdout}")
     except FileNotFoundError:
         print(f"Error: The batch file was not found at {bat_file_path}.")
     except subprocess.CalledProcessError as e:
@@ -75,9 +79,9 @@ def clear_clipboard_content():
 
 def start_listener(check_interval=None, check_duplicate=None, clear_on_combo=None):
     # 根据三个形参提示启用关闭了什么功能
-    mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\nClear on combo: {clear_on_combo}"
-    print(mode_prompt)
-    show_toast("提醒", mode_prompt, timeout=0.3)
+    # mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\nClear on combo: {clear_on_combo}"
+    # print(mode_prompt)
+    # show_toast("提醒", mode_prompt, timeout=0.3)
 
     # 绑定快捷键 Ctrl + Space
     # keyboard.add_hotkey('ctrl+space', on_press_clipboard())
