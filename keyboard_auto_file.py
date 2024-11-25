@@ -39,7 +39,7 @@ def show_toast(title, message, timeout=1):
     )
 
 # 定义一个函数来处理热字符串
-def on_press_clipboard(check_interval=None, check_duplicate=None):
+def on_press_clipboard(auto_copy=True, check_interval=None, check_duplicate=None):
     # mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\n"
     # print(mode_prompt)
     # show_toast("提醒", mode_prompt, timeout=0.3)
@@ -47,6 +47,16 @@ def on_press_clipboard(check_interval=None, check_duplicate=None):
     global last_checked_time, previous_clipboard_content
 
     current_time = time.time()
+
+    if auto_copy:
+        # keyboard.Controller().type('{ctrl}a')  # 全选
+        # keyboard.Controller().type('{ctrl}x')  # 复制
+        # 获取输入框当前的内容
+        keyboard.press_and_release('ctrl+a')  
+        keyboard.press_and_release('ctrl+x')  # 模拟按下并释放
+        current_text = pyperclip.paste()      # 获取剪贴板中的文本
+        time.sleep(0.1)  # 等待复制操作完成
+
     if not check_interval or current_time - last_checked_time > CHECK_INTERVAL:
         last_checked_time = current_time
         # 获取当前复制的文本
@@ -61,6 +71,7 @@ def on_press_clipboard(check_interval=None, check_duplicate=None):
                     threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
                     show_toast("提醒", f"已执行 {file_path}", timeout=0.3)
                     print(f"Found hotstring: {hotstring}, executing batch file with argument: {file_path}")
+
 
 def execute_bat(bat_file_path, file_path):
     try:
@@ -105,3 +116,34 @@ if __name__ == '__main__':
         print('Exiting...')
     finally:
         stop_listener()
+
+
+def get_express_company(tracking_number):
+    if tracking_number.startswith('4'):
+        return "韵达"
+    elif tracking_number.startswith('7'):
+        return "申通"
+    elif tracking_number.startswith('SF'):
+        return "顺丰"
+    else:
+        return ""
+    
+
+def update_clipboard():
+    # 读取剪切板的内容
+    tracking_number = pyperclip.paste().strip()
+
+    # 获取快递公司
+    express_company = get_express_company(tracking_number)
+
+    # 构建新的剪切板内容
+    if express_company:
+        new_content = f" {express_company} 快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
+    else:
+        new_content = f" 快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
+
+    # 将新的内容覆盖到剪切板
+    pyperclip.copy(new_content)
+
+    print(f"剪切板内容已更新为：{new_content}")
+    show_toast("提醒", f"剪切板内容已更新为：{new_content}", timeout=0.3)
