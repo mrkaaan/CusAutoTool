@@ -46,6 +46,13 @@ def on_press_clipboard(auto_copy=True, check_interval=None, check_duplicate=None
 
     global last_checked_time, previous_clipboard_content
 
+    if auto_copy:
+        # 获取输入框当前的内容
+        keyboard.press_and_release('ctrl+a')  
+        keyboard.press_and_release('ctrl+x')  # 模拟按下并释放
+        current_text = pyperclip.paste()      # 获取剪贴板中的文本
+        time.sleep(0.1)
+
     current_time = time.time()
 
     if auto_copy:
@@ -127,7 +134,6 @@ def get_express_company(tracking_number):
         return "顺丰"
     else:
         return ""
-    
 
 def update_clipboard():
     # 读取剪切板的内容
@@ -138,12 +144,11 @@ def update_clipboard():
 
     # 构建新的剪切板内容
     if express_company:
-        new_content = f" {express_company} 快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
+        new_content = f"{express_company} 快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
     else:
-        new_content = f" 快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
+        new_content = f"快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
 
     # 将新的内容覆盖到剪切板
     pyperclip.copy(new_content)
 
     print(f"剪切板内容已更新为：{new_content}")
-    show_toast("提醒", f"剪切板内容已更新为：{new_content}", timeout=0.3)
