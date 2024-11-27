@@ -46,13 +46,6 @@ def on_press_clipboard(auto_copy=True, check_interval=None, check_duplicate=None
 
     global last_checked_time, previous_clipboard_content
 
-    if auto_copy:
-        # 获取输入框当前的内容
-        keyboard.press_and_release('ctrl+a')  
-        keyboard.press_and_release('ctrl+x')  # 模拟按下并释放
-        current_text = pyperclip.paste()      # 获取剪贴板中的文本
-        time.sleep(0.1)
-
     current_time = time.time()
 
     if auto_copy:
