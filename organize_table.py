@@ -32,6 +32,7 @@ def read_excel(input_file, dtype=None):
             pass
     return df
 
+# 处理表格
 def process_table(input_filename, form_folder='./form'):
     file_format = input_filename.split('.')[-1]
     # 生成精确日期的文件名
@@ -45,6 +46,10 @@ def process_table(input_filename, form_folder='./form'):
     # 使用 os.path.join 组合路径和文件名
     input_file = os.path.join(form_folder, input_filename)
     output_file = os.path.join(form_folder, output_filename)
+
+    # 输入文件不存在
+    if not os.path.exists(input_file):
+        raise FileNotFoundError(f"文件不存在：{input_file}")
 
     # 读取表格，尝试多种编码
     if file_format == 'csv':
@@ -79,6 +84,7 @@ def process_table(input_filename, form_folder='./form'):
 
         # 处理每个 sheet
         for sheet_name, sheet_df in sheets.items():
+            print(sheet_name)
             # 填充空值
             sheet_df["原始单号"].fillna('', inplace=True)
             sheet_df["物流单号"].fillna('', inplace=True)
@@ -99,6 +105,7 @@ def process_table(input_filename, form_folder='./form'):
                 .str.replace(r"^[\'\"]", "", regex=True)  # 去掉以单引号或双引号开头的字符
                 .str.replace(r"[=“”\"\'']", "", regex=True)  # 去除指定符号
                 .str.replace(r"-\d+$", "", regex=True)  # 去除斜杠及其后面的数字
+                .str.replace(r"\.0$", "", regex=True)  # 去除末尾的 ".0"
             )
 
             # 获取所有的店铺名称

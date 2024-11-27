@@ -1,10 +1,12 @@
 from WinGUI import WinGUI
+import keyboard_auto_file as kf
 
 # 标准库
 import math       # 提供数学函数，例如三角函数、对数、幂运算等
 import os         # 提供与操作系统交互的功能，如文件和目录管理
 import shutil     # 提供高级的文件和目录操作，如复制、移动和删除
 import time       # 提供时间相关的功能，如延迟、时间戳等
+import datetime
 
 # 第三方库
 import cv2 as cv       # OpenCV库，用于图像和视频处理
@@ -118,20 +120,37 @@ def run_once_remarks_by_qianniu(window_name):
         logger.info(err)  # 记录异常信息
 
 # 千牛 执行一次取消标记操作
-def run_once_unmark_by_qianniu(window_name):
+def run_once_unmark_by_qianniu(window_name, mode=1):
+    '''
+        mode: 1 使用快捷键取消标记 2 使用鼠标点击取消标记
+    '''
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
     # logger.info(f'START | window name: {window_name}')  # 记录窗口名称
 
     try:
         # app.get_app_screenshot()
         # 取消标记
-        local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.4,0,1.0)
-        if is_find:
-            app.move_and_click(local_x, local_y, 'right')
-            time.sleep(0.1)
-            app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
-        else:
-            logger.info(f"END | not find button_selected_session_annotation.png, windoe name: {window_name}") # 停止记录
+        if mode == 1:
+            keyboard.press_and_release('ctrl+i')
+            # 按下三次 ctrl+w 取消标记
+            keyboard.press_and_release('ctrl+w')
+            keyboard.press_and_release('ctrl+w')
+            keyboard.press_and_release('ctrl+w')
+        elif mode == 2:
+            local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.4,0,1.0)
+            if is_find:
+                app.move_and_click(local_x, local_y, 'right')
+                time.sleep(0.1)
+                app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+            else:
+                # 找 button_selected_session_annotation.png
+                local_other_x, local_other_y, is_find_other = app.locate_icon('button_selected_session_annotation_other.png',0,0.4,0,1.0)
+                if is_find_other:
+                    app.move_and_click(local_other_x, local_other_y, 'right')
+                    time.sleep(0.1)
+                    app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+                else:
+                    logger.info(f"END | not find button_selected_session_annotation.png, windoe name: {window_name}") # 停止记录
 
         # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
     except Exception as err:
@@ -252,31 +271,92 @@ def run_test(window_name):
 
 # 通知补发单号
 # mode1 使用输入框通知 mode2 使用补发窗口通知
-def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
+def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, form_folder='./form'):
+    '''
+        :param window_name: 应用窗口的名称
+        :param table_name: 表单名称
+        :param notic_shop_name: 店铺名称
+        :param notic_mode: 通知模式 1：输入框通知 2：补发窗口通知
+        :param show_logistics: 是否显示物流公司
+        :param logistics_mode: 物流模式 1自动识别物流公司 2手动输入物流公司
+        :param form_folder: 表单文件夹路径
+    '''
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+    # 避免店铺名称冲突
+    if notic_shop_name == '团洁':
+        notic_shop_name = '团洁旗舰店'
+
+    # 设置店铺名称图片名称 包含选中与未选中状态
+    # '潮洁居家日用旗舰店-天猫', '余猫旗舰店-天猫', '团洁3504猫宁-天猫', '团洁旗舰店-天猫', '潮洁873猫宁-天猫'
+    if notic_shop_name == '团洁旗舰店':
+        shop_name_icon = '团洁旗舰店_table_icon_selected.png'
+        shop_name_icon_not_selected = '团洁旗舰店_table_icon_not_selected.png'
+    elif notic_shop_name == '潮洁':
+        shop_name_icon = '潮洁居家_table_icon_selected.png'
+        shop_name_icon_not_selected = '潮洁居家_table_icon_not_selected.png'
+    elif notic_shop_name == '余猫':
+        shop_name_icon = '余猫旗舰店_table_icon_selected.png'
+        shop_name_icon_not_selected = '余猫旗舰店_table_icon_not_selected.png'
+    elif notic_shop_name == '3504':
+        shop_name_icon = '猫宁_table_icon_selected.png'
+        shop_name_icon_not_selected = '猫宁_table_icon_not_selected.png'
+    elif notic_shop_name == '873':
+        shop_name_icon = '猫宁_table_icon_selected.png'
+        shop_name_icon_not_selected = '猫宁_table_icon_not_selected.png'
+    else:
+        print(f"未知店铺名称：{notic_shop_name}")
+        return
+    
     try:
+        # 组合表单路径
+        form_folder += f"/{datetime.datetime.now().strftime('%Y-%m-%d')}"
         table_file = os.path.join(form_folder, table_name)
 
+        # 根据不同文件格式读取表格
         file_format = table_name.split('.')
         if 'xls' in file_format[1]:
-            df = pd.read_excel(table_file, dtype={'原始单号': str, '物流单号': str})
+            # 当前表格已打开提示
+            # if os.path.exists(table_file):
+            #     print(f"当前表格已打开，请关闭后再运行程序")
+            #     return
+            # 读取 Excel 文件
+            df = pd.read_excel(table_file, sheet_name=None, dtype={'原始单号': str, '物流单号': str})
         elif 'csv' in file_format[1]:
-            print(table_file)
-            # df = pd.read_csv(table_file)
-        return
-        # else:
-        #     print('未知格式')
-        #     return
-        # print(df.sheet_names)
-        return
-        column_names = df.columns.tolist()  # 获取列名列表
+            print('未处理 csv 文件')
+            return
+        else:
+            print('未知格式')
+            return
+        
+        # 获取所有sheet的名称
+        sheet_names = df.keys()
+
+        current_sheet_name = ''
+        # 选定店铺名 循环判断notic_shop_name是否在sheet_names中
+        for sheet_name in sheet_names:
+            if notic_shop_name in sheet_name:
+                print(f"选定表单：{sheet_name}")
+                current_sheet_name = sheet_name
+                break
+        if not current_sheet_name:
+            print(f"未找到 '{notic_shop_name}' 的表单，程序终止")
+            return
+        
+        # 读取当前表单
+        df_current_sheet = df[current_sheet_name]
+        column_names = df_current_sheet.columns.tolist()  # 获取列名列表
+        # print(column_names) # 打印列名列表
+
         # 检查是否存在"是否通知"列，如果不存在则添加
         if '是否通知' not in column_names:
-            df['是否通知'] = 0
+            df_current_sheet['是否通知'] = 0
             # 将更改写回 Excel 文件
             with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-                df.to_excel(writer, index=False)
-            print("列 '是否通知' 已添加到表格中。")
+                df_current_sheet.to_excel(writer, index=False, sheet_name=current_sheet_name)
+            print(f"列 '是否通知' 已添加到表格指定sheet '{current_sheet_name}' 中")
+        else:
+            print(f"列 '是否通知' 已存在于表格指定sheet '{current_sheet_name}' 中")
         
         # 定义一个退出标志
         exit_flag = False
@@ -290,32 +370,36 @@ def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
         
         keyboard.on_press(on_key_event)  # 设置按键监听
 
-        # 限制 DataFrame 到前两行
-        # df_subset = df.iloc
+        # 点击店铺名称 分为两种情况 已经被选中和未被选中的状态
+        is_find_shop_icon = app.click_icon(shop_name_icon, 0, 0.9, 0, 0.3)
+        if not is_find_shop_icon:
+            is_find_shop_icon = app.click_icon(shop_name_icon_not_selected, 0, 0.9, 0, 0.3)
+        if not is_find_shop_icon:
+            print(f"未找到店铺名称：{notic_shop_name}")
+            return
+        time.sleep(0.2)
+
+        # 限制 DataFrame 到指定行数 用于测试
+        # df_subset = df_current_sheet.head(2)
+        df_subset = df_current_sheet.iloc[:1]
         # 逐行处理DataFrame
-        for index, row in df.iterrows():
+        for index, row in df_subset.iterrows():
             if exit_flag:
                 break  # 如果接收到退出信号，则终止循环
-                
-            # app.click_icon(shop_name_icon)
+            
             # 检查是否已经通知
             if row['是否通知'] == 1:
                 print('当前用户已通知')
                 continue  # 如果已经通知，则跳过当前行
+
             # 获取原始单号和物流单号
-
-            # 循环起始等待
-            time.sleep(0.1)
-
             original_number = row['原始单号']
             logistics_number = row['物流单号']
-            print(original_number)
-            print(logistics_number)
+            print(f"原始单号：{original_number} 物流单号：{logistics_number}")
 
             # original_number=123456789789
 
-            app.get_app_screenshot()
-
+            # app.get_app_screenshot()
             # app.move_and_click(750, 500)
             # time.sleep(0.5)
             # 模拟按下 alt+W 快捷键打开目标软件
@@ -327,26 +411,26 @@ def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
             # keyboard.press_and_release('ctrl+f')
             # time.sleep(0.5)
 
-            # 容错 点击搜索框
+            # 点击搜索框
             app.click_icon('button_search_cus.png',0,0.3,0,0.3)
-
             time.sleep(0.1)
-            # 清除
+
+            # 清除搜索框
             keyboard.press_and_release('ctrl+a')  
             keyboard.press_and_release('backspace')
+
             # 将 original_number 的内容输入到搜索框中
             # pyautogui.typewrite(original_number)
             # 将中文字符串复制到剪贴板
             pyperclip.copy(original_number)
             keyboard.press_and_release('ctrl+v') 
-            
             # 等待搜索结果响应
             time.sleep(0.2)
+
+            # 判断是否未找到
             _, __, not_find_cus = app.locate_icon('not_find_customer.png',0, 0.4, 0, 0.6)
-            # 判断搜索结果
             if not_find_cus:
                 print(f"未搜索到结果，跳过 {original_number}")
-                # df.at[index, '是否通知'] = 0
                 continue  # 未搜索到直接continue下一个
             else:
               print('搜索到指定用户，即将发送通知...')
@@ -355,7 +439,8 @@ def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
             keyboard.press_and_release('enter')
             time.sleep(0.2)
             
-            if mode == 1:
+            # 通知模式 1：输入框通知 2：补发窗口通知
+            if notic_mode == 1:
                 # 按下 ctrl+J 定位到输入框中
                 keyboard.press_and_release('ctrl+i')
                 time.sleep(0.2)
@@ -369,12 +454,18 @@ def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
                 # 如果为 True，则相对向下移动 200 个像素后点击
                 # app.remove_and_click(x, y + 200)
 
-                # 清除
+                # 清除输入框
                 keyboard.press_and_release('ctrl+a')  
                 keyboard.press_and_release('backspace')
+
                 time.sleep(0.2)
-                # 将 亲 + logistics_number + 这是您的补发单号 请注意查收 这段内容输入到输入框中
-                message = f"亲 {logistics_number} 这是您的补发单号 请注意查收"
+                # 获取快递公司
+                if show_logistics:
+                    logistics = kf.get_express_company(logistics_number)
+                else:
+                    logistics = ''
+                message = f"亲 {logistics} {logistics_number} 这是您的补发单号 请注意查收"
+
                 # 将中文字符串复制到剪贴板
                 pyperclip.copy(message)
                 # 使用 pyautogui.typewrite 粘贴剪贴板内容
@@ -384,7 +475,7 @@ def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
 
                 # 模拟按下回车发送消息
                 keyboard.press_and_release('enter')
-            elif mode == 2:
+            elif notic_mode == 2:
                 # 点击搜索订单按钮
                 is_find_search_button, search_button_x, search_button_y = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_search_button:
@@ -393,25 +484,26 @@ def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
                 time.sleep(0.2)
 
                 # 向下移动到订单输入框
-                app.move_and_click(search_button_x, search_button_y+55)
+                app.move_and_click(0, 55)
                 # 输入订单号
                 pyperclip.copy(original_number)
                 keyboard.press_and_release('ctrl+v') 
                 time.sleep(0.1)
-
                 # 模拟按下回车搜索
                 keyboard.press_and_release('enter')
-                time.sleep(0.4)
+                # 使用 pyautogui 向下滚动鼠标滚轮
+                pyautogui.scroll(-300)
+                time.sleep(0.3)
 
                 # 点击补发按钮
                 is_find_reissue_button = app.click_icon('reissue_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_reissue_button:
                     print(f'未找到补发按钮，跳过{original_number}')
                     continue
-                time.sleep(0.4)
+                time.sleep(0.3)
 
-                # 点击添加物流单号的提示文字
-                is_find_add_logistics_number, add_logistics_number_x, add_logistics_number_y = app.locate_icon('add_logistics_number.png', 0.6, 1, 0.2, 1)
+                # 点击输入框
+                is_find_add_logistics_number, add_logistics_number_x, add_logistics_number_y = app.locate_icon('add_logistics_number.png', 0.6, 1, 0.5, 1)
                 if not is_find_add_logistics_number:
                     print(f'未找到添加物流单号提示文字，跳过{original_number}')
                     continue
@@ -422,18 +514,35 @@ def notification_reissue(window_name, table_name, mode=1, form_folder='./form'):
                 keyboard.press_and_release('ctrl+v') 
                 time.sleep(0.3)
 
-                # 点击上面自动提示的物流公司
-                app.move_and_click(add_logistics_number_x, add_logistics_number_y-35)
-                # change 加一个自动识别无论公司的函数
+                keyboard.press_and_release('tab')
+                # 手动输入物流公司
+                if logistics_mode == 2:
+                    logistics = kf.get_express_company(logistics_number)
+                    # 如果不为空 末尾加快递二字
+                    if logistics:
+                        logistics = f"{logistics}快递"
+                        pyperclip.copy(logistics)
+                        keyboard.press_and_release('ctrl+v')
+                        keyboard.press_and_release('enter')
+
+                    else:
+                        logistics_mode = 1  # 自动识别物流公司
+                # 自动识别物流
+                if logistics_mode == 1:
+                    # 按下回车
+                    keyboard.press_and_release('enter')
                 time.sleep(0.1)
 
-                # 点击确认补发按钮 这个按钮如果没有填入物流公司则是灰色的搜不到
+                # 点击确认补发按钮
                 is_find_confirm_button, confirm_button_x, confirm_button_y = app.locate_icon('confirm_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_confirm_button:
                     print(f'未找到确认补发按钮，跳过{original_number}')
                     continue
                 app.move_and_click(confirm_button_x, confirm_button_y)
 
+            else:
+                print(f"未知通知模式：{notic_mode}")
+                return
                 
             # 将当前行的"是否通知"标记为1
             df.at[index, '是否通知'] = 1

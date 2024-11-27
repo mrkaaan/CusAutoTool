@@ -101,7 +101,7 @@ class WinGUI:
         time.sleep(0.1)                                # 使用time库延迟1秒
     
     # 相对移动
-    def rel_remove_and_click(self, x, y):
+    def rel_remove_and_click(self, x_add, y_add):
         """
         移动鼠标到指定坐标并点击。
 
@@ -113,7 +113,9 @@ class WinGUI:
             - `pyautogui`: `moveTo`和`click`方法用于移动和点击。
             - `time`: 延时操作。
         """
-        pyautogui.move(x, y)                         # 使用pyautogui库移动鼠标
+        # 获取当前位置
+        current_x, current_y = pyautogui.position()
+        pyautogui.move(current_x + x_add, current_y + y_add)                         # 使用pyautogui库移动鼠标
         pyautogui.click()                          # 使用pyautogui库点击鼠标
         time.sleep(0.1)  
 

@@ -48,12 +48,15 @@ if __name__ == "__main__":
         {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 取消标记
         {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 取消标记
     ]
-    ut.auto_key_with_threads(hotkey_actions)
+    # ut.auto_key_with_threads(hotkey_actions)
 
     # ---------- 测试 -------------
     # au.run_test(window_name)
     # ut.open_sof('ToDesk')
     # au.run_once_by_erp(window_name_erp)
+    # tb.process_table('11月26日天猫补发单号.csv')
+    # au.notification_reissue(window_name, '11月26日天猫补发单号.csv')
+    au.notification_reissue(window_name, '2024-11-27_124101_处理结果.xlsx', '余猫')
 
     # ---------- 通知补发单号 -------------
     '''
