@@ -40,15 +40,20 @@ if __name__ == "__main__":
         {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP']}, # 打开制定软件
         {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]}, # 添加备注 并 取消标记
         {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}, # 取消标记
-        {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 取消标记
-        {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 取消标记
+        {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
+        {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 默认剪切板为物流单号 拼凑为指定格式
     ]
     ut.auto_key_with_threads(hotkey_actions)
 
 
     # ---------- 通知补发单号 -------------
-    # au.notification_reissue(window_name, '11月26日天猫补发单号.csv')
-    # au.notification_reissue(window_name, '2024-11-27_230453_处理结果', '潮洁')
+    notification_reissue_parameter = {
+        'window_name': window_name, # 窗口名称
+        'table_name': '2024-11-27_230453_处理结果.xlsx',  # 表格名称
+        'notic_shop_name': '潮洁', # 通知店铺名称
+        'use_today': '2024-11-27', # 使用日期 如果为空则使用当天日期
+    }
+    # au.notification_reissue(**notification_reissue_parameter)
 
 
     # ---------- 表格处理 -------------

@@ -457,7 +457,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             
             # 模拟按下回车键进入指定用户的聊天窗口
             keyboard.press_and_release('enter')
-            time.sleep(0.2)
+            time.sleep(0.3)
 
             
             # 通知模式 1：输入框通知 2：补发窗口通知
@@ -499,41 +499,49 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             elif notic_mode == 2:
                 # 聚焦到智能客服 避免误触
                 keyboard.press_and_release('ctrl+o')
-                # 点击最近三月订单 避免误触
+                # 点击最近三月订单和安装服务 避免误触
+                recent_orders_text_x, recent_orders_text_y, is_find_recent_orders_text = app.locate_icon('recent_orders_text.png', 0.6, 1, 0.2, 1)
                 app.click_icon('recent_orders_text.png', 0.6, 1, 0.2, 1)
+                if not is_find_recent_orders_text:
+                    app.click_icon('installation_services.png', 0.6, 1, 0.2, 1)
                 # time.sleep(0.1)
 
+                
 
-                # 点击搜索订单按钮
-                search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
-                if not is_find_search_button:
-                    # 未找到搜索订单按钮 尝试点击以选中的按钮
-                    selected_search_button_x, selected_search_button_y, is_find_selected_search_button = app.locate_icon('selected_search_order_button.png', 0.6, 1, 0.2, 1)
-                    if not is_find_selected_search_button:
-                        print(f'未找到搜索订单按钮，跳过{logistics_number}')
-                        continue
+
+                # 尝试点击两次搜索订单按钮
+                is_find_search_button = False 
+                for i in range(2):
+                    search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
+                    if not is_find_search_button:
+                        # 未找到搜索订单按钮 尝试点击以选中的按钮
+                        selected_search_button_x, selected_search_button_y, is_find_selected_search_button = app.locate_icon('selected_search_order_button.png', 0.6, 1, 0.2, 1)
+                        if not is_find_selected_search_button:
+                            print(f'未找到搜索订单按钮，尝试滑动后再次查找...')
+                            pyautogui.scroll(-100)
+                        else:
+                            print(f'当前搜索按钮已被点击直接执行下一步...')
+                            is_find_search_button = True
+                            break
                     else:
-                        print(f'当前搜索按钮已被点击直接执行下一步...')
-                else:
-                    app.move_and_click(search_button_x, search_button_y)
+                        app.move_and_click(search_button_x, search_button_y)
+                        break
+                if not is_find_search_button:
+                    print(f'未找到搜索订单按钮，跳过{logistics_number}')
+                    continue
                 # time.sleep(0.1)
 
-                # 点击搜索框
-                search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
-                if not is_find_search_text:
-                    # # 未找到搜索框 假设是因为搜索按钮被点击了一次 二次点击导致搜索框无法出现 那么尝试再次点击搜索按钮
-                    # search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
-                    # if not is_find_search_button:
-                    #     print(f'未找到搜索按钮2，跳过{logistics_number}')
-                    #     continue
-                    # else:
-                    #     # 确实是因为搜索按钮被点击了一次导致的 再次点击搜索按钮 并再次点击搜索框
-                    #     app.move_and_click(search_button_x, search_button_y)
-                    #     time.sleep(0.2)
-                    #     search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
-                    #     if not is_find_search_text:
-                    #         print(f'二次尝试点击搜索按钮无果同事未找到搜索框，跳过{logistics_number}')
+                # 尝试点击两次搜索框
+                is_find_search_text = False
+                for i in range(2):
+                    search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
+                    if is_find_search_text:
+                        print(f'找到搜索框，点击搜索框...')
+                        break
+                    print(f'未找到搜索框，尝试滑动后再次查找...')
+                    pyautogui.scroll(-150)
 
+                if not is_find_search_text:
                     print(f'未找到搜索框，跳过{logistics_number}')
                     continue
                 else:
@@ -553,11 +561,20 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 pyautogui.scroll(-300)
                 time.sleep(0.3)
 
-                # 点击补发按钮
-                is_find_reissue_button = app.click_icon('reissue_button.png', 0.6, 1, 0.2, 1)
+                #  尝试点击两次补发按钮
+                is_find_reissue_button = False
+                for _ in range(2):
+                    reissue_button_x, reissue_button_y, is_find_reissue_button = app.locate_icon('reissue_button.png', 0.6, 1, 0.2, 1)
+                    if is_find_reissue_button:
+                        print(f'找到补发按钮，点击补发按钮...')
+                        break
+                    print(f'未找补发按钮，尝试滑动后再次查找...')
+                    pyautogui.scroll(-150)
+
                 if not is_find_reissue_button:
                     print(f'未找到补发按钮，跳过{original_number}')
                     continue
+                app.move_and_click(reissue_button_x, reissue_button_y, 'left')
                 time.sleep(0.3)
 
                 # 点击输入框

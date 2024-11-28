@@ -61,18 +61,18 @@ if __name__ == "__main__":
             避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
 
     '''
-    # au.notification_reissue(window_name, '11月26日天猫补发单号.csv')
-    au.notification_reissue(
-        window_name=window_name, # 窗口名称
-        table_name='2024-11-27_230453_处理结果.xlsx',  # 表格名称
-        notic_shop_name='潮洁', # 通知店铺名称
-        notic_mode=2,       # 通知模式  1：输入框通知 2：补发窗口按钮通知
-        show_logistics=False, # 是否显示物流公司 输入框通知模式下生效
-        logistics_mode=1,    # 物流模式 1自动识别物流公司 2手动输入物流公司
-        use_today='2024-11-27', # 使用日期 如果为空则使用当天日期
-        test_mode=2, # 测试模式 0：不测试 若测试则输入测试数量
-        is_write=False, # 是否回写表格
-    )
+    notification_reissue_parameter = {
+        'window_name':window_name, # 窗口名称
+        'table_name':'2024-11-27_230453_处理结果.xlsx',  # 表格名称
+        'notic_shop_name':'潮洁', # 通知店铺名称
+        'notic_mode':2,       # 通知模式  1：输入框通知 2：补发窗口按钮通知
+        'show_logistics':False, # 是否显示物流公司 输入框通知模式下生效
+        'logistics_mode':1,    # 物流模式 1自动识别物流公司 2手动输入物流公司
+        'use_today':'2024-11-27', # 使用日期 如果为空则使用当天日期
+        'test_mode':3, # 测试模式 0：不测试 若测试则输入测试数量
+        'is_write':False, # 是否回写表格
+    }
+    au.notification_reissue(**notification_reissue_parameter)
 
     # ---------- 表格处理 -------------
     # tb.process_table('11月27日天猫补发单号.csv')
