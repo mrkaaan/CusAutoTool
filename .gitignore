@@ -25,7 +25,7 @@ __pycache__/
 
 # 文件
 form/
-image/
+# image/
 temp/
 handles.json
 config.ini
