@@ -271,7 +271,7 @@ def run_test(window_name):
 
 # 通知补发单号
 # mode1 使用输入框通知 mode2 使用补发窗口通知
-def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, form_folder='./form'):
+def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, form_folder='./form'):
     '''
         :param window_name: 应用窗口的名称
         :param table_name: 表单名称
@@ -279,6 +279,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         :param notic_mode: 通知模式 1：输入框通知 2：补发窗口通知
         :param show_logistics: 是否显示物流公司
         :param logistics_mode: 物流模式 1自动识别物流公司 2手动输入物流公司
+        :param use_today: 是否使用今天日期作为路径 默认今天 指定则传入如 2024-11-27 注需要存在文件及路径
         :param form_folder: 表单文件夹路径
     '''
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
@@ -290,28 +291,33 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
     # 设置店铺名称图片名称 包含选中与未选中状态
     # '潮洁居家日用旗舰店-天猫', '余猫旗舰店-天猫', '团洁3504猫宁-天猫', '团洁旗舰店-天猫', '潮洁873猫宁-天猫'
     if notic_shop_name == '团洁旗舰店':
-        shop_name_icon = '团洁旗舰店_table_icon_selected.png'
-        shop_name_icon_not_selected = '团洁旗舰店_table_icon_not_selected.png'
+        shop_name_icon = 'tuanjie_table_icon_selected.png'
+        shop_name_icon_not_selected = 'tuanjie_table_icon_not_selected.png'
     elif notic_shop_name == '潮洁':
-        shop_name_icon = '潮洁居家_table_icon_selected.png'
-        shop_name_icon_not_selected = '潮洁居家_table_icon_not_selected.png'
+        shop_name_icon = 'chaojie_table_icon_selected.png'
+        shop_name_icon_not_selected = 'chaojie_table_icon_not_selected.png'
     elif notic_shop_name == '余猫':
-        shop_name_icon = '余猫旗舰店_table_icon_selected.png'
-        shop_name_icon_not_selected = '余猫旗舰店_table_icon_not_selected.png'
+        shop_name_icon = 'yumao_table_icon_selected.png'
+        shop_name_icon_not_selected = 'yumao_table_icon_not_selected.png'
     elif notic_shop_name == '3504':
-        shop_name_icon = '猫宁_table_icon_selected.png'
-        shop_name_icon_not_selected = '猫宁_table_icon_not_selected.png'
+        shop_name_icon = 'maoning_table_icon_selected.png'
+        shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
     elif notic_shop_name == '873':
-        shop_name_icon = '猫宁_table_icon_selected.png'
-        shop_name_icon_not_selected = '猫宁_table_icon_not_selected.png'
+        shop_name_icon = 'maoning_table_icon_selected.png'
+        shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
     else:
         print(f"未知店铺名称：{notic_shop_name}")
         return
     
     try:
         # 组合表单路径
-        form_folder += f"/{datetime.datetime.now().strftime('%Y-%m-%d')}"
+        # 如果使用今天日期 则进行组合
+        if not use_today:
+            form_folder += f"/{datetime.datetime.now().strftime('%Y-%m-%d')}"
+        else:
+            form_folder += f"/{use_today}"
         table_file = os.path.join(form_folder, table_name)
+
 
         # 根据不同文件格式读取表格
         file_format = table_name.split('.')
@@ -379,9 +385,10 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             return
         time.sleep(0.2)
 
-        # 限制 DataFrame 到指定行数 用于测试
+        # 限制 DataFrame 到指定行数 用于测试 排除 '是否通知' 列中值为 0 的行
         # df_subset = df_current_sheet.head(2)
-        df_subset = df_current_sheet.iloc[:1]
+        # df_subset = df_current_sheet.iloc[:2]
+        df_subset = df_current_sheet.loc[df_current_sheet['是否通知'] != 1, :].iloc[:2]
         # 逐行处理DataFrame
         for index, row in df_subset.iterrows():
             if exit_flag:
@@ -396,6 +403,14 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             original_number = row['原始单号']
             logistics_number = row['物流单号']
             print(f"原始单号：{original_number} 物流单号：{logistics_number}")
+            # 原始单号为空 提示并跳过
+            if not original_number:
+                print(f"原始单号为空：{original_number} 物流单号：{logistics_number} 跳过")
+                continue
+            # 物流单号为空 提示并跳过
+            if not logistics_number:
+                print(f"物流单号为空：{original_number} 物流单号：{logistics_number} 跳过")
+                continue
 
             # original_number=123456789789
 
@@ -438,6 +453,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             # 模拟按下回车键进入指定用户的聊天窗口
             keyboard.press_and_release('enter')
             time.sleep(0.2)
+
             
             # 通知模式 1：输入框通知 2：补发窗口通知
             if notic_mode == 1:
@@ -476,24 +492,41 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 # 模拟按下回车发送消息
                 keyboard.press_and_release('enter')
             elif notic_mode == 2:
+                # 聚焦到智能客服 避免误触
+                keyboard.press_and_release('ctrl+o')
+                time.sleep(0.1)
+                # 点击智能客服空白位置 避免误触
+                app.move_and_click(1555,500)
+
                 # 点击搜索订单按钮
-                is_find_search_button, search_button_x, search_button_y = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
+                search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_search_button:
-                    print(f'未找到搜索订单按钮，跳过{original_number}')
-                    continue
+                    # 未找到搜索订单按钮 尝试点击以选中的按钮
+                    search_button_x, search_button_y, is_find_search_button = app.locate_icon('selected_search_order_button.png', 0.6, 1, 0.2, 1)
+                    if not is_find_search_button:
+                        print(f'未找到搜索订单按钮，跳过{logistics_number}')
+                        continue
+                else:
+                    app.move_and_click(search_button_x, search_button_y)
+                time.sleep(0.1)
+
+                # 向下移动并点击订单输入框
+                app.move_and_click(search_button_x, search_button_y+55)
                 time.sleep(0.2)
 
-                # 向下移动到订单输入框
-                app.move_and_click(0, 55)
+                # 保证输入框没有内容
+                keyboard.press_and_release('ctrl+a') 
+                keyboard.press_and_release('backspace') 
                 # 输入订单号
                 pyperclip.copy(original_number)
                 keyboard.press_and_release('ctrl+v') 
-                time.sleep(0.1)
+                # time.sleep(0.1)
                 # 模拟按下回车搜索
                 keyboard.press_and_release('enter')
                 # 使用 pyautogui 向下滚动鼠标滚轮
                 pyautogui.scroll(-300)
                 time.sleep(0.3)
+
 
                 # 点击补发按钮
                 is_find_reissue_button = app.click_icon('reissue_button.png', 0.6, 1, 0.2, 1)
@@ -503,7 +536,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 time.sleep(0.3)
 
                 # 点击输入框
-                is_find_add_logistics_number, add_logistics_number_x, add_logistics_number_y = app.locate_icon('add_logistics_number.png', 0.6, 1, 0.5, 1)
+                add_logistics_number_x, add_logistics_number_y, is_find_add_logistics_number = app.locate_icon('add_logistics_number.png', 0.6, 1, 0.5, 1)
                 if not is_find_add_logistics_number:
                     print(f'未找到添加物流单号提示文字，跳过{original_number}')
                     continue
@@ -512,11 +545,12 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 # 将中文字符串复制到剪贴板
                 pyperclip.copy(logistics_number)
                 keyboard.press_and_release('ctrl+v') 
-                time.sleep(0.3)
-
                 keyboard.press_and_release('tab')
+                time.sleep(0.5)
+
                 # 手动输入物流公司
                 if logistics_mode == 2:
+                    print(f'手动输入快递公司模式..')
                     logistics = kf.get_express_company(logistics_number)
                     # 如果不为空 末尾加快递二字
                     if logistics:
@@ -529,32 +563,38 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                         logistics_mode = 1  # 自动识别物流公司
                 # 自动识别物流
                 if logistics_mode == 1:
+                    print(f'自动输入快递模式...')
                     # 按下回车
                     keyboard.press_and_release('enter')
                 time.sleep(0.1)
 
+
                 # 点击确认补发按钮
-                is_find_confirm_button, confirm_button_x, confirm_button_y = app.locate_icon('confirm_button.png', 0.6, 1, 0.2, 1)
+                confirm_button_x, confirm_button_y, is_find_confirm_button = app.locate_icon('confirm_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_confirm_button:
                     print(f'未找到确认补发按钮，跳过{original_number}')
                     continue
-                app.move_and_click(confirm_button_x, confirm_button_y)
+                else:
+                    # 点击确认按钮
+                    app.move_and_click(confirm_button_x, confirm_button_y)
 
             else:
                 print(f"未知通知模式：{notic_mode}")
                 return
                 
             # 将当前行的"是否通知"标记为1
-            df.at[index, '是否通知'] = 1
-
-            # 将更改写回 Excel 文件
-            with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
-                df.to_excel(writer, index=False)
+            print(f'已通知 {notic_shop_name} {original_number}')
+            df_current_sheet.at[index, '是否通知'] = 1
                 
             # 循环结束暂停
-            time.sleep(0.3)
+            time.sleep(0.2)
     except Exception as err:
         logger.info(err)
+    finally:
+        # 将更改写回 Excel 文件
+        with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+            # 只写回当前处理的sheet
+            df_current_sheet.to_excel(writer, sheet_name=current_sheet_name, index=False)
 
     keyboard.unhook_all()  # 移除所有按键监听
     return df

@@ -10,9 +10,23 @@ import keyboard        # 提供键盘事件处理的功能
 import pyautogui       # 提供屏幕自动化控制，如鼠标点击、键盘输入、截图等
 import win32con        # 包含Windows API常量，用于与Windows系统交互
 import win32gui        # 提供与Windows GUI（图形用户界面）交互的功能
+import configparser
 
 from PIL import ImageGrab     # 从PIL库导入ImageGrab模块，用于截图
 from loguru import logger     # 引入loguru库，用于简便的日志记录
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+# 访问环境变量
+TRY_NUMBER = config['default'].get('TRY_NUMBER', '1')  # 使用 get 方法提供默认值
+
+# 尝试将 TRY_NUMBER 转换为整数
+try:
+    TRY_NUMBER = int(TRY_NUMBER)
+except ValueError:
+    # 如果转换失败，设置默认值为 1
+    TRY_NUMBER = 1
 
 class WinGUI:
     """
@@ -147,7 +161,7 @@ class WinGUI:
         x_end_ratio=1.0,
         y_start_ratio=0,
         y_end_ratio=1.0,
-        try_number=3
+        try_number=TRY_NUMBER
     ):
         """
         查找目标图标的中心坐标，多个相似图标可通过指定搜索区域来定位
@@ -262,7 +276,7 @@ class WinGUI:
             x_end_ratio,
             y_start_ratio,
             y_end_ratio,
-            try_number=3,
+            try_number=TRY_NUMBER,
         )
         # 如果坐标无效，则返回未找到状态
         if x < 0 or y < 0:

@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
     '''
     # au.notification_reissue(window_name, '11月26日天猫补发单号.csv')
-    # au.notification_reissue(window_name, '2024-11-27_230453_处理结果', '潮洁')
+    au.notification_reissue(window_name, '2024-11-27_230453_处理结果.xlsx', '潮洁', 2, False, 1, '2024-11-27')
 
     # ---------- 表格处理 -------------
     # tb.process_table('11月27日天猫补发单号.csv')
