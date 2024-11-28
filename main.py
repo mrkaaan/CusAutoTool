@@ -42,21 +42,24 @@ if __name__ == "__main__":
     # auto_key()
     hotkey_actions = [
         # {'key': 'alt+a', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
-        {'key': 'alt+e', 'func': ut.open_sof, 'args': ['旺店通ERP']}, # 打开制定软件
+        {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP']}, # 打开制定软件
         {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]}, # 添加备注 并 取消标记
         {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}, # 取消标记
         {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 取消标记
         {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 取消标记
     ]
-    # ut.auto_key_with_threads(hotkey_actions)
+    ut.auto_key_with_threads(hotkey_actions)
+
+    
 
     # ---------- 测试 -------------
     # au.run_test(window_name)
     # ut.open_sof('ToDesk')
     # au.run_once_by_erp(window_name_erp)
-    # tb.process_table('11月26日天猫补发单号.csv')
+
+    # tb.process_table('11月27日天猫补发单号.csv')
     # au.notification_reissue(window_name, '11月26日天猫补发单号.csv')
-    au.notification_reissue(window_name, '2024-11-27_124101_处理结果.xlsx', '余猫')
+    # au.notification_reissue(window_name, '2024-11-27_230453_处理结果', '潮洁')
 
     # ---------- 通知补发单号 -------------
     '''
