@@ -271,15 +271,17 @@ def run_test(window_name):
 
 # 通知补发单号
 # mode1 使用输入框通知 mode2 使用补发窗口通知
-def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, form_folder='./form'):
+def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, test_mode=0, is_write=True, form_folder='./form'):
     '''
         :param window_name: 应用窗口的名称
         :param table_name: 表单名称
         :param notic_shop_name: 店铺名称
-        :param notic_mode: 通知模式 1：输入框通知 2：补发窗口通知
-        :param show_logistics: 是否显示物流公司
+        :param notic_mode: 通知模式 1：输入框通知 2：补发窗口按钮通知
+        :param show_logistics: 是否显示物流公司 输入框通知模式下生效
         :param logistics_mode: 物流模式 1自动识别物流公司 2手动输入物流公司
         :param use_today: 是否使用今天日期作为路径 默认今天 指定则传入如 2024-11-27 注需要存在文件及路径
+        : param test_mode: 测试模式 0：不测试 若测试则输入测试数量
+        :param is_write: 是否写入数据 默认写入
         :param form_folder: 表单文件夹路径
     '''
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
@@ -385,10 +387,13 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             return
         time.sleep(0.2)
 
-        # 限制 DataFrame 到指定行数 用于测试 排除 '是否通知' 列中值为 0 的行
-        # df_subset = df_current_sheet.head(2)
-        # df_subset = df_current_sheet.iloc[:2]
-        df_subset = df_current_sheet.loc[df_current_sheet['是否通知'] != 1, :].iloc[:2]
+        if test_mode:
+            # 限制 DataFrame 到指定行数 用于测试 排除 '是否通知' 列中值为 0 的行
+            # df_subset = df_current_sheet.head(2)
+            # df_subset = df_current_sheet.iloc[:2]
+            df_subset = df_current_sheet.loc[df_current_sheet['是否通知'] != 1, :].iloc[:test_mode]
+        else:
+            df_subset = df_current_sheet.iloc
         # 逐行处理DataFrame
         for index, row in df_subset.iterrows():
             if exit_flag:
@@ -494,25 +499,46 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             elif notic_mode == 2:
                 # 聚焦到智能客服 避免误触
                 keyboard.press_and_release('ctrl+o')
-                time.sleep(0.1)
-                # 点击智能客服空白位置 避免误触
-                app.move_and_click(1555,500)
+                # 点击最近三月订单 避免误触
+                app.click_icon('recent_orders_text.png', 0.6, 1, 0.2, 1)
+                # time.sleep(0.1)
+
 
                 # 点击搜索订单按钮
                 search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_search_button:
                     # 未找到搜索订单按钮 尝试点击以选中的按钮
-                    search_button_x, search_button_y, is_find_search_button = app.locate_icon('selected_search_order_button.png', 0.6, 1, 0.2, 1)
-                    if not is_find_search_button:
+                    selected_search_button_x, selected_search_button_y, is_find_selected_search_button = app.locate_icon('selected_search_order_button.png', 0.6, 1, 0.2, 1)
+                    if not is_find_selected_search_button:
                         print(f'未找到搜索订单按钮，跳过{logistics_number}')
                         continue
+                    else:
+                        print(f'当前搜索按钮已被点击直接执行下一步...')
                 else:
                     app.move_and_click(search_button_x, search_button_y)
-                time.sleep(0.1)
+                # time.sleep(0.1)
 
-                # 向下移动并点击订单输入框
-                app.move_and_click(search_button_x, search_button_y+55)
-                time.sleep(0.2)
+                # 点击搜索框
+                search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
+                if not is_find_search_text:
+                    # # 未找到搜索框 假设是因为搜索按钮被点击了一次 二次点击导致搜索框无法出现 那么尝试再次点击搜索按钮
+                    # search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
+                    # if not is_find_search_button:
+                    #     print(f'未找到搜索按钮2，跳过{logistics_number}')
+                    #     continue
+                    # else:
+                    #     # 确实是因为搜索按钮被点击了一次导致的 再次点击搜索按钮 并再次点击搜索框
+                    #     app.move_and_click(search_button_x, search_button_y)
+                    #     time.sleep(0.2)
+                    #     search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
+                    #     if not is_find_search_text:
+                    #         print(f'二次尝试点击搜索按钮无果同事未找到搜索框，跳过{logistics_number}')
+
+                    print(f'未找到搜索框，跳过{logistics_number}')
+                    continue
+                else:
+                    app.move_and_click(search_text_x+100, search_text_y)
+                time.sleep(0.3)
 
                 # 保证输入框没有内容
                 keyboard.press_and_release('ctrl+a') 
@@ -526,7 +552,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 # 使用 pyautogui 向下滚动鼠标滚轮
                 pyautogui.scroll(-300)
                 time.sleep(0.3)
-
 
                 # 点击补发按钮
                 is_find_reissue_button = app.click_icon('reissue_button.png', 0.6, 1, 0.2, 1)
@@ -591,6 +616,8 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
     except Exception as err:
         logger.info(err)
     finally:
+        # 使用pyperclip库清空剪切板
+        pyperclip.copy('')
         # 将更改写回 Excel 文件
         with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
             # 只写回当前处理的sheet
