@@ -27,10 +27,6 @@ if __name__ == "__main__":
     pyautogui.FAILSAFE = False  # 关闭 pyautogui 的故障保护机制
     pyautogui.PAUSE = 0.1  # 设置 pyautogui 的默认操作延时 如移动和点击的间隔
     logger.add("dev.log", rotation="10 MB")  # 设置日志文件轮换
-    # original_folder = "C:/Users/Public/Documents/Data"  # 源文件夹路径
-    # target_folder = r"C:\Users\Joey\Desktop\data"  # 目标文件夹路径
-    # suffix_list = []  # 要移动的文件后缀列表
-    # cycle_number = -1  # 循环次数，-1 表示无限循环
     window_name = r"千牛接待台"  # 窗口名称
     window_name_erp = r"旺店通ERP"
     
@@ -39,9 +35,8 @@ if __name__ == "__main__":
         按下 esc 退出
         按下 shift+ctrl+1 添加备注
     '''
-    # auto_key()
     hotkey_actions = [
-        # {'key': 'alt+a', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
+        # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
         {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP']}, # 打开制定软件
         {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]}, # 添加备注 并 取消标记
         {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}, # 取消标记
@@ -50,47 +45,13 @@ if __name__ == "__main__":
     ]
     ut.auto_key_with_threads(hotkey_actions)
 
-    
 
-    # ---------- 测试 -------------
-    # au.run_test(window_name)
-    # ut.open_sof('ToDesk')
-    # au.run_once_by_erp(window_name_erp)
-
-    # tb.process_table('11月27日天猫补发单号.csv')
+    # ---------- 通知补发单号 -------------
     # au.notification_reissue(window_name, '11月26日天猫补发单号.csv')
     # au.notification_reissue(window_name, '2024-11-27_230453_处理结果', '潮洁')
 
-    # ---------- 通知补发单号 -------------
-    '''
-        表格必须经过格式化，有整理过后的原始单号以及物流单号
-
-        change 
-            0 自动切换店铺
-
-            1 添加功能 在直径结束后 显示当前表格有多少个需要通知补发 已经通知了多少个 多少个没有通知补发
-
-            2 检查功能 is_find_cus 的未搜到处理办法 提示并跳过 有没有问题没有问题则下一个问题
-
-            3 修改功能 能否修改监听停止按钮 但用一个q容易不起作用 改为使用组合键的 ctrl+shift+q监听停止
-
-            4 修改功能 
-            是否可以保证在按下停止的案件后 如果程序执行了发送通知 则必定在回写表格后才终止
-            避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
-
-    '''
-    # mode1 使用输入框通知 mode2 使用补发窗口通知
-    # au.notification_reissue(window_name, '2024-11-17_ERP二次导出表格.csv', 2, './form/2024-11-17')
 
     # ---------- 表格处理 -------------
-    # 首次处理 群中表格 筛选制定店铺名称的物流单号 一个表有两个sheet 结果文件拿去ERP搜索后导出为新的表格
-    # tb.process_original_table('11月8日天猫补发单号.csv')
+    # tb.process_table('11月27日天猫补发单号.csv')
 
-    # 二次处理 ERP导出表格 清洗新表格的原始单号 结果文件执行自动化操作
-    # 有多少个店铺 就调用多少次 
-    # tb.process_original_number('2024-11-08_余猫_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
-    # tb.process_original_number('2024-11-07_潮洁_ERP二次导出表格.csv') # 日期_店铺_ERP二次导出表格
-
-    # ---------- 取消备注 -------------
-    # au.run_once_remarks_by_qianniu(window_name)
     
