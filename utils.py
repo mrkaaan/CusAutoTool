@@ -20,6 +20,7 @@ import json
 
 import threading
 
+from organize_table_by_Window import call_create_window  # 导入回调函数
 
 # 存储句柄
 def save_handle(name, handle):
@@ -118,9 +119,12 @@ def auto_key_with_threads(hotkeys):
     def threaded_function(func, args):
         # 在独立线程中执行功能
         try:
-            thread = threading.Thread(target=func, args=args)
-            thread.daemon = True  # 守护线程，主线程结束后自动清理
-            thread.start()
+            if func == call_create_window:  # 检查是否为call_create_window函数
+                func()  # 直接调用，因为call_create_window会处理线程问题
+            else:
+                thread = threading.Thread(target=func, args=args)
+                thread.daemon = True  # 守护线程，主线程结束后自动清理
+                thread.start()
         except Exception as e:
             print(f"快捷键功能执行出错：{e}")
     

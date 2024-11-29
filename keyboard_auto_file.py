@@ -92,6 +92,7 @@ def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=Fal
             # 检查当前输入的文本是否是热字符串
             for hotstring in hotstring_set:
                 if current_text.endswith(hotstring):
+                    is_find_hotstring = True
                     file_path = hotstrings[hotstring]
 
                     # 在独立线程中执行批处理文件
@@ -101,7 +102,7 @@ def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=Fal
                     break
             if not is_find_hotstring:
                 print(f"No hotstring found: {current_text}")
-                show_toast("提醒", f"未找到字符串: {current_text}")
+                show_toast("提醒", f"未找到字符串: '{current_text}'")
 
 
 

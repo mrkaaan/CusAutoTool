@@ -1,5 +1,6 @@
 from WinGUI import WinGUI
 import organize_table as tb
+import organize_table_by_Window as tb_win
 import automation as au
 import utils as ut
 import keyboard_auto_file as kf
@@ -40,7 +41,9 @@ if __name__ == "__main__":
         {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
         {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 默认剪切板为物流单号 拼凑为指定格式
         {'key': 'f3', 'func': kf.clear_clipboard}, # 清空剪切板
-        {'key': 'ctrl+shift+space', 'func': kf.clear_clipboard} # 清空剪切板
+        {'key': 'ctrl+shift+space', 'func': kf.clear_clipboard}, # 清空剪切板
+        {'key': 'ctrl+shift+z', 'func': tb_win.call_create_window}, # 打开窗口，用于整理表格
+
     ]
     ut.auto_key_with_threads(hotkey_actions)
 
