@@ -35,20 +35,16 @@ if __name__ == "__main__":
     window_name_erp = r"旺店通ERP"
     
     # ---------- 快捷键启动 -------------
-    '''
-        按下 esc 退出
-        按下 shift+ctrl+1 添加备注
-    '''
-    # auto_key()
     hotkey_actions = [
-        # {'key': 'alt+a', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
-        {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP']}, # 打开制定软件
-        {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]}, # 添加备注 并 取消标记
-        {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}, # 取消标记
-        {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 取消标记
-        {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 取消标记
+        # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
+        # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP']}, # 打开制定软件
+        # {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]}, # 添加备注 并 取消标记
+        # {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}, # 取消标记
+        {'key': 'f2', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
+        {'key': 'ctrl+space', 'func': kf.on_press_clipboard} # 自动识别输入框并替换剪切板内容为图片或视频文件
+        # {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 默认剪切板为物流单号 拼凑为指定格式
     ]
-    # ut.auto_key_with_threads(hotkey_actions)
+    ut.auto_key_with_threads(hotkey_actions)
 
 
     # ---------- 通知补发单号 -------------
@@ -72,7 +68,7 @@ if __name__ == "__main__":
         'test_mode':3, # 测试模式 0：不测试 若测试则输入测试数量
         'is_write':False, # 是否回写表格
     }
-    au.notification_reissue(**notification_reissue_parameter)
+    # au.notification_reissue(**notification_reissue_parameter)
 
     # ---------- 表格处理 -------------
     # tb.process_table('11月27日天猫补发单号.csv')
