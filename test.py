@@ -61,6 +61,7 @@ if __name__ == "__main__":
     notification_reissue_parameter = {
         'window_name':window_name, # 窗口名称
         'table_name':'2024-11-27_230453_处理结果.xlsx',  # 表格名称
+        'table_path': '', # 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
         'notic_shop_name':'潮洁', # 通知店铺名称
         'notic_mode':2,       # 通知模式  1：输入框通知 2：补发窗口按钮通知
         'show_logistics':False, # 是否显示物流公司 输入框通知模式下生效
@@ -69,7 +70,7 @@ if __name__ == "__main__":
         'test_mode':3, # 测试模式 0：不测试 若测试则输入测试数量
         'is_write':False, # 是否回写表格
     }
-    # au.notification_reissue(**notification_reissue_parameter)
+    au.notification_reissue(**notification_reissue_parameter)
 
     # ---------- 表格处理 -------------
     # tb.process_table('11月27日天猫补发单号.csv')

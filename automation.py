@@ -314,7 +314,7 @@ def run_test(window_name):
 
 # 通知补发单号
 # mode1 使用输入框通知 mode2 使用补发窗口通知
-def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, test_mode=0, is_write=True, form_folder='./form'):
+def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, test_mode=0, is_write=True, table_path='', form_folder='./form'):
     '''
         :param window_name: 应用窗口的名称
         :param table_name: 表单名称
@@ -323,8 +323,9 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         :param show_logistics: 是否显示物流公司 输入框通知模式下生效
         :param logistics_mode: 物流模式 1自动识别物流公司 2手动输入物流公司
         :param use_today: 是否使用今天日期作为路径 默认今天 指定则传入如 2024-11-27 注需要存在文件及路径
-        : param test_mode: 测试模式 0：不测试 若测试则输入测试数量
+        :param test_mode: 测试模式 0：不测试 若测试则输入测试数量
         :param is_write: 是否写入数据 默认写入
+        :param table_path: 表单路径 暂时用不到 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
         :param form_folder: 表单文件夹路径
     '''
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作

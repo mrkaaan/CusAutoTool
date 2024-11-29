@@ -1,0 +1,14 @@
+{
+    "defaults": {
+        "window_name": "千牛工作台",
+        "table_name": "xxx_处理结果.xlsx",
+        "notic_shop_name": "",
+        "notic_mode": 2,
+        "show_logistics": true,
+        "logistics_mode": 1,
+        "use_today": "",
+        "test_mode": "0",
+        "is_write": true
+    },
+    "last_used": {}
+}
