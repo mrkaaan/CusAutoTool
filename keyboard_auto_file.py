@@ -60,7 +60,15 @@ def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=Fal
         keyboard.press_and_release('ctrl+a')  
         keyboard.press_and_release('ctrl+x')  # 模拟按下并释放
         current_text = pyperclip.paste()      # 获取剪贴板中的文本
+        # 限制文本长度
+        if len(current_text) > 15:
+            print(f"Text length exceeds 15 characters")
+            show_toast("提醒", f"文本长度超过 15 个字符")
+            keyboard.press_and_release('ctrl+z')  # 模拟按下并释放
+
+            return
         time.sleep(0.1)  # 等待复制操作完成
+
 
     is_find_hotstring = False
 
@@ -70,6 +78,12 @@ def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=Fal
 
         # 获取当前复制的文本
         current_text = pyperclip.paste().replace(" ", "")  # 去掉多余的空格
+        
+        # 空文本限制
+        if not current_text:
+            print(f"Empty text: {current_text}")
+            show_toast("提醒", f"空文本: {current_text}")
+            return
 
         # 检查剪切板是否重复
         if not check_duplicate or current_text != previous_clipboard_content:
