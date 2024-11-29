@@ -3,6 +3,7 @@ import organize_table as tb
 import automation as au
 import utils as ut
 import keyboard_auto_file as kf
+import auto_web_link as al
 
 # 标准库
 import math       # 提供数学函数，例如三角函数、对数、幂运算等
@@ -46,7 +47,7 @@ if __name__ == "__main__":
         {'key': 'ctrl+shift+space', 'func': kf.clear_clipboard} # 清空剪切板
         # {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 默认剪切板为物流单号 拼凑为指定格式
     ]
-    ut.auto_key_with_threads(hotkey_actions)
+    # ut.auto_key_with_threads(hotkey_actions)
 
 
     # ---------- 通知补发单号 -------------
@@ -73,3 +74,7 @@ if __name__ == "__main__":
 
     # ---------- 取消备注 -------------
     # au.run_once_remarks_by_qianniu(window_name)
+
+    # 示例调用
+    al.open_or_focus_url("https://www.kdocs.cn/l/cbyYlnoIbKtX", "银宾表", browser='edge')
+    # al.open_or_focus_url("https://www.kdocs.cn/l/ctLqaUf1xH6O", "罗刚表", browser='edge')
