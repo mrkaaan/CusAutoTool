@@ -62,6 +62,49 @@ def running_loop(window_name, cycle_number=-1):
         
         time.sleep(0.5)   # 每次循环暂停1秒
 
+def running_loop_test(cycle_number=-1):
+    """
+    :param cycle_number: 循环次数，-1 表示无限循环 直到手动终止
+    """
+    # 假设这里打开文件
+
+    exit_flag = False
+
+    def set_exit_flag():
+        nonlocal exit_flag
+        print(f"END | terminated by user")
+        exit_flag = True
+
+    # 设置组合键监听
+    keyboard.add_hotkey('shift+ctrl+e', set_exit_flag)
+
+    cycle_count = 0  # 初始化循环计数器
+    try:
+        while not exit_flag:
+            print(f"Cycle {cycle_count} is finished")
+            if cycle_number > 0 and cycle_count >= cycle_number:  # 检查是否达到设定的循环次数
+                logger.info(f"finished {cycle_count} cycles!")  # 记录完成循环次数
+                return
+                
+            cycle_count += 1  # 循环计数加一
+
+            # 省略一系列复杂操作
+            # 操作末尾给当前数据打上处理完毕标记
+
+            time.sleep(0.5)  # 每次循环暂停1秒
+
+    except KeyboardInterrupt:
+        print("检测到 Ctrl+C，正在退出...")
+    except Exception as e:
+        print(f"快捷键监听出错：{e}")
+    finally:
+        # 回写文件
+        
+        # 移除所有快捷键监听
+        keyboard.unhook_all()
+        print('退出监听')
+
+
 # 判断循环是否结束 需要修改
 def is_loop_over(app, icon):
     """
@@ -311,6 +354,18 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         print(f"未知店铺名称：{notic_shop_name}")
         return
     
+    # 定义一个退出标志
+    exit_flag = False
+    
+    # 定义按键监听事件
+    def set_exit_flag():
+        nonlocal exit_flag
+        print(f"END | terminated by user")
+        exit_flag = True
+    
+    keyboard.add_hotkey('shift+ctrl+e', set_exit_flag)
+
+
     try:
         # 组合表单路径
         # 如果使用今天日期 则进行组合
@@ -366,17 +421,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         else:
             print(f"列 '是否通知' 已存在于表格指定sheet '{current_sheet_name}' 中")
         
-        # 定义一个退出标志
-        exit_flag = False
-        
-        # 定义按键监听事件
-        def on_key_event(event):
-            nonlocal exit_flag
-            if event.name == 'q':
-                logger.info("terminated by user")
-                exit_flag = True
-        
-        keyboard.on_press(on_key_event)  # 设置按键监听
 
         # 点击店铺名称 分为两种情况 已经被选中和未被选中的状态
         is_find_shop_icon = app.click_icon(shop_name_icon, 0, 0.9, 0, 0.3)
@@ -506,9 +550,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     app.click_icon('installation_services.png', 0.6, 1, 0.2, 1)
                 # time.sleep(0.1)
 
-                
-
-
                 # 尝试点击两次搜索订单按钮
                 is_find_search_button = False 
                 for i in range(2):
@@ -630,8 +671,10 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 
             # 循环结束暂停
             time.sleep(0.2)
-    except Exception as err:
-        logger.info(err)
+    except KeyboardInterrupt:
+        print("检测到 Ctrl+C，正在退出...")
+    except Exception as e:
+        print(f"快捷键监听出错：{e}")
     finally:
         # 使用pyperclip库清空剪切板
         pyperclip.copy('')
@@ -640,5 +683,5 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             # 只写回当前处理的sheet
             df_current_sheet.to_excel(writer, sheet_name=current_sheet_name, index=False)
 
-    keyboard.unhook_all()  # 移除所有按键监听
+        keyboard.unhook_all()  # 移除所有按键监听
     return df

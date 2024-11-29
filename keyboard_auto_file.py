@@ -29,7 +29,7 @@ CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
 
 previous_clipboard_content = ""
 
-def show_toast(title, message, timeout=1):
+def show_toast(title, message, timeout=0.2):
     notification.notify(
         title=title,
         message=message,
@@ -39,10 +39,15 @@ def show_toast(title, message, timeout=1):
     )
 
 # 定义一个函数来处理热字符串
-def on_press_clipboard(auto_copy=True, check_interval=None, check_duplicate=None):
+def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=False):
+    '''
+        :param auto_copy: 是否自动选择当前输入框内容 默认True
+        :param check_interval: 是否检查间隔 默认False
+        :param check_duplicate: 是否检查重复 默认False
+    '''
     # mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\n"
     # print(mode_prompt)
-    # show_toast("提醒", mode_prompt, timeout=0.3)
+    # show_toast("提醒", mode_prompt)
 
     global last_checked_time, previous_clipboard_content
 
@@ -57,20 +62,33 @@ def on_press_clipboard(auto_copy=True, check_interval=None, check_duplicate=None
         current_text = pyperclip.paste()      # 获取剪贴板中的文本
         time.sleep(0.1)  # 等待复制操作完成
 
+    is_find_hotstring = False
+
+    # 检查间隔
     if not check_interval or current_time - last_checked_time > CHECK_INTERVAL:
         last_checked_time = current_time
+
         # 获取当前复制的文本
         current_text = pyperclip.paste().replace(" ", "")  # 去掉多余的空格
+
+        # 检查剪切板是否重复
         if not check_duplicate or current_text != previous_clipboard_content:
             previous_clipboard_content = current_text
+
             # 检查当前输入的文本是否是热字符串
             for hotstring in hotstring_set:
                 if current_text.endswith(hotstring):
                     file_path = hotstrings[hotstring]
+
                     # 在独立线程中执行批处理文件
                     threading.Thread(target=execute_bat, args=(bat_file_path, file_path)).start()
-                    show_toast("提醒", f"已执行 {file_path}", timeout=0.3)
+                    show_toast("提醒", f"已执行 {file_path}")
                     print(f"Found hotstring: {hotstring}, executing batch file with argument: {file_path}")
+                    break
+            if not is_find_hotstring:
+                print(f"No hotstring found: {current_text}")
+                show_toast("提醒", f"未找到字符串: {current_text}")
+
 
 
 def execute_bat(bat_file_path, file_path):
@@ -82,17 +100,31 @@ def execute_bat(bat_file_path, file_path):
     except subprocess.CalledProcessError as e:
         print(f"Error executing batch file: {e}, Output: {e.output}")
 
+# 清空剪切板 仅在当前文件启动时生效
 def clear_clipboard_content():
     global previous_clipboard_content
     previous_clipboard_content = ""
     print("Clipboard content cleared.")
-    show_toast("提醒", "剪贴板内容已清除", timeout=0.3)
+    show_toast("提醒", "剪贴板内容已清除")
 
+# 清空剪切板 全局
+def clear_clipboard():
+    # 使用pyperclip库清空剪切板
+    pyperclip.copy('')
+    print("Clipboard content cleared.")
+    show_toast("提醒", "剪贴板内容已清除")
+
+# 仅在运行当前文件时生效
 def start_listener(check_interval=None, check_duplicate=None, clear_on_combo=None):
+    '''
+        :param check_interval: 是否检查间隔 默认None
+        :param check_duplicate: 是否检查重复 默认None
+        :param clear_on_combo: 是否按下 Ctrl + Shift + Space 后清除剪切板内容 默认None
+    '''
     # 根据三个形参提示启用关闭了什么功能
     # mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\nClear on combo: {clear_on_combo}"
     # print(mode_prompt)
-    # show_toast("提醒", mode_prompt, timeout=0.3)
+    # show_toast("提醒", mode_prompt)
 
     # 绑定快捷键 Ctrl + Space
     # keyboard.add_hotkey('ctrl+space', on_press_clipboard())

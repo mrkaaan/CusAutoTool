@@ -41,7 +41,9 @@ if __name__ == "__main__":
         # {'key': 'ctrl+shift+o', 'func': au.run_once_remarks_by_qianniu, 'args': [window_name]}, # 添加备注 并 取消标记
         # {'key': 'ctrl+shift+u', 'func': au.run_once_unmark_by_qianniu, 'args': [window_name]}, # 取消标记
         {'key': 'f2', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
-        {'key': 'ctrl+space', 'func': kf.on_press_clipboard} # 自动识别输入框并替换剪切板内容为图片或视频文件
+        {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
+        {'key': 'f3', 'func': kf.clear_clipboard}, # 清空剪切板
+        {'key': 'ctrl+shift+space', 'func': kf.clear_clipboard} # 清空剪切板
         # {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 默认剪切板为物流单号 拼凑为指定格式
     ]
     ut.auto_key_with_threads(hotkey_actions)
@@ -50,12 +52,8 @@ if __name__ == "__main__":
     # ---------- 通知补发单号 -------------
     '''
         表格必须经过格式化，有整理过后的原始单号以及物流单号
-
-        change 
-            修改监听停止按钮 但用一个q容易不起作用 改为使用组合键的 ctrl+shift+q监听停止
-            是否可以保证在按下停止的案件后 如果程序执行了发送通知 则必定在回写表格后才终止
-            避免在已经通知但是暂未回写表格这个中间状态程序终止导致表格未更新 下次启动会重复通知
-
+        不必担心循环被手动终止导致下次启动有问题，做了相应的防误触处理
+        停止运行组合键为 ctrl+shift+e
     '''
     notification_reissue_parameter = {
         'window_name':window_name, # 窗口名称
@@ -75,4 +73,3 @@ if __name__ == "__main__":
 
     # ---------- 取消备注 -------------
     # au.run_once_remarks_by_qianniu(window_name)
-    

@@ -39,11 +39,15 @@ if __name__ == "__main__":
         {'key': 'f2', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
         {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
         {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 默认剪切板为物流单号 拼凑为指定格式
+        {'key': 'f3', 'func': kf.clear_clipboard}, # 清空剪切板
+        {'key': 'ctrl+shift+space', 'func': kf.clear_clipboard} # 清空剪切板
     ]
     ut.auto_key_with_threads(hotkey_actions)
 
 
     # ---------- 通知补发单号 -------------
+        
+    # 停止运行组合键为 ctrl+shift+e
     notification_reissue_parameter = {
         'window_name': window_name, # 窗口名称
         'table_name': '2024-11-27_230453_处理结果.xlsx',  # 表格名称
