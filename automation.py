@@ -349,9 +349,11 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         shop_name_icon = 'yumao_table_icon_selected.png'
         shop_name_icon_not_selected = 'yumao_table_icon_not_selected.png'
     elif notic_shop_name == '猫宁3504':
+        notic_shop_name = '3504猫宁'
         shop_name_icon = 'maoning_table_icon_selected.png'
         shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
     elif notic_shop_name == '猫宁873':
+        notic_shop_name = '873猫宁'
         shop_name_icon = 'maoning_table_icon_selected.png'
         shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
     elif notic_shop_name == '音美旗舰':
@@ -448,9 +450,13 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             # 限制 DataFrame 到指定行数 用于测试 排除 '是否通知' 列中值为 0 的行
             # df_subset = df_current_sheet.head(2)
             # df_subset = df_current_sheet.iloc[:2]
+            # df_subset = df_current_sheet.iloc
+            print(f"当前sheet: {current_sheet_name}，测试模式，只处理前 {test_mode} 行")
             df_subset = df_current_sheet.loc[df_current_sheet['是否通知'] != 1, :].iloc[:test_mode]
         else:
-            df_subset = df_current_sheet.iloc
+            print(f"当前sheet: {current_sheet_name}，处理所有行")
+            df_subset = df_current_sheet
+        print(df_subset)
         # 逐行处理DataFrame
         for index, row in df_subset.iterrows():
             if exit_flag:

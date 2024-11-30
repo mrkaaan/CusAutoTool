@@ -13,14 +13,14 @@
     },
     "last_used": {
         "window_name": "千牛接待台",
-        "table_name": "2024-11-27_230453_处理结果.xlsx",
-        "table_path": "C:/note/python-WinGUI/form/2024-11-30/2024-11-30_141111_处理结果.xlsx",
-        "notic_shop_name": "潮洁居家",
-        "notic_mode": 2,
-        "show_logistics": false,
+        "table_name": "2024-11-30_223855_处理结果.xlsx",
+        "table_path": "C:/note/python-WinGUI/form/2024-11-30/2024-11-30_223855_处理结果.xlsx",
+        "notic_shop_name": "猫宁873",
+        "notic_mode": 1,
+        "show_logistics": true,
         "logistics_mode": 1,
-        "use_today": "2024-11-27",
-        "test_mode": 1,
-        "is_write": false
+        "use_today": "2024-11-30",
+        "test_mode": 0,
+        "is_write": true
     }
 }

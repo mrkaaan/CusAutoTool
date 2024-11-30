@@ -56,9 +56,9 @@ if __name__ == "__main__":
     # 停止运行组合键为 ctrl+shift+e
     notification_reissue_parameter = {
         'window_name': window_name, # 窗口名称
-        'table_name': '2024-11-27_230453_处理结果.xlsx',  # 表格名称
-        'notic_shop_name': '潮洁', # 通知店铺名称
-        'use_today': '2024-11-27', # 使用日期 如果为空则使用当天日期
+        'table_name': '2024-11-30_223855_处理结果.xlsx',  # 表格名称
+        'notic_shop_name': '潮洁居家', # 通知店铺名称
+        'use_today': '2024-11-30', # 使用日期 如果为空则使用当天日期
     }
     # au.notification_reissue(**notification_reissue_parameter)
 
