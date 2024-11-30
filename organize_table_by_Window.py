@@ -13,7 +13,9 @@ from organize_table import process_table
 config = configparser.ConfigParser()
 config.read('config.ini')
 # 访问环境变量
-window_open_mode = config['default']['WINDOW_OPEN_MODE']
+window_open_mode = config['default'].get('WINDOW_OPEN_MODE')
+# 尝试将 TRY_NUMBER 转换为整数
+window_open_mode = int(window_open_mode)
 
 table_path = ''
 table_name = ''

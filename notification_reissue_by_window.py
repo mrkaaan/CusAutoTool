@@ -18,7 +18,9 @@ import automation as au
 config = configparser.ConfigParser()
 config.read('config.ini')
 # 访问环境变量
-window_open_mode = config['default']['WINDOW_OPEN_MODE']
+window_open_mode = config['default'].get('WINDOW_OPEN_MODE')
+# 尝试将 TRY_NUMBER 转换为整数
+window_open_mode = int(window_open_mode)
 
 table_path = ''
 table_name = ''
@@ -203,6 +205,7 @@ def create_window(mode=0):
             return
         # 判断文件路径table_path是否存在
         if not os.path.exists(table_path):
+            print(f"文件不存在：{table_path}")
             messagebox.showwarning("警告", "表格文件不存在")
             return
 
@@ -239,14 +242,14 @@ def create_window(mode=0):
 
     # 使用上次内容
     def use_last_used():
-        global table_path
+        global table_name
         global table_path
         last_used = get_last_used(notic_config)
         if last_used:
             window_name_var.set(last_used['window_name'])
             table_name = last_used['table_name'].split('/')[-1]
             table_name_var.set(table_name)
-            table_path = last_used['table_name']
+            table_path = last_used['table_path']
             notic_shop_name_var.set(last_used['notic_shop_name'])
             notic_mode_var.set(last_used['notic_mode'])
             show_logistics_var.set(last_used['show_logistics'])
@@ -261,6 +264,7 @@ def create_window(mode=0):
         global table_name
         print(f"identify_shop_name notic_shop_name_var: {table_path}")
         if not os.path.exists(table_path):
+            print(f"文件不存在：{table_path}")
             messagebox.showwarning("警告", "表格文件不存在")
             return
 
