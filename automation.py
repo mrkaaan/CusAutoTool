@@ -335,25 +335,34 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
 
     # 避免店铺名称冲突
     if notic_shop_name == '团洁':
-        notic_shop_name = '团洁旗舰店'
+        notic_shop_name = '团洁旗舰'
 
     # 设置店铺名称图片名称 包含选中与未选中状态
     # '潮洁居家日用旗舰店-天猫', '余猫旗舰店-天猫', '团洁3504猫宁-天猫', '团洁旗舰店-天猫', '潮洁873猫宁-天猫'
-    if notic_shop_name == '团洁旗舰店':
+    if notic_shop_name == '团洁旗舰':
         shop_name_icon = 'tuanjie_table_icon_selected.png'
         shop_name_icon_not_selected = 'tuanjie_table_icon_not_selected.png'
-    elif notic_shop_name == '潮洁':
+    elif notic_shop_name == '潮洁居家':
         shop_name_icon = 'chaojie_table_icon_selected.png'
         shop_name_icon_not_selected = 'chaojie_table_icon_not_selected.png'
-    elif notic_shop_name == '余猫':
+    elif notic_shop_name == '余猫旗舰':
         shop_name_icon = 'yumao_table_icon_selected.png'
         shop_name_icon_not_selected = 'yumao_table_icon_not_selected.png'
-    elif notic_shop_name == '3504':
+    elif notic_shop_name == '猫宁3504':
         shop_name_icon = 'maoning_table_icon_selected.png'
         shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
-    elif notic_shop_name == '873':
+    elif notic_shop_name == '猫宁873':
         shop_name_icon = 'maoning_table_icon_selected.png'
         shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
+    elif notic_shop_name == '音美旗舰':
+        shop_name_icon = 'yinmei_table_icon_selected.png'
+        shop_name_icon_not_selected = 'yinmei_table_icon_not_selected.png'
+    elif notic_shop_name == 'lelodi':
+        shop_name_icon = 'lelodi_table_icon_selected.png'
+        shop_name_icon_not_selected = 'lelodi_table_icon_not_selected.png'
+    elif notic_shop_name == 'yemo':
+        shop_name_icon = 'yemo_table_icon_selected.png'
+        shop_name_icon_not_selected = 'yemo_table_icon_not_selected.png'
     else:
         print(f"未知店铺名称：{notic_shop_name}")
         return

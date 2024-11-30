@@ -148,6 +148,12 @@ def simplify_shop_name(shop_name):
         return "猫宁3504"
     elif "873" in shop_name:
         return "猫宁873"
+    elif "音乐美" in shop_name:
+        return "音乐旗舰"
+    elif "lelodi" in shop_name:
+        return "lelodi"
+    elif "yemo" in shop_name:
+        return "yemo"
     else:
         return shop_name
 
@@ -298,7 +304,7 @@ def create_window(mode=0):
                 notic_shop_name_combobox['values'] = shop_names  # 更新下拉菜单选项
             else:
                 notic_shop_name_var.set('自行输入或识别表格获取')
-                notic_shop_name_combobox['values'] = ['潮洁居家', '余猫日用', '自行输入或识别表格获取']
+                notic_shop_name_combobox['values'] = ['潮洁居家', '余猫旗舰', '自行输入或识别表格获取']
         except Exception as e:
             messagebox.showerror("错误", f"读取表格时发生错误: {e}")
 
@@ -381,7 +387,7 @@ def create_window(mode=0):
     notic_shop_name_label = tk.Label(window, text="店铺名称:", font=f'{label_font_fam} {label_font_size} {label_weight}', fg=label_color)
     notic_shop_name_label.place(x=label_x_offset, y=label_y_offset+2*label_y_interval)
     notic_shop_name_var = tk.StringVar()
-    notic_shop_name_combobox = ttk.Combobox(window, textvariable=notic_shop_name_var, values=['潮洁居家', '余猫日用', '自行输入或识别表格获取'], width=(entry_width if mode == 0 else entry_width-2))
+    notic_shop_name_combobox = ttk.Combobox(window, textvariable=notic_shop_name_var, values=['潮洁居家', '余猫旗舰', '自行输入或识别表格获取'], width=(entry_width if mode == 0 else entry_width-2))
     notic_shop_name_combobox.place(x=entry_x_offset, y=entry_y_offset+2*entry_y_interval)
     identify_shop_name_button = tk.Label(window, text="识别店铺", cursor='hand2', compound='center', font=f'{entry_font_fam} {entry_font_size-2} bold', fg=entry_color)
     identify_shop_name_button.bind("<Button-1>", lambda event: identify_shop_name(notic_shop_name_var, notic_shop_name_combobox))
