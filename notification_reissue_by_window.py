@@ -10,9 +10,15 @@ import shutil
 import re
 import openpyxl
 from plyer import notification
+import configparser
 
 import automation as au
 
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+# 访问环境变量
+window_open_mode = config['default']['WINDOW_OPEN_MODE']
 
 table_path = ''
 table_name = ''
@@ -464,7 +470,7 @@ def call_create_window():
         window.lift()  # 如果窗口已经存在，将其提升到最前面
         window.focus_force()  # 强制窗口获得焦点
     else:
-        create_window(mode=1)
+        create_window(mode=window_open_mode)
         # window.after(0, create_window)  # 如果窗口不存在，创建新窗口
 
 

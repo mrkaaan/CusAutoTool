@@ -6,8 +6,14 @@ import threading
 from datetime import datetime
 import pyperclip
 import shutil
+import configparser
 
 from organize_table import process_table
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+# 访问环境变量
+window_open_mode = config['default']['WINDOW_OPEN_MODE']
 
 table_path = ''
 table_name = ''
@@ -292,7 +298,7 @@ def call_create_window():
         root.lift()  # 如果窗口已经存在，将其提升到最前面
         root.focus_force()  # 强制窗口获得焦点
     else:
-        create_window(mode=1)
+        create_window(mode=window_open_mode)
         # root.after(0, create_window)  # 如果窗口不存在，创建新窗口
 
 if __name__ == "__main__":
