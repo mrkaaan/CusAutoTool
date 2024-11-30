@@ -215,10 +215,12 @@ def create_window(mode=0):    # 主窗口
             dynamic_buttons.append(shop_button)
             button_x_offset += button_y_interval
 
-    # 设置窗口居中
+    # 设置窗口位于屏幕的右上部分中间
     scnwidth, scnheight = root.maxsize()
-    tmp = '%dx%d+%d+%d' % (
-        window_width, window_height, (scnwidth - window_width) / 2, (scnheight - window_height) / 2)  # 参数为（‘窗口宽 x 窗口高 + 窗口位于x轴位置 + 窗口位于y轴位置）
+    # 计算窗口的x坐标为屏幕宽度减去窗口宽度，y坐标为0（屏幕最上端）
+    x_offset = scnwidth - window_width - 100
+    y_offset = (scnheight - window_height) / 2 - 100
+    tmp = '%dx%d+%d+%d' % (window_width, window_height, x_offset, y_offset)
     root.geometry(tmp)
 
     # 禁止更改窗口大小

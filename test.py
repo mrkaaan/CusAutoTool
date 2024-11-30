@@ -5,6 +5,7 @@ import utils as ut
 import keyboard_auto_file as kf
 import auto_web_link as al
 import organize_table_by_Window as tb_win
+import notification_reissue_by_window as no_win
 
 # 标准库
 import math       # 提供数学函数，例如三角函数、对数、幂运算等
@@ -46,7 +47,9 @@ if __name__ == "__main__":
         {'key': 'ctrl+space', 'func': kf.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
         {'key': 'f3', 'func': kf.clear_clipboard}, # 清空剪切板
         {'key': 'ctrl+shift+space', 'func': kf.clear_clipboard}, # 清空剪切板
-        {'key': 'ctrl+shift+z', 'func': tb_win.call_create_window}, # 打开窗口，用于整理表格
+        {'key': 'ctrl+shift+alt+z', 'func': tb_win.call_create_window}, # 打开窗口，用于整理表格
+        {'key': 'ctrl+shift+alt+a', 'func': no_win.call_create_window}, # 打开窗口，用于通知补发
+        {'key': 'ctrl+shift+alt+q', 'func': no_win.notic_last_data} # 使用上次数据直接通知补发
         # {'key': 'ctrl+shift+x', 'func': kf.update_clipboard}, # 默认剪切板为物流单号 拼凑为指定格式
     ]
     ut.auto_key_with_threads(hotkey_actions)

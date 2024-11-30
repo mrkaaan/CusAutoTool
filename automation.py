@@ -328,6 +328,9 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         :param table_path: 表单路径 暂时用不到 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
         :param form_folder: 表单文件夹路径
     '''
+    # 打印参数信息 每条信息换行
+    print(f"窗口名称：{window_name}\n表单名称：{table_name}\n店铺名称：{notic_shop_name}\n通知模式：{notic_mode}\n显示物流公司：{show_logistics}\n物流模式：{logistics_mode}\n是否使用今天日期作为路径：{use_today}\n测试模式：{test_mode}\n是否写入数据：{is_write}\n表单路径：{table_path}\n表单文件夹路径：{form_folder}")
+
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
     # 避免店铺名称冲突

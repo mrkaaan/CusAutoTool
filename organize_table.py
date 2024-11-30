@@ -3,6 +3,17 @@ import datetime
 import os
 import pyperclip
 
+from plyer import notification
+
+def show_toast(title, message, timeout=0.2):
+    notification.notify(
+        title=title,
+        message=message,
+        app_name="提醒",
+        timeout=timeout,
+        toast=True
+    )
+
 # 读取csv文件
 def read_csv(input_file):
     # 读取表格，尝试多种编码
@@ -159,6 +170,7 @@ def process_table(input_filename, form_folder='./form'):
 
     print(f"文件已成功创建：{output_file}")
     print(f"所有订单编号已复制到剪贴板")
+    show_toast("提醒", f"文件已成功创建：{output_file}\n所有订单编号已复制到剪贴板")
 
     return output_filename, all_order_numbers, shop_order_numbers
 
