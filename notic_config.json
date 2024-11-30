@@ -1,6 +1,6 @@
 {
     "defaults": {
-        "window_name": "千牛工作台",
+        "window_name": "千牛接待台",
         "table_name": "xxx_处理结果.xlsx",
         "table_path": "",
         "notic_shop_name": "",
@@ -12,15 +12,15 @@
         "is_write": true
     },
     "last_used": {
-        "window_name": "千牛工作台",
-        "table_name": "2024-11-23_142753_处理结果.xlsx",
-        "table_path": "D:/projects/auto_customer/form/2024-11-30/2024-11-23_142753_处理结果.xlsx",
-        "notic_shop_name": "音美乐旗舰店-天猫",
+        "window_name": "千牛接待台",
+        "table_name": "2024-11-27_230453_处理结果.xlsx",
+        "table_path": "C:/note/python-WinGUI/form/2024-11-30/2024-11-30_141111_处理结果.xlsx",
+        "notic_shop_name": "潮洁居家",
         "notic_mode": 2,
-        "show_logistics": true,
+        "show_logistics": false,
         "logistics_mode": 1,
-        "use_today": "2024-11-30",
-        "test_mode": 0,
-        "is_write": true
+        "use_today": "2024-11-27",
+        "test_mode": 1,
+        "is_write": false
     }
 }

@@ -11,9 +11,10 @@ import re
 import openpyxl
 from plyer import notification
 import configparser
+import time
 
 import automation as au
-
+from pyautogui import FailSafeException
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -29,7 +30,7 @@ window_initialized = False  # 标志 window 是否已经初始化
 
 DEFAULT_VALUES = {
     "defaults": {
-        "window_name": "千牛工作台",
+        "window_name": "千牛接待台",
         "table_name": "xxx_处理结果.xlsx",
         "table_path": "",
         "notic_shop_name": "",
@@ -364,7 +365,7 @@ def create_window(mode=0):
     # 窗口名
     window_name_label = tk.Label(window, text="窗口名称:", font=f'{label_font_fam} {label_font_size} {label_weight}', fg=label_color)
     window_name_label.place(x=label_x_offset, y=label_y_offset)
-    window_name_var = tk.StringVar(value='千牛工作台')
+    window_name_var = tk.StringVar(value='千牛接待台')
     window_name_entry = tk.Entry(window, textvariable=window_name_var, width=entry_width, font=f'{entry_font_fam} {entry_font_size}', fg=entry_color)
     window_name_entry.place(x=entry_x_offset, y=entry_y_offset)
 
@@ -486,17 +487,42 @@ def call_create_window():
 
 # 使用上一次数据直接通知
 def notic_last_data():
-    # 读取配置文件
+    # # 读取配置文件
     notic_config = load_config()
-    last_data = get_last_used(notic_config)
-    if last_data is not None:
-        au.notification_reissue(**last_data)
-        print("使用上次数据通知补发")
-        show_toast("提醒", "使用上次数据通知补发...")
+    notification_reissue_parameter_load = get_last_used(notic_config)
+    time.sleep(0.5)
+    notification_reissue_parameter_load['table_path'] = ''
+    notification_reissue_parameter = {
+        'window_name':'千牛接待台', # 窗口名称
+        'table_name':'2024-11-27_230453_处理结果.xlsx',  # 表格名称
+        'table_path': '', # 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
+        'notic_shop_name':'潮洁居家', # 通知店铺名称
+        'notic_mode':2,       # 通知模式  1：输入框通知 2：补发窗口按钮通知
+        'show_logistics':False, # 是否显示物流公司 输入框通知模式下生效
+        'logistics_mode':1,    # 物流模式 1自动识别物流公司 2手动输入物流公司
+        'use_today':'2024-11-27', # 使用日期 如果为空则使用当天日期
+        'test_mode':1, # 测试模式 0：不测试 若测试则输入测试数量
+        'is_write':False, # 是否回写表格
+    }
+    # print(notification_reissue_parameter_load)
+    # print(notification_reissue_parameter)
+    notification_reissue_parameter = notification_reissue_parameter_load
+    if notification_reissue_parameter is not None:
+        try:
+            au.notification_reissue(**notification_reissue_parameter)
+            print("使用上次数据通知补发")
+            show_toast("提醒", "使用上次数据通知补发...")
+        except FailSafeException:
+            print("Fail-safe 被触发，请确保鼠标不要移动到屏幕角落。")
+        except Exception as e:
+            print(f"发生错误: {e}")
+            show_toast("提醒", f"发生错误: {e}")
+        
     else:
         print("没有上次数据")
         show_toast("提醒", "没有上次数据")
 
 # 测试
 if __name__ == "__main__":
-    create_window()
+    # create_window()
+    notic_last_data()
