@@ -177,7 +177,10 @@ def create_window(mode=0):
     global table_name
 
     # 修改 on_ok 函数以保存上次使用的值
-    def on_ok():
+    def on_ok(notic=True):
+        '''
+            :param notic: 是否启动通知 默认启动
+        '''
         # 收集所有参数
         notification_reissue_parameter = {
             'window_name': window_name_var.get(),
@@ -219,12 +222,14 @@ def create_window(mode=0):
         # 保存上次使用的值
         save_config({"defaults":DEFAULT_VALUES.get("defaults"),"last_used": notification_reissue_parameter})
 
-        # 关闭窗口
-        window.destroy()
-        show_toast("提醒", "开始补发通知...")
-        # 调用函数 a
-        au.notification_reissue(**notification_reissue_parameter)
-
+        if notic:
+            # 关闭窗口
+            window.destroy()
+            show_toast("提醒", "开始补发通知...")
+            # 调用函数 a
+            au.notification_reissue(**notification_reissue_parameter)
+        else:
+            show_toast("提醒", "保存配置成功")
 
     def set_today_date():
         use_today_var.set(datetime.now().strftime('%Y-%m-%d'))
@@ -309,6 +314,14 @@ def create_window(mode=0):
         except Exception as e:
             messagebox.showerror("错误", f"读取表格时发生错误: {e}")
 
+    def on_combobox_change(*args):
+        selected_value = notic_shop_name_var.get()
+        if selected_value in ["猫宁873", "猫宁3504"]:
+            notic_mode_var.set(1)
+        else:
+            notic_mode_var.set(2)
+        window.update()
+            
     # 创建主窗口
     window = tk.Tk()
     window.title("通知补发参数设置")
@@ -346,9 +359,9 @@ def create_window(mode=0):
     button_x_offset = 140
     button_y_offset = 300
     # 功能按钮设置
-    set_button_x_offset = window_width - 150 if mode == 0 else window_width - 146  # button x轴位置间隔设置
+    set_button_x_offset = window_width - 140 if mode == 0 else window_width - 136  # button x轴位置间隔设置
     set_button_y_offset = window_height - 40 if mode == 0 else window_height - 43  # button y轴位置间隔设置
-    set_button_x_interval = 30  if mode == 0 else 32  # button x轴位置间隔设置
+    set_button_x_interval = 26  if mode == 0 else 30  # button x轴位置间隔设置
     
     # 设置窗口位于屏幕的右上部分中间
     scnwidth, scnheight = window.maxsize()
@@ -394,6 +407,7 @@ def create_window(mode=0):
     identify_shop_name_button.bind("<Button-1>", lambda event: identify_shop_name(notic_shop_name_var, notic_shop_name_combobox))
     identify_shop_name_button.place(x=entry_x_offset+int(1.8*entry_x_interval), y=entry_y_offset+2*entry_y_interval)
 
+
     # 通知模式
     notic_mode_label = tk.Label(window, text="通知模式:", font=f'{label_font_fam} {label_font_size} {label_weight}', fg=label_color)
     notic_mode_label.place(x=label_x_offset, y=label_y_offset+3*label_y_interval)
@@ -402,6 +416,9 @@ def create_window(mode=0):
     notic_mode_radio1.place(x=entry_x_offset, y=entry_y_offset+3*entry_y_interval)
     notic_mode_radio2 = tk.Radiobutton(window, text="窗口通知", variable=notic_mode_var, value=2)
     notic_mode_radio2.place(x=entry_x_offset+entry_x_interval, y=entry_y_offset+3*entry_y_interval)
+    
+    # 监听 Combobox 的值变化
+    notic_shop_name_var.trace("w", on_combobox_change)
 
     # 是否显示物流公司
     show_logistics_label = tk.Label(window, text="显示物流:", font=f'{label_font_fam} {label_font_size} {label_weight}', fg=label_color)
@@ -453,6 +470,7 @@ def create_window(mode=0):
     ok_button = tk.Button(window, text="通知补发", command=on_ok)
     ok_button.place(x=button_x_offset, y=button_y_offset)
 
+
     # 使用默认值按钮
     use_defaults_button = tk.Label(window, text="默认值", cursor='hand2', compound='center', font=f'{button_font_fam} {button_font_size-1} bold', fg=button_color)
     use_defaults_button.bind("<Button-1>", lambda event: use_defaults())
@@ -461,7 +479,13 @@ def create_window(mode=0):
     # 使用上次内容按钮
     use_last_used_button = tk.Label(window, text="上次值", cursor='hand2', compound='center', font=f'{button_font_fam} {button_font_size-1} bold', fg=button_color)
     use_last_used_button.bind("<Button-1>", lambda event: use_last_used())
-    use_last_used_button.place(x=set_button_x_offset+2*set_button_x_interval, y=set_button_y_offset)
+    use_last_used_button.place(x=set_button_x_offset+int(1.8*set_button_x_interval), y=set_button_y_offset)
+
+    # 存储last按钮
+    save_last_used_button = tk.Label(window, text="保存", cursor='hand2', compound='center', font=f'{button_font_fam} {button_font_size-1} bold', fg=button_color)
+    save_last_used_button.bind("<Button-1>", lambda event: on_ok(False))
+    save_last_used_button.place(x=set_button_x_offset+int(3.5*set_button_x_interval), y=set_button_y_offset)
+
 
     # 运行主循环
     window.protocol("WM_DELETE_WINDOW", on_close)  # 设置关闭窗口时的回调函数
