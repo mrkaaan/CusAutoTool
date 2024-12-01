@@ -3,6 +3,9 @@ import subprocess
 import threading
 import time
 import keyboard
+import pyautogui
+from pynput.keyboard import Controller, Key
+keyboard_controller = Controller()
 from utils import show_toast, read_json
 from config import setup_bat_path, setup_hot_file_name
 
@@ -27,27 +30,43 @@ def on_press_clipboard(bat_file_path, hotstrings, hotstrings_set, auto_copy=True
     global last_checked_time, previous_clipboard_content
 
     current_time = time.time()
+    current_text = ""
 
     if auto_copy:
-        # 获取输入框当前的内容
-        keyboard.press_and_release('ctrl+a')  
-        keyboard.press_and_release('ctrl+x')  # 模拟按下并释放
-        current_text = pyperclip.paste().replace(" ", "")  # 获取剪贴板中的文本 去掉多余的空格
+        # keyboard.press_and_release('ctrl+a')  
+        # keyboard.press_and_release('ctrl+x')
+
+        pyautogui.hotkey('ctrl', 'a')  # 模拟按下并释放
+        pyautogui.hotkey('ctrl', 'x')  # 模拟按下并释放
+
+        # 模拟按下并释放 Ctrl + A
+        # with keyboard_controller.pressed(Key.ctrl):
+        #     keyboard_controller.press('a')
+        #     keyboard_controller.release('a')
+
+
+        # # 模拟按下并释放 Ctrl + X
+        # with keyboard_controller.pressed(Key.ctrl):
+        #     keyboard_controller.press('x')
+        #     keyboard_controller.release('x')
+
+    current_text = pyperclip.paste().replace(" ", "").lower()  # 获取剪贴板中的文本 去掉多余的空格
+
         # 空文本限制
-        if not current_text:
-            print(f"Empty text: {current_text}")
-            show_toast("提醒", f"空文本: {current_text}")
-            return
-        
-        # 限制文本长度
-        if len(current_text) > 15:
-            print(f"Text length exceeds 15 characters")
-            show_toast("提醒", f"文本长度超过 15 个字符")
+    if not current_text:
+        print(f"Empty text: {current_text}")
+        show_toast("提醒", f"空文本: {current_text}")
+        return
+    
+    # 限制文本长度
+    if len(current_text) > 15:
+        print(f"Text length exceeds 15 characters")
+        show_toast("提醒", f"文本长度超过 15 个字符")
+        if auto_copy:
             keyboard.press_and_release('ctrl+z')  # 模拟按下并释放
-
-            return
-        time.sleep(0.1)  # 等待复制操作完成
-
+        return
+    
+    time.sleep(0.1)  # 等待复制操作完成
 
     is_find_hotstring = False
 
@@ -73,9 +92,8 @@ def on_press_clipboard(bat_file_path, hotstrings, hotstrings_set, auto_copy=True
             if not is_find_hotstring:
                 print(f"No hotstring found: {current_text}")
                 show_toast("提醒", f"未找到字符串: '{current_text}'")
-
-
-
+        
+# 定义一个函数来执行批处理文件
 def execute_bat(bat_file_path, file_path):
     try:
         result = subprocess.run([bat_file_path, file_path], check=True, capture_output=True, text=True)
