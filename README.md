@@ -24,3 +24,7 @@ conda env create -f environment.yml
 
 conda activate gui
 ```
+
+## 项目目录
+
+1. `main.py`：主程序文件，运行此文件即可打开程序

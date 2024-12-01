@@ -1,27 +1,13 @@
 from WinGUI import WinGUI
-import keyboard_auto_file as kf
-
-# 标准库
-import math       # 提供数学函数，例如三角函数、对数、幂运算等
-import os         # 提供与操作系统交互的功能，如文件和目录管理
-import shutil     # 提供高级的文件和目录操作，如复制、移动和删除
-import time       # 提供时间相关的功能，如延迟、时间戳等
+import utils as ul
+import os   
+import time     
 import datetime
-
-# 第三方库
-import cv2 as cv       # OpenCV库，用于图像和视频处理
-import keyboard        # 提供键盘事件处理的功能
-import pyautogui       # 提供屏幕自动化控制，如鼠标点击、键盘输入、截图等
-import win32con        # 包含Windows API常量，用于与Windows系统交互
-import win32gui        # 提供与Windows GUI（图形用户界面）交互的功能
-import pyperclip       # 处理剪贴板内容
-import openpyxl
-
-from PIL import ImageGrab     # 从PIL库导入ImageGrab模块，用于截图
-from loguru import logger     # 引入loguru库，用于简便的日志记录
-
-# 表格操作
+import keyboard   
+import pyautogui   
+import pyperclip   
 import pandas as pd
+from loguru import logger  
 
 # 循环执行 直到出现标志或者手动终止 需要修改
 def running_loop(window_name, cycle_number=-1):
@@ -103,7 +89,6 @@ def running_loop_test(cycle_number=-1):
         # 移除所有快捷键监听
         keyboard.unhook_all()
         print('退出监听')
-
 
 # 判断循环是否结束 需要修改
 def is_loop_over(app, icon):
@@ -198,111 +183,6 @@ def run_once_unmark_by_qianniu(window_name, mode=1):
         # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
     except Exception as err:
         logger.info(err)  # 记录异常信息
-
-# 万店通
-# 订单管理界面 order_management_interface
-# 历史订单界面 historical_order_interface
-# 手工建单界面 manual_order_creation_interface
-
-# 选中的订单    current_order
-# 复制补发订单   copy_reissue_order
-# 重复创建确认   repeat_creation_confirmation
-# 是    repeat_creation_confirmation_yes
-
-# 成交日期       transaction_date
-
-# 已有订单   existing_orders
-
-# 添加单品   add_single_item
-# 货品名称    goods_name
-# 编码    goods_code
-# 保存   save_add_item 
-
-# 补发   customer_service_remarks
-def run_once_by_erp(window_name):
-    app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
-
-    try:
-        # 判断是否未选中 订单管理 是则选中
-        order_manage_x, order_manage_y, is_find_not_current_order_management = app.locate_icon('erp/order_management_interface_not_current.png',0,0.3,0,0.4)
-        if is_find_not_current_order_management:
-            app.move_and_click(order_manage_x, order_manage_y)
-        # 点击订单管理
-        # app.click_icon('erp/order_management_interface.png',0,0.3,0,0.4)
-        '''
-        # 右键选中订单
-        app.click_icon('current_order.png',0.5,1.0,0.5,1.0,'right')
-        # 选择复制补发订单
-        app.click_icon('copy_reissue_order.png',0.5,1.0,0.5,1.0)
-        # 判断是否提示
-        is_find = app.check_icon('repeat_creation_confirmation.png',0.5,1.0,0.5,1.0)
-        if is_find:
-            # 点击是
-            app.click_icon('repeat_creation_confirmation_yes.png',0.5,1.0,0.5,1.0)
-        # 延迟
-        time.sleep(0.5)
-
-        # 子窗口-创建补发订单
-        child_window_reissue_order = WinGUI('创建补发订单')
-        # 设置今天日期
-        trans_data_icon_local_x, trans_data_icon_local_y, trans_data_icon_is_find = child_window_reissue_order.locate_icon('transaction_date.png',0.5,1.0,0.5,1.0)
-        if trans_data_icon_is_find:
-            # 向右移动并点击呼出日期下拉框
-            child_window_reissue_order.move_and_click(trans_data_icon_local_x+50, trans_data_icon_local_y)
-            # 相对向右下角移动点击今天
-            child_window_reissue_order.rel_remove_and_click(50, 50)
-
-        # 循环检测指定位置是否有1来判断是否已经存在商品 有则向右轻微移动到商品条目 双击删除商品 保证删除至没有商品
-        while True:
-            existence_orders_local_x, existing_orders_local_y, is_find_existence = child_window_reissue_order.locate_icon('existing_orders.png',0.5,1.0,0.5,1.0)
-            if is_find_existence:
-                # 向右轻微移动到商品条目 双击删除商品
-                child_window_reissue_order.move_and_click(existence_orders_local_x+10, existing_orders_local_y)
-                child_window_reissue_order.move_and_click(existence_orders_local_x+10, existing_orders_local_y)
-                # 延迟
-                time.sleep(0.5)
-            else:
-                break
-        
-        # 点击添加单品
-        child_window_reissue_order.click_icon('add_single_item.png',0.5,1.0,0.5,1.0)
-        # 子窗口-添加单品
-        child_window_add_single_item = WinGUI('添加单品')
-        # 定位到货品名称 并移动到输入框
-        goods_name_local_x, goods_name_local_y, goods_name_local_is_find = child_window_add_single_item.locate_icon('goods_name.png',0.5,1.0,0.5,1.0)
-        if goods_name_local_is_find:
-            # 向下移动并点击输入框
-            child_window_add_single_item.rel_remove_and_click(goods_name_local_x, goods_name_local_y+8)
-            # 输入货品名称 备注
-            keyboard.write('备注')
-            # 回车
-            keyboard.press_and_release('enter')
-
-            # 双击指定编码商品添加
-            goods_code_local_x, goods_code_local_y, goods_code_local_is_find = child_window_add_single_item.locate_icon('goods_code.png',0.5,1.0,0.5,1.0)
-            if goods_code_local_is_find:
-                # 双击商品名添加
-                child_window_add_single_item.move_and_click(goods_code_local_x, goods_code_local_y)
-                child_window_add_single_item.move_and_click(goods_code_local_x, goods_code_local_y)
-                # 延迟
-                time.sleep(0.5)
-            
-            # 点击保存
-            child_window_add_single_item.click_icon('save_add_item.png',0.5,1.0,0.5,1.0)
-
-        # 回到 子窗口-创建补发订单
-        # 定位到客服备注 并移动到输入框
-        customer_service_remarks_local_x, customer_service_remarks_local_y, customer_service_remarks_local_is_find = child_window_reissue_order.locate_icon('customer_service_remarks.png',0.5,1.0,0.5,1.0)
-        if customer_service_remarks_local_is_find:
-            # 向右移动点击输入框
-            child_window_reissue_order.move_and_click(customer_service_remarks_local_x+10, customer_service_remarks_local_y)
-            # 输入客服备注：补发
-            keyboard.write('补发')
-        '''
-    except Exception as err:
-        logger.info(err)
-
-
 
 # 测试
 def run_test(window_name):
@@ -545,7 +425,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 time.sleep(0.2)
                 # 获取快递公司
                 if show_logistics:
-                    logistics = kf.get_express_company(logistics_number)
+                    logistics = ul.get_express_company(logistics_number)
                 else:
                     logistics = ''
                 message = f"亲 {logistics} {logistics_number} 这是您的补发单号 请注意查收"
@@ -653,7 +533,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 # 手动输入物流公司
                 if logistics_mode == 2:
                     print(f'手动输入快递公司模式..')
-                    logistics = kf.get_express_company(logistics_number)
+                    logistics = ul.get_express_company(logistics_number)
                     # 如果不为空 末尾加快递二字
                     if logistics:
                         logistics = f"{logistics}快递"

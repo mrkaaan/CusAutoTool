@@ -3,17 +3,16 @@ import json
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk, messagebox
-import threading
 from datetime import datetime
-import pyperclip
 import shutil
 import re
 import openpyxl
-from plyer import notification
 import configparser
 import time
+from utils import show_toast
 
-import automation as au
+
+import auto_operation as au
 from pyautogui import FailSafeException
 
 config = configparser.ConfigParser()
@@ -46,14 +45,6 @@ DEFAULT_VALUES = {
 
 CONFIG_FILE = 'notic_config.json'
 
-def show_toast(title, message, timeout=0.2):
-    notification.notify(
-        title=title,
-        message=message,
-        app_name="提醒",
-        timeout=timeout,
-        toast=True
-    )
 
 def load_config():
     if os.path.exists(CONFIG_FILE):

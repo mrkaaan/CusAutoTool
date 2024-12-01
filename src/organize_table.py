@@ -2,17 +2,7 @@ import pandas as pd
 import datetime
 import os
 import pyperclip
-
-from plyer import notification
-
-def show_toast(title, message, timeout=0.2):
-    notification.notify(
-        title=title,
-        message=message,
-        app_name="提醒",
-        timeout=timeout,
-        toast=True
-    )
+from utils import show_toast
 
 # 读取csv文件
 def read_csv(input_file):

@@ -1,7 +1,6 @@
 import os
 import tkinter as tk
 from tkinter import filedialog
-from tkinter import messagebox
 import threading
 from datetime import datetime
 import pyperclip
@@ -11,9 +10,9 @@ import configparser
 from organize_table import process_table
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('../config/config.ini')
 # 访问环境变量
-window_open_mode = config['default'].get('WINDOW_OPEN_MODE')
+window_open_mode = config['numbers'].get('WINDOW_OPEN_MODE')
 # 尝试将 TRY_NUMBER 转换为整数
 window_open_mode = int(window_open_mode)
 

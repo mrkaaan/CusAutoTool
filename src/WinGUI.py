@@ -16,10 +16,10 @@ from PIL import ImageGrab     # 从PIL库导入ImageGrab模块，用于截图
 from loguru import logger     # 引入loguru库，用于简便的日志记录
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('../config/config.ini')
 
 # 访问环境变量
-TRY_NUMBER = config['default'].get('TRY_NUMBER', '1')  # 使用 get 方法提供默认值
+TRY_NUMBER = config['numbers'].get('TRY_NUMBER', '1')  # 使用 get 方法提供默认值
 
 # 尝试将 TRY_NUMBER 转换为整数
 try:

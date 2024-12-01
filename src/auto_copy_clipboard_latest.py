@@ -1,45 +1,20 @@
 import pyperclip
 import subprocess
 import threading
-import json
 import time
-import configparser
 import keyboard
-from plyer import notification
+from utils import show_toast, read_json
+from config import setup_bat_path, setup_hot_file_name
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-
-# 访问环境变量
-bat_file_path = config['default']['BAT_FILE_PATH']
-hotstrings_file_name = config['default']['HOT_FILE_NAME']
-
-print(f"Batch file path: {bat_file_path}")  # 打印批处理文件路径
-print(f"Hotstrings file name: {hotstrings_file_name}")  # 打印热字符串文件名
-
-# 定义要监听的热字符串及其对应的批处理文件路径
-with open(hotstrings_file_name, 'r', encoding='utf-8') as f:
-    hotstrings = json.load(f)
-
-# 将热字符串存储在一个集合中，以便更快地查找匹配项
-hotstring_set = set(hotstrings.keys())
 
 last_checked_time = 0
 CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
 
 previous_clipboard_content = ""
 
-def show_toast(title, message, timeout=0.2):
-    notification.notify(
-        title=title,
-        message=message,
-        app_name="提醒",
-        timeout=timeout,
-        toast=True
-    )
 
 # 定义一个函数来处理热字符串
-def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=False):
+def on_press_clipboard(bat_file_path, hotstrings, hotstrings_set, auto_copy=True, check_interval=False, check_duplicate=False):
     '''
         :param auto_copy: 是否自动选择当前输入框内容 默认True
         :param check_interval: 是否检查间隔 默认False
@@ -48,18 +23,22 @@ def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=Fal
     # mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\n"
     # print(mode_prompt)
     # show_toast("提醒", mode_prompt)
-
+    print('Starting listener...')
     global last_checked_time, previous_clipboard_content
 
     current_time = time.time()
 
     if auto_copy:
-        # keyboard.Controller().type('{ctrl}a')  # 全选
-        # keyboard.Controller().type('{ctrl}x')  # 复制
         # 获取输入框当前的内容
         keyboard.press_and_release('ctrl+a')  
         keyboard.press_and_release('ctrl+x')  # 模拟按下并释放
-        current_text = pyperclip.paste()      # 获取剪贴板中的文本
+        current_text = pyperclip.paste().replace(" ", "")  # 获取剪贴板中的文本 去掉多余的空格
+        # 空文本限制
+        if not current_text:
+            print(f"Empty text: {current_text}")
+            show_toast("提醒", f"空文本: {current_text}")
+            return
+        
         # 限制文本长度
         if len(current_text) > 15:
             print(f"Text length exceeds 15 characters")
@@ -76,21 +55,12 @@ def on_press_clipboard(auto_copy=True, check_interval=False, check_duplicate=Fal
     if not check_interval or current_time - last_checked_time > CHECK_INTERVAL:
         last_checked_time = current_time
 
-        # 获取当前复制的文本
-        current_text = pyperclip.paste().replace(" ", "")  # 去掉多余的空格
-        
-        # 空文本限制
-        if not current_text:
-            print(f"Empty text: {current_text}")
-            show_toast("提醒", f"空文本: {current_text}")
-            return
-
         # 检查剪切板是否重复
         if not check_duplicate or current_text != previous_clipboard_content:
             previous_clipboard_content = current_text
 
             # 检查当前输入的文本是否是热字符串
-            for hotstring in hotstring_set:
+            for hotstring in hotstrings_set:
                 if current_text.endswith(hotstring):
                     is_find_hotstring = True
                     file_path = hotstrings[hotstring]
@@ -130,7 +100,7 @@ def clear_clipboard():
     show_toast("提醒", "剪贴板内容已清除")
 
 # 仅在运行当前文件时生效
-def start_listener(check_interval=None, check_duplicate=None, clear_on_combo=None):
+def start_listener(bat_file_path, hotstrings, hotstrings_set, check_interval=None, check_duplicate=None, clear_on_combo=None):
     '''
         :param check_interval: 是否检查间隔 默认None
         :param check_duplicate: 是否检查重复 默认None
@@ -141,9 +111,11 @@ def start_listener(check_interval=None, check_duplicate=None, clear_on_combo=Non
     # print(mode_prompt)
     # show_toast("提醒", mode_prompt)
 
+
     # 绑定快捷键 Ctrl + Space
     # keyboard.add_hotkey('ctrl+space', on_press_clipboard())
-    keyboard.add_hotkey('ctrl+space', lambda *args, f=on_press_clipboard, a=[check_interval, check_duplicate]: f(*a))
+    keyboard.add_hotkey('ctrl+space', lambda *args, f=on_press_clipboard, a=[bat_file_path, hotstrings, hotstrings_set]: f(*a))
+    # keyboard.add_hotkey('ctrl+space', lambda: on_press_clipboard(bat_file_path, hotstrings, hotstrings_set))
 
     # 绑定快捷键 Ctrl + Shift + Space
     if clear_on_combo:
@@ -156,7 +128,28 @@ def stop_listener():
 
 if __name__ == '__main__':
     try:
-        start_listener()
+        bat_file_path = setup_bat_path()
+        if not bat_file_path:
+            print("未设置批处理文件路径，请在 config.py 中设置")
+            exit()
+        hotstrings_file_name = setup_hot_file_name()
+        if not hotstrings_file_name:
+            print("未设置热键配置文件，请在 config.py 中设置")
+            exit()
+        hotstrings_path = f"../config/{hotstrings_file_name}"
+        # 定义要监听的热字符串及其对应的批处理文件路径
+        hotstrings = read_json(hotstrings_path, 'utf-8')
+        if not hotstrings:
+            print(f"热键配置文件 {hotstrings_file_name} 为空，请检查文件内容")
+            exit()
+
+        print(f"Batch file path: {bat_file_path}")  # 打印批处理文件路径
+        print(f"Hotstrings file name: {hotstrings_file_name}")  # 打印热字符串文件名
+
+        # 将热字符串存储在一个集合中，以便更快地查找匹配项
+        hotstrings_set = set(hotstrings.keys())
+
+        start_listener(bat_file_path, hotstrings, hotstrings_set)
         while True:
             pass
     except KeyboardInterrupt:
@@ -165,30 +158,4 @@ if __name__ == '__main__':
         stop_listener()
 
 
-def get_express_company(tracking_number):
-    if tracking_number.startswith('4'):
-        return "韵达"
-    elif tracking_number.startswith('7'):
-        return "申通"
-    elif tracking_number.startswith('SF'):
-        return "顺丰"
-    else:
-        return ""
 
-def update_clipboard():
-    # 读取剪切板的内容
-    tracking_number = pyperclip.paste().strip()
-
-    # 获取快递公司
-    express_company = get_express_company(tracking_number)
-
-    # 构建新的剪切板内容
-    if express_company:
-        new_content = f"{express_company} 快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
-    else:
-        new_content = f"快递单号 {tracking_number} 亲亲这个是您的补发单号哈 注意查收~"
-
-    # 将新的内容覆盖到剪切板
-    pyperclip.copy(new_content)
-
-    print(f"剪切板内容已更新为：{new_content}")
