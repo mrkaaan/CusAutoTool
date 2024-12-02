@@ -202,7 +202,7 @@ def auto_key(hotkeys):
         for hotkey in filtered_hotkeys:
             keyboard.add_hotkey(
                 hotkey['key'],
-                lambda *args, f=hotkey['func'], a=hotkey['args']: threaded_function(f, a)
+                lambda *args, f=hotkey['func'], a=hotkey['args'], u=hotkey['use_thread']: threaded_function(f, a, u)
             )
         # 保持脚本运行，直到按下退出快捷键
         print("快捷键监听已启动，按下 Shift+Ctrl+E 退出\n")

@@ -7,6 +7,7 @@ import keyboard
 import pyautogui   
 import pyperclip   
 import pandas as pd
+from utils import show_toast
 from loguru import logger  
 
 # 循环执行 直到出现标志或者手动终止 需要修改
@@ -258,7 +259,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         print(f"END | terminated by user")
         exit_flag = True
     
-    keyboard.add_hotkey('shift+ctrl+e', set_exit_flag)
+    keyboard.add_hotkey('shift+ctrl+q', set_exit_flag)
 
 
     try:
@@ -274,10 +275,11 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         # 根据不同文件格式读取表格
         file_format = table_name.split('.')
         if 'xls' in file_format[1]:
-            # 当前表格已打开提示
-            # if os.path.exists(table_file):
-            #     print(f"当前表格已打开，请关闭后再运行程序")
-            #     return
+            # 表格不存在提示
+            if os.path.exists(table_file):
+                print(f"表单文件：{table_file} 不存在")
+                show_toast('提醒', f'表单文件：{table_file} 不存在')
+                return
             # 读取 Excel 文件
             df = pd.read_excel(table_file, sheet_name=None, dtype={'原始单号': str, '物流单号': str})
         elif 'csv' in file_format[1]:
@@ -353,11 +355,13 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             print(f"原始单号：{original_number} 物流单号：{logistics_number}")
             # 原始单号为空 提示并跳过
             if not original_number:
-                print(f"原始单号为空：{original_number} 物流单号：{logistics_number} 跳过")
+                print(f"原始单号为空 跳过")
+                show_toast('提醒', f'原始单号为空 跳过')
                 continue
             # 物流单号为空 提示并跳过
             if not logistics_number:
-                print(f"物流单号为空：{original_number} 物流单号：{logistics_number} 跳过")
+                print(f"物流单号为空 跳过")
+                show_toast('提醒', f'物流单号为空 跳过')
                 continue
 
             # original_number=123456789789
@@ -560,6 +564,8 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     # 点击确认按钮
                     app.move_and_click(confirm_button_x, confirm_button_y)
 
+                # change  判断是否弹出失败提示
+
             else:
                 print(f"未知通知模式：{notic_mode}")
                 return
@@ -573,10 +579,15 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
     except KeyboardInterrupt:
         print("检测到 Ctrl+C，正在退出...")
     except Exception as e:
-        print(f"快捷键监听出错：{e}")
+        print(f"通知程序异常：{e}")
+        # 如果读取过程中出现异常，可能是文件被其他程序占用（例如已打开）
+        if 'Permission error' in str(e) or '已被其他程序打开' in str(e):
+            print("文件可能已被其他程序打开，请确保文件未被打开后再试。")
     finally:
         # 使用pyperclip库清空剪切板
         pyperclip.copy('')
+        print('通知程序已退出')
+        show_toast('提示', '程序已退出')
         # 将更改写回 Excel 文件
         with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
             # 只写回当前处理的sheet

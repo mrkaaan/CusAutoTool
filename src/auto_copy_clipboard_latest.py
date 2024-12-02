@@ -4,11 +4,29 @@ import threading
 import time
 import keyboard
 import pyautogui
-from pynput.keyboard import Controller, Key
-keyboard_controller = Controller()
 from utils import show_toast, read_json
 from config import setup_bat_path, setup_hot_file_name
 
+# 读取配置文件
+bat_file_path = setup_bat_path()
+if not bat_file_path:
+    print("未设置批处理文件路径，请在 config.py 中设置")
+    exit()
+hotstrings_file_name = setup_hot_file_name()
+if not hotstrings_file_name:
+    print("未设置热键配置文件，请在 config.py 中设置")
+    exit()
+hotstrings_path = f"../config/{hotstrings_file_name}"
+# 定义要监听的热字符串及其对应的批处理文件路径
+hotstrings = read_json(hotstrings_path, 'utf-8')
+if not hotstrings:
+    print(f"热键配置文件 {hotstrings_file_name} 为空，请检查文件内容")
+    exit()
+
+hotstrings_set = set(hotstrings.keys())
+
+print(f"Batch file path: {bat_file_path}")  # 打印批处理文件路径
+print(f"Hotstrings file name: {hotstrings_file_name}")  # 打印热字符串文件名
 
 last_checked_time = 0
 CHECK_INTERVAL = 0.5  # 检查间隔时间（秒）
@@ -17,7 +35,7 @@ previous_clipboard_content = ""
 
 
 # 定义一个函数来处理热字符串
-def on_press_clipboard(bat_file_path, hotstrings, hotstrings_set, auto_copy=True, check_interval=False, check_duplicate=False):
+def on_press_clipboard(auto_copy=True, check_interval=True, check_duplicate=False):
     '''
         :param auto_copy: 是否自动选择当前输入框内容 默认True
         :param check_interval: 是否检查间隔 默认False
@@ -38,17 +56,6 @@ def on_press_clipboard(bat_file_path, hotstrings, hotstrings_set, auto_copy=True
 
         pyautogui.hotkey('ctrl', 'a')  # 模拟按下并释放
         pyautogui.hotkey('ctrl', 'x')  # 模拟按下并释放
-
-        # 模拟按下并释放 Ctrl + A
-        # with keyboard_controller.pressed(Key.ctrl):
-        #     keyboard_controller.press('a')
-        #     keyboard_controller.release('a')
-
-
-        # # 模拟按下并释放 Ctrl + X
-        # with keyboard_controller.pressed(Key.ctrl):
-        #     keyboard_controller.press('x')
-        #     keyboard_controller.release('x')
 
     current_text = pyperclip.paste().replace(" ", "").lower()  # 获取剪贴板中的文本 去掉多余的空格
 
@@ -118,22 +125,19 @@ def clear_clipboard():
     show_toast("提醒", "剪贴板内容已清除")
 
 # 仅在运行当前文件时生效
-def start_listener(bat_file_path, hotstrings, hotstrings_set, check_interval=None, check_duplicate=None, clear_on_combo=None):
+def start_listener(check_interval=None, check_duplicate=None, clear_on_combo=None):
     '''
         :param check_interval: 是否检查间隔 默认None
         :param check_duplicate: 是否检查重复 默认None
         :param clear_on_combo: 是否按下 Ctrl + Shift + Space 后清除剪切板内容 默认None
     '''
     # 根据三个形参提示启用关闭了什么功能
-    # mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\nClear on combo: {clear_on_combo}"
-    # print(mode_prompt)
-    # show_toast("提醒", mode_prompt)
-
+    mode_prompt = f"Starting listener...\nCheck interval: {check_interval}\nCheck duplicate: {check_duplicate}\nClear on combo: {clear_on_combo}"
+    print(mode_prompt)
+    show_toast("提醒", mode_prompt)
 
     # 绑定快捷键 Ctrl + Space
-    # keyboard.add_hotkey('ctrl+space', on_press_clipboard())
-    keyboard.add_hotkey('ctrl+space', lambda *args, f=on_press_clipboard, a=[bat_file_path, hotstrings, hotstrings_set]: f(*a))
-    # keyboard.add_hotkey('ctrl+space', lambda: on_press_clipboard(bat_file_path, hotstrings, hotstrings_set))
+    keyboard.add_hotkey('ctrl+space', on_press_clipboard())
 
     # 绑定快捷键 Ctrl + Shift + Space
     if clear_on_combo:
@@ -146,28 +150,7 @@ def stop_listener():
 
 if __name__ == '__main__':
     try:
-        bat_file_path = setup_bat_path()
-        if not bat_file_path:
-            print("未设置批处理文件路径，请在 config.py 中设置")
-            exit()
-        hotstrings_file_name = setup_hot_file_name()
-        if not hotstrings_file_name:
-            print("未设置热键配置文件，请在 config.py 中设置")
-            exit()
-        hotstrings_path = f"../config/{hotstrings_file_name}"
-        # 定义要监听的热字符串及其对应的批处理文件路径
-        hotstrings = read_json(hotstrings_path, 'utf-8')
-        if not hotstrings:
-            print(f"热键配置文件 {hotstrings_file_name} 为空，请检查文件内容")
-            exit()
-
-        print(f"Batch file path: {bat_file_path}")  # 打印批处理文件路径
-        print(f"Hotstrings file name: {hotstrings_file_name}")  # 打印热字符串文件名
-
-        # 将热字符串存储在一个集合中，以便更快地查找匹配项
-        hotstrings_set = set(hotstrings.keys())
-
-        start_listener(bat_file_path, hotstrings, hotstrings_set)
+        start_listener()
         while True:
             pass
     except KeyboardInterrupt:

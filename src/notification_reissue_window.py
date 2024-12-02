@@ -16,9 +16,9 @@ import auto_operation as au
 from pyautogui import FailSafeException
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('../config/config.ini')
 # 访问环境变量
-window_open_mode = config['default'].get('WINDOW_OPEN_MODE')
+window_open_mode = config['numbers'].get('WINDOW_OPEN_MODE')
 # 尝试将 TRY_NUMBER 转换为整数
 window_open_mode = int(window_open_mode)
 
