@@ -2,6 +2,7 @@ import argparse
 import pyautogui
 from loguru import logger
 import utils as ut
+import os
 
 def setup_arguments():
     parser = argparse.ArgumentParser(description="Main script and testing.")
@@ -13,7 +14,7 @@ def setup_pyautogui():
     pyautogui.PAUSE = 0.1  # 设置 pyautogui 的默认操作延时 如移动和点击的间隔
 
 def setup_logging():
-    logger.add("dev.log", rotation="10 MB")  # 设置日志文件轮换
+    logger.add("../config/dev.log", rotation="10 MB")  # 设置日志文件轮换
 
 def setup_bat_path():
     """

@@ -10,6 +10,14 @@ __pycache__/
 
 # 日志
 logs/
+*.log
 
 # 表格文件
 form/
+
+# 临时图片
+temp/
+
+# 意外文件
+src/*.json
+src/*.log
