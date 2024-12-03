@@ -17,3 +17,7 @@ form/
 
 # 临时图片
 temp/
+
+# 意外文件
+src/*.json
+src/*.log

@@ -43,7 +43,7 @@ DEFAULT_VALUES = {
     "last_used": {}
 }
 
-CONFIG_FILE = 'notic_config.json'
+CONFIG_FILE = '../config/notic_config.json'
 
 
 def load_config():

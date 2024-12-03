@@ -12,6 +12,7 @@ import pyperclip
 from plyer import notification
 # from win10toast import ToastNotifier
 
+handles = '../config/handles.json'
 
 # 读取配置文件
 def read_config():
@@ -79,18 +80,18 @@ def read_json(file_path, encoding=None):
         return {}
     
 # 存储句柄到文件
-def save_handle(name, handle, file_path='handles.json', encoding=None):
+def save_handle(name, handle, file_path=handles, encoding=None):
     handles = load_handles(file_path, encoding)
     handles[name] = handle
     write_json(file_path, handles, encoding)
 
 # 加载句柄
-def load_handle(name, file_path='handles.json', encoding=None):
+def load_handle(name, file_path=handles, encoding=None):
     handles = load_handles(file_path, encoding)
     return handles.get(name)
 
 # 打开句柄文件
-def load_handles(file_path='handles.json', encoding=None):
+def load_handles(file_path=handles, encoding=None):
     return read_json(file_path, encoding)
 
 
@@ -228,8 +229,8 @@ def auto_key(hotkeys):
         # 无论是否按下 Shift+Ctrl+E 都移除所有快捷键监听
         keyboard.unhook_all()
         # 清空句柄文件
-        if os.path.exists('handles.json'):
-            os.remove('handles.json')
+        if os.path.exists(handles):
+            os.remove(handles)
         print('退出监听')
 
 
