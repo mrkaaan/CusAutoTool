@@ -46,9 +46,9 @@ class WinGUI:
             window_name (str): 目标窗口的名称，用于定位窗口句柄。
         """
         self.window_name = window_name
-        self.work_screen_path = "./temp/work_screen.png"
-        self.app_screen_path = "./temp/app.png"
-        self.img_folder_path = "./image" 
+        self.work_screen_path = "../temp/work_screen.png"
+        self.app_screen_path = "../temp/app.png"
+        self.img_folder_path = "../image" 
 
     # 需要 self.window_name
     def get_app_screenshot(self):
