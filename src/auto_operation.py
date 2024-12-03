@@ -103,58 +103,63 @@ def is_loop_over(app, icon):
     return valid
 
 # 千牛 执行一次备注操作
-def run_once_remarks_by_qianniu(window_name):
+def run_once_remarks_by_qianniu(window_name, unmark=True, unmark_mode=1):
+    '''
+        :param window_name: 应用窗口的名称
+        :param unmark: 是否取消标记
+        :param unmark_mode: 取消标记模式 仅在 unmark=True 时有效  1 使用快捷键取消标记 2 使用鼠标点击取消标记
+    '''
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
     # logger.info(f'START | window name: {window_name}')  # 记录窗口名称
 
     try:
         # app.get_app_screenshot()
         # 点击备注
-        find_button_remarks = app.click_icon('Button_Remarks.png',0.5,1.0,0.4,1.0)
+        find_button_remarks = app.click_icon('Button_Remarks.png',0.7,1.0,0.6,1.0)
         if not find_button_remarks:
             logger.info(f"END | not find Button_Remarks.png, windoe name: {window_name}") # 停止记录
             return
         # 点击红色备注
-        app.click_icon('Button_RedFlag.png',0.4,1.0,0.4,1.0)
+        redflag_x, redflag_y, is_find_redflag = app.click_icon('Button_RedFlag.png',0.5,1.0,0.6,1.0)
+        if not is_find_redflag:
+            logger.info(f"END | not find Button_RedFlag.png, windoe name: {window_name}") # 停止记录
+            return
         # 向下移动到输入框并点击
-        app.rel_remove_and_click(0, 150)
-        # time.sleep(0.1)
+        app.move_and_click(redflag_x, redflag_y+150)
         # 获取输入框当前的内容
         keyboard.press_and_release('ctrl+a')  
         keyboard.press_and_release('ctrl+c')  # 模拟按下并释放
         current_text = pyperclip.paste()      # 获取剪贴板中的文本
-        time.sleep(0.1)
-        entry_text = ''
-        # 判断输入框是否有内容
-        print('------')
-        print(current_text)
-        if current_text.strip():  # 如果字符串不为空
-            entry_text = f'{current_text}\n已登记补发' if '已登记' in current_text else '已登记补发'
-        else:
-            entry_text = '已登记补发'
-        print(entry_text)
-        # 判断有无按下附加信息按钮
-        # app.check_icon('button_additional_information.png'):
+        # 按下右边取消选中
+        keyboard.press_and_release('right')
         # time.sleep(0.1)
+        # 判断输入框是否有内容
+        entry_text = '\n已登记补发' if current_text.strip() else '已登记补发'
         # 输入
         keyboard.write(entry_text)
         # 点击确认
         app.click_icon('Button_Confirm_Remarks.png',0.8,1.0,0.8,1.0)
         # 点击取消
         # app.click_icon('Button_Cancel_Remarks.png',0.8,1.0,0.8,1.0)
-
-        # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
-        run_once_unmark_by_qianniu(window_name)
+        # 取消备注
+        if unmark:
+            run_once_unmark_by_qianniu(Window_name=None, mode=unmark_mode, app=app)
     except Exception as err:
         logger.info(err)  # 记录异常信息
 
 # 千牛 执行一次取消标记操作
-def run_once_unmark_by_qianniu(window_name, mode=1):
+def run_once_unmark_by_qianniu(window_name, mode=1, app=None):
     '''
-        mode: 1 使用快捷键取消标记 2 使用鼠标点击取消标记
+        :param window_name: 应用窗口的名称
+        :param mode: 1 使用快捷键取消标记 2 使用鼠标点击取消标记
+        :param app: WinGUI 实例  使用时默认为被其他函数调用时传入 window_name 这时为空
     '''
-    app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
-    # logger.info(f'START | window name: {window_name}')  # 记录窗口名称
+    # 创建 WinGUI 实例
+    if not app:
+        app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+    else:
+        # 如果传入 app 则使用传入的 app 实例 并截图
+        app.get_app_screenshot()
 
     try:
         # app.get_app_screenshot()
@@ -166,24 +171,34 @@ def run_once_unmark_by_qianniu(window_name, mode=1):
             keyboard.press_and_release('ctrl+w')
             keyboard.press_and_release('ctrl+w')
         elif mode == 2:
-            local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.4,0,1.0)
+            local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.3,0.1,0.9)
             if is_find:
                 app.move_and_click(local_x, local_y, 'right')
                 time.sleep(0.1)
-                app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+                button_cancel_x, button_cancel_y, is_find_buuton_canbel = app.location_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+                if is_find_buuton_canbel:
+                    app.move_and_click(button_cancel_x, button_cancel_y)
             else:
                 # 找 button_selected_session_annotation.png
                 local_other_x, local_other_y, is_find_other = app.locate_icon('button_selected_session_annotation_other.png',0,0.4,0,1.0)
                 if is_find_other:
                     app.move_and_click(local_other_x, local_other_y, 'right')
                     time.sleep(0.1)
-                    app.click_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+                    button_cancel_x, button_cancel_y, is_find_buuton_canbel = app.location_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+                    if is_find_buuton_canbel:
+                        app.move_and_click(button_cancel_x, button_cancel_y)
                 else:
                     logger.info(f"END | not find button_selected_session_annotation.png, windoe name: {window_name}") # 停止记录
 
-        # logger.info(f"END | terminated by program, windoe name: {window_name}") # 停止记录
     except Exception as err:
         logger.info(err)  # 记录异常信息
+
+def run_once_copy_username_by_qianniu(window_name):
+    '''
+        :param window_name: 应用窗口的名称
+    '''
+    app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+    
 
 # 测试
 def run_test(window_name):
