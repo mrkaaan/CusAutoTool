@@ -10,6 +10,7 @@ __pycache__/
 
 # 日志
 logs/
+*.log
 
 # 表格文件
 form/

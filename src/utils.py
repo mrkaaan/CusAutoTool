@@ -144,21 +144,34 @@ def open_sof(name, handle=None, class_name=None):
             print(f"文件中找到有效句柄：{handle}")
 
     try:
-         # 确保窗口恢复显示
-        win32gui.SendMessage(handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
-        time.sleep(0.2)  # 延迟0.2秒，等待窗口恢复
+        win32gui.ShowWindow(handle, win32con.SW_MAXIMIZE)  # 最大化窗口
+        time.sleep(0.2)  # 等待窗口状态稳定
 
-        # 使窗口可见
-        win32gui.ShowWindow(handle, win32con.SW_SHOW)
-        time.sleep(0.1)  # 延迟0.1秒
+        # 尝试将窗口置于前台
+        if not win32gui.SetForegroundWindow(handle):
+            print("无法将窗口置于前台，尝试重试...")
+            for _ in range(3):  # 重试3次
+                time.sleep(0.1)  # 等待
+                if win32gui.SetForegroundWindow(handle):
+                    print("窗口已成功置于前台。")
+                    break
+            else:
+                print("无法将窗口置于前台，操作失败。")
 
-        # 将窗口置于前台
-        win32gui.SetForegroundWindow(handle)
-        time.sleep(0.1)  # 延迟0.1秒
+        # 将窗口置于前台并最大化
+        # win32gui.ShowWindow(handle, win32con.SW_MAXIMIZE)
+        # win32gui.SetForegroundWindow(handle)
+        # time.sleep(0.1)  # 延迟0.1秒，等待窗口变化完成
 
-        # 最大化窗口
-        win32gui.ShowWindow(handle, win32con.SW_MAXIMIZE)
-        time.sleep(0.1)  # 延迟0.1秒
+        #  确保窗口恢复显示
+        # win32gui.SendMessage(handle, win32con.WM_SYSCOMMAND, win32con.SC_RESTORE, 0)
+        # time.sleep(0.2)  # 延迟0.2秒，等待窗口恢复
+        # # 将窗口置于前台
+        # win32gui.SetForegroundWindow(handle)
+        # time.sleep(0.1)  # 延迟0.1秒
+        # # 最大化窗口
+        # win32gui.ShowWindow(handle, win32con.SW_MAXIMIZE)
+        # time.sleep(0.1)  # 延迟0.1秒
     except Exception as e:
         print(f"无法设置窗口为前台，错误信息：{e}")
         return None
