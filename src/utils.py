@@ -238,17 +238,29 @@ def auto_key(hotkeys):
 def get_express_company(tracking_number):
     if tracking_number.startswith('4'):
         return "韵达"
-    elif tracking_number.startswith('7'):
+    elif tracking_number.startswith('77'):
         return "申通"
-    elif tracking_number.startswith('SF'):
+    elif tracking_number.startswith('sf'):
         return "顺丰"
+    elif tracking_number.startswith('jt'):
+        return "极兔"
+    elif tracking_number.startswith('788') or tracking_number.startswith('784') or tracking_number.startswith('756'):
+        return "中通"
     else:
         return ""
 
-def update_clipboard():
+def update_clipboard_express_company():
     # 读取剪切板的内容
-    tracking_number = pyperclip.paste().strip()
+    tracking_number = pyperclip.paste().strip().lower()
 
+    if not tracking_number:
+        print("剪切板内容为空，退出更新")
+        return
+    tracking_number_len = len(tracking_number)
+    # 判断是否为物流单号
+    if tracking_number_len < 10 or tracking_number_len > 20:
+        print("剪切板内容长度不符合要求，退出更新")
+        return
     # 获取快递公司
     express_company = get_express_company(tracking_number)
 
