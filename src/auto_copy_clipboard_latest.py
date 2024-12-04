@@ -35,7 +35,7 @@ previous_clipboard_content = ""
 
 
 # 定义一个函数来处理热字符串
-def on_press_clipboard(auto_copy=True, check_interval=True, check_duplicate=False):
+def on_press_clipboard(specify_filename='', auto_copy=True, check_interval=True, check_duplicate=False):
     '''
         :param auto_copy: 是否自动选择当前输入框内容 默认True
         :param check_interval: 是否检查间隔 默认False
@@ -84,6 +84,9 @@ def on_press_clipboard(auto_copy=True, check_interval=True, check_duplicate=Fals
         # 检查剪切板是否重复
         if not check_duplicate or current_text != previous_clipboard_content:
             previous_clipboard_content = current_text
+
+            if specify_filename:
+                current_text = specify_filename
 
             # 检查当前输入的文本是否是热字符串
             for hotstring in hotstrings_set:
