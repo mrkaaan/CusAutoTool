@@ -16,6 +16,8 @@ def main():
         {'key': 'ctrl+shift+q', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, True, 2]}, # 添加备注 并 取消标记
         {'key': 'ctrl+shift+w', 'func': ao.run_once_unmark_by_qianniu, 'args': [window_name, 2]}, # 取消标记
 
+        {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
+
         {'key': 'f2', 'func': ac.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
         {'key': 'ctrl+space', 'func': ac.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
         {'key': 'ctrl+shift+space', 'func': ac.clear_clipboard, 'use_thread':False}, # 清空剪切板

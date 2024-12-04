@@ -629,3 +629,112 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
 
         keyboard.unhook_all()  # 移除所有按键监听
     return df
+
+
+# 千年自动发送差价链接
+def auto_send_price_link(window_name, product_number=1, mode=1):
+    '''
+        :param window_name: 窗口名称
+        :param mode: 1 识别移动 2 相对移动
+    '''
+    try:
+        app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 聚焦到智能客服 避免误触
+        keyboard.press_and_release('ctrl+o')
+
+        # 滚动到顶部
+        pyautogui.scroll(-1000)
+
+        # 寻找搜索商品图
+        search_product_x, search_product_y, is_find_search_product = app.locate_icon('search_products.png', 0.6, 1, 0.2, 1)
+        if not is_find_search_product:
+            print('未找到搜索商品图标，程序退出')
+            return
+
+        # 点击搜索商品图标
+        app.move_and_click(search_product_x, search_product_y)
+        time.sleep(0.1)
+
+        # 搜索差价链接
+        keyboard.write('差价')
+        keyboard.press_and_release('enter')
+        time.sleep(0.1)
+
+        # 移动到邀请下单图标
+        invite_order_x, invite_order_y, is_find_invite_order = app.locate_icon('invite_order.png', 0.6, 1, 0.2, 1)
+        if not is_find_invite_order:
+            print('未找到邀请下单图标，程序退出')
+            return
+        # 点击邀请下单
+        app.move_and_click(invite_order_x, invite_order_y)
+        time.sleep(0.1)
+
+        # 点击输入数量
+        if mode == 1:
+            # 移动到输入数量图标
+            product_quantity_x, product_quantity_y, is_find_product_quantity = app.locate_icon('product_quantity.png', 0.6, 1, 0.2, 1)
+            if not is_find_product_quantity:
+                print('未找到输入数量图标，程序退出')
+                return
+            # 点击输入数量
+            app.move_and_click(product_quantity_x, product_quantity_y+35)
+        elif mode == 2:
+            # 使用相对移动点击输入数量 0,780
+            app.move_and_click(search_product_x, search_product_y + 780)
+        else:
+            print(f'未知模式：{mode}')
+            return
+        time.sleep(0.1)
+
+        # 输入数量
+        keyboard.write(product_number)
+        keyboard.press_and_release('enter')
+        time.sleep(0.1)
+
+        # 点击邀请下单
+        if mode == 1:
+            # 移动到邀请下单图标
+            send_invitation_x, send_invitation_y, is_find_send_invitation = app.locate_icon('send_invitation.png', 0.6, 1, 0.2, 1)
+            if not is_find_send_invitation:
+                print('未找到邀请下单图标，程序退出')
+                return
+            # 点击邀请下单
+            app.move_and_click(send_invitation_x, send_invitation_y)
+        elif mode == 2:
+            # 使用相对移动点击邀请下单 280,235
+            app.move_and_click(search_product_x + 280, search_product_y + 235)
+        else:
+            print(f'未知模式：{mode}')
+            return
+        time.sleep(0.1)
+
+    except Exception as e:
+        print(f"差价链接程序异常：{e}")
+
+
+# 从剪切板获取数量
+def get_clipboard_number(auto_copy=True):
+    '''
+        :param auto_copy: 是否自动复制到剪切板
+        :return: 剪切板中的数字
+    '''
+    if auto_copy:
+        keyboard.press_and_release('ctrl+a')
+        keyboard.press_and_release('ctrl+x')
+    clipboard_text = pyperclip.paste()
+    if not clipboard_text.isdigit():
+        print('剪切板中没有数字，程序退出')
+        return 0
+    return int(clipboard_text)
+
+def handle_auto_send_price_link(window_name, mode=1):
+    '''
+        :param window_name: 窗口名称
+        :param mode: 1 识别移动 2 相对移动
+    '''
+    number = get_clipboard_number()
+    if number == 0:
+        print('剪切板中没有数字，程序退出')
+        return
+    auto_send_price_link(window_name, number, mode)
