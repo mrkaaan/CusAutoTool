@@ -97,7 +97,7 @@ class WinGUI:
         return None
 
 
-    def move_and_click(self, x, y, direction='left'):
+    def move_and_click(self, x, y, direction='left', click_num=1):
         """
         移动鼠标到指定坐标并点击。
 
@@ -111,7 +111,15 @@ class WinGUI:
             - `time`: 延时操作。
         """
         pyautogui.moveTo(x, y)                         # 使用pyautogui库移动鼠标
-        pyautogui.click(x, y, button=direction)                          # 使用pyautogui库点击鼠标
+        if click_num == 1:
+            pyautogui.click(x, y, button=direction)                          # 使用pyautogui库点击鼠标
+        elif click_num == 2:
+            # 双击
+            pyautogui.doubleClick(x, y, button=direction)
+        else:
+            # 多击
+            for i in range(click_num):
+                pyautogui.click(x, y, button=direction)
         time.sleep(0.1)                                # 使用time库延迟1秒
     
     # 相对移动

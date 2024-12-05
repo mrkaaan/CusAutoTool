@@ -775,3 +775,75 @@ def handle_auto_send_price_link(window_name, mode=1):
         print('剪切板中没有数字，程序退出')
         return
     auto_send_price_link(window_name, str(number), mode)
+
+
+
+def erp_select_today(window_name, app=None):
+    '''
+        :param window_name: 窗口名称
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 点击日期下拉框
+        app.move_and_click()
+
+        # 点击今天日期
+        app.move_and_click()
+
+    except Exception as e:
+        print(f"ERP选择今天日期异常：{e}")
+
+def erp_clear_product(window_name, app=None):
+    '''
+        :param window_name: 窗口名称
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 判断是否还有序号为1的商品
+        is_find_product = True
+        while is_find_product:
+            if is_find_product:
+                # 双击第一个商品以删除
+                app.move_and_click(0, 0, 'left', 2)
+            is_find_product = app.locate_icon('product_1.png', 0.6, 1, 0.2, 1)
+    except Exception as e:
+        print(f"ERP清空商品异常：{e}")
+
+def erp_input_remarks(window_name, remarks='补发', app=None):
+    '''
+        :param window_name: 窗口名称
+        :param remarks: 备注内容
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 点击备注输入框
+        app.move_and_click(0, 0, 'left')
+
+        # 输入备注内容
+        keyboard.write(remarks)
+
+    except Exception as e:
+        print(f"ERP输入备注异常：{e}")
+
+def erp_common_action_1(window_name, app=None):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        erp_select_today(window_name, app)
+        erp_clear_product(window_name, app)
+        erp_input_remarks(window_name, '补发', app)
+
+    except Exception as e:
+        print(f"ERP常用操作1异常：{e}")
