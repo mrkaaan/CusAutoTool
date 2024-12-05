@@ -787,10 +787,10 @@ def erp_select_today(window_name, app=None):
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 点击日期下拉框
-        app.move_and_click()
-
+        app.move_and_click(800, 55)
+        time.sleep(0.3)
         # 点击今天日期
-        app.move_and_click()
+        app.move_and_click(888,252)
 
     except Exception as e:
         print(f"ERP选择今天日期异常：{e}")
@@ -808,8 +808,10 @@ def erp_clear_product(window_name, app=None):
         while is_find_product:
             if is_find_product:
                 # 双击第一个商品以删除
-                app.move_and_click(0, 0, 'left', 2)
-            is_find_product = app.locate_icon('product_1.png', 0.6, 1, 0.2, 1)
+                app.move_and_click(385, 330, 'left', 2)
+                time.sleep(0.1)
+            _, __, is_find_product = app.locate_icon('product_1.png', 0, 0.2, 0.2, 0.8)
+            time.sleep(0.1)
     except Exception as e:
         print(f"ERP清空商品异常：{e}")
 
@@ -824,7 +826,8 @@ def erp_input_remarks(window_name, remarks='补发', app=None):
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 点击备注输入框
-        app.move_and_click(0, 0, 'left')
+        app.move_and_click(1200, 985, 'left')
+        time.sleep(0.1)
 
         # 输入备注内容
         keyboard.write(remarks)

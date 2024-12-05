@@ -39,7 +39,34 @@ def main():
 
 def test():
     print("Running tests...")
-    ao.erp_select_today('旺店通ERP')
+    # ---------- 快捷键启动 -------------
+    hotkey_actions = [
+        # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
+        # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP'], 'use_thread':False}, # 打开制定软件
+        
+        # {'key': 'ctrl+shift+q', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, True, 2]}, # 添加备注 并 取消标记
+        # {'key': 'ctrl+shift+w', 'func': ao.run_once_unmark_by_qianniu, 'args': [window_name, 2]}, # 取消标记
+
+        # {'key': 'f2', 'func': ac.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
+        # {'key': 'ctrl+space', 'func': ac.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
+        # {'key': 'ctrl+shift+space', 'func': ac.clear_clipboard, 'use_thread':False}, # 清空剪切板
+
+        # {'key': 'ctrl+shift+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
+        # {'key': 'f3', 'func': ac.clear_clipboard, 'use_thread':False}, # 清空剪切板
+        
+        # {'key': 'ctrl+shift+alt+z', 'func': tb_win.call_create_window, 'use_thread':False}, # 打开窗口，用于整理表格
+        # {'key': 'ctrl+shift+alt+a', 'func': nr_win.call_create_window, 'use_thread':False}, # 打开窗口，用于通知补发
+        # {'key': 'ctrl+shift+alt+q', 'func': nr_win.notic_last_data, 'use_thread':False}, # 使用上次数据直接通知补发
+
+        # {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
+        # {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图
+        # {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
+        # {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]} # 复制用户名
+
+        {'key': 'ctrl+shift+a', 'func': ao.erp_select_today, 'args': ['旺店通ERP']} # 复制用户名
+
+    ]
+    ut.auto_key(hotkey_actions)
 
     # ---------- 快捷键启动 -------------
 
