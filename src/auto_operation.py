@@ -217,7 +217,36 @@ def run_once_copy_username_by_qianniu(window_name):
         :param window_name: 应用窗口的名称
     '''
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
-    
+
+    try:
+        local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.3,0.1,0.9)
+        if is_find:
+            app.move_and_click(local_x, local_y, 'right')
+            # 按下上方向键
+            keyboard.press_and_release('down')
+            # 按下回车
+            keyboard.press_and_release('enter')
+            # time.sleep(0.1)
+            # button_cancel_x, button_cancel_y, is_find_buuton_canbel = app.locate_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+            # if is_find_buuton_canbel:
+            #     app.move_and_click(button_cancel_x, button_cancel_y)
+        else:
+            # 找 button_selected_session_annotation.png
+            local_other_x, local_other_y, is_find_other = app.locate_icon('button_selected_session_annotation_other.png',0,0.4,0,1.0)
+            if is_find_other:
+                app.move_and_click(local_other_x, local_other_y, 'right')
+                # 按下上方向键
+                keyboard.press_and_release('down')
+                # 按下回车
+                keyboard.press_and_release('enter')
+                # time.sleep(0.1)
+                # button_cancel_x, button_cancel_y, is_find_buuton_canbel = app.locate_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+                # if is_find_buuton_canbel:
+                #     app.move_and_click(button_cancel_x, button_cancel_y)
+            else:
+                logger.info(f"END | not find button_selected_session_annotation.png, windoe name: {window_name}") # 停止记录
+    except Exception as err:
+        logger.info(err)
 
 # 测试
 def run_test(window_name):
@@ -643,6 +672,9 @@ def auto_send_price_link(window_name, product_number=1, mode=1):
         # 聚焦到智能客服 避免误触
         keyboard.press_and_release('ctrl+o')
 
+        # 移动鼠标 1600 450
+        pyautogui.moveTo(1600, 450, duration=0.1)
+
         # 滚动到顶部
         pyautogui.scroll(-1000)
 
@@ -688,6 +720,8 @@ def auto_send_price_link(window_name, product_number=1, mode=1):
         time.sleep(0.1)
 
         # 输入数量
+        keyboard.press_and_release('ctrl+a')
+        keyboard.press_and_release('backspace')
         keyboard.write(product_number)
         keyboard.press_and_release('enter')
         time.sleep(0.1)
@@ -720,8 +754,11 @@ def get_clipboard_number(auto_copy=True):
         :return: 剪切板中的数字
     '''
     if auto_copy:
-        keyboard.press_and_release('ctrl+a')
-        keyboard.press_and_release('ctrl+x')
+        # keyboard.press_and_release('ctrl+a')
+        # keyboard.press_and_release('ctrl+x')
+        pyautogui.hotkey('ctrl', 'a')  # 模拟按下并释放
+        pyautogui.hotkey('ctrl', 'x')  # 模拟按下并释放
+        time.sleep(0.1)
     clipboard_text = pyperclip.paste()
     if not clipboard_text.isdigit():
         print('剪切板中没有数字，程序退出')
@@ -737,4 +774,4 @@ def handle_auto_send_price_link(window_name, mode=1):
     if number == 0:
         print('剪切板中没有数字，程序退出')
         return
-    auto_send_price_link(window_name, number, mode)
+    auto_send_price_link(window_name, str(number), mode)

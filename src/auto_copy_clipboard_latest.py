@@ -58,6 +58,10 @@ def on_press_clipboard(specify_filename='', auto_copy=True, check_interval=True,
         pyautogui.hotkey('ctrl', 'x')  # 模拟按下并释放
 
     current_text = pyperclip.paste().replace(" ", "").lower()  # 获取剪贴板中的文本 去掉多余的空格
+    
+    if specify_filename:
+        print(specify_filename)
+        current_text = specify_filename
 
         # 空文本限制
     if not current_text:
@@ -84,9 +88,6 @@ def on_press_clipboard(specify_filename='', auto_copy=True, check_interval=True,
         # 检查剪切板是否重复
         if not check_duplicate or current_text != previous_clipboard_content:
             previous_clipboard_content = current_text
-
-            if specify_filename:
-                current_text = specify_filename
 
             # 检查当前输入的文本是否是热字符串
             for hotstring in hotstrings_set:
