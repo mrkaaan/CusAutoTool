@@ -676,7 +676,7 @@ def auto_send_price_link(window_name, product_number=1, mode=1):
         pyautogui.moveTo(1600, 450, duration=0.1)
 
         # 滚动到顶部
-        pyautogui.scroll(-1000)
+        pyautogui.scroll(1000)
 
         # 寻找搜索商品图
         search_product_x, search_product_y, is_find_search_product = app.locate_icon('search_products.png', 0.6, 1, 0.2, 1)
@@ -743,6 +743,10 @@ def auto_send_price_link(window_name, product_number=1, mode=1):
             return
         time.sleep(0.1)
 
+        keyboard.press_and_release('ctrl+i')
+        keyboard.write('这里下单付款呢亲')
+        keyboard.press_and_release('enter')
+
     except Exception as e:
         print(f"差价链接程序异常：{e}")
 
@@ -795,23 +799,32 @@ def erp_select_today(window_name, app=None):
     except Exception as e:
         print(f"ERP选择今天日期异常：{e}")
 
-def erp_clear_product(window_name, app=None):
+def erp_clear_product(window_name, app=None, mode=5):
     '''
         :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+        :param mode: 1 识别移动 非1之外的数字 直接循环点击次数
     '''
     try:
         if not app:
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 判断是否还有序号为1的商品
-        is_find_product = True
-        while is_find_product:
-            if is_find_product:
-                # 双击第一个商品以删除
-                app.move_and_click(385, 330, 'left', 2)
+        if mode == 1:
+            is_find_product = True
+            while is_find_product:
+                if is_find_product:
+                    # 双击第一个商品以删除
+                    app.move_and_click(385, 330, 'left', 2)
+                    time.sleep(0.1)
+                _, __, is_find_product = app.locate_icon('product_1.png', 0, 0.2, 0.2, 0.8)
                 time.sleep(0.1)
-            _, __, is_find_product = app.locate_icon('product_1.png', 0, 0.2, 0.2, 0.8)
-            time.sleep(0.1)
+        else:
+            for _ in range(mode):
+                # 双击第一个商品以删除
+                pyautogui.moveTo(385, 330)
+                pyautogui.click()
+                app.move_and_click(385, 330, 'left', 2)
     except Exception as e:
         print(f"ERP清空商品异常：{e}")
 
@@ -829,11 +842,33 @@ def erp_input_remarks(window_name, remarks='补发', app=None):
         app.move_and_click(1200, 985, 'left')
         time.sleep(0.1)
 
+        # 清空输入框
+        keyboard.press_and_release('ctrl+a')
+        keyboard.press_and_release('backspace')
+
         # 输入备注内容
         keyboard.write(remarks)
 
     except Exception as e:
         print(f"ERP输入备注异常：{e}")
+
+def erp_choose_warehouse(window_name, app=None, warehouse='chaozhou'):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 点击仓库下拉框
+        app.move_and_click(860, 55)
+        time.sleep(0.2)
+        # 点击仓库
+        app.move_and_click(860, 252)
+
+    except Exception as e:
+        print(f"ERP选择仓库异常：{e}")
 
 def erp_common_action_1(window_name, app=None):
     '''

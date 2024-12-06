@@ -30,7 +30,9 @@ def main():
         {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
         {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图
         {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
-        {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]} # 复制用户名
+        {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]}, # 复制用户名
+        {'key': 'ctrl+shift+b', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP']} # 复制用户名
+
 
     ]
     ut.auto_key(hotkey_actions)
@@ -63,7 +65,6 @@ def test():
         # {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
         # {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]} # 复制用户名
 
-        {'key': 'ctrl+shift+a', 'func': ao.erp_select_today, 'args': ['旺店通ERP']} # 复制用户名
 
     ]
     ut.auto_key(hotkey_actions)
