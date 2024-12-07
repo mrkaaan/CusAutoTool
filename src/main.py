@@ -31,8 +31,14 @@ def main():
         {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图
         {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
         {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]}, # 复制用户名
-        {'key': 'ctrl+shift+b', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP']} # 复制用户名
-
+        {'key': 'ctrl+shift+b+numpd 1', 'func': ao.erp_select_today, 'args': ['旺店通ERP']}, # erp 选择今天
+        {'key': 'ctrl+shift+b+numpd 2', 'func': ao.erp_clear_product, 'args': ['旺店通ERP']}, # erp 清空产品
+        {'key': 'ctrl+shift+b+numpd 3', 'func': ao.erp_input_remarks, 'args': ['旺店通ERP']}, # erp 输入备注
+        {'key': 'ctrl+shift+b+numpd 4', 'func': ao.erp_add_product_notes, 'args': ['旺店通ERP']}, # erp 添加备注产品
+        {'key': 'ctrl+shift+b+numpd 5', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', 'cz']}, # erp 常用操作1 潮州仓
+        {'key': 'ctrl+shift+b+numpd 6', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', 'sz']}, # erp 常用操作1 深圳仓
+        {'key': 'ctrl+shift+b+numpd 8', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', ['内23', '内24']]}, # erp 常用操作2 转接头23 24
+        {'key': 'ctrl+shift+b+numpd 9', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', ['内23']]}, # erp 常用操作2 转接头23
 
     ]
     ut.auto_key(hotkey_actions)

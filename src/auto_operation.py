@@ -823,8 +823,7 @@ def erp_clear_product(window_name, app=None, mode=5):
             for _ in range(mode):
                 # 双击第一个商品以删除
                 pyautogui.moveTo(385, 330)
-                pyautogui.click()
-                app.move_and_click(385, 330, 'left', 2)
+                pyautogui.doubleClick()
     except Exception as e:
         print(f"ERP清空商品异常：{e}")
 
@@ -852,7 +851,7 @@ def erp_input_remarks(window_name, remarks='补发', app=None):
     except Exception as e:
         print(f"ERP输入备注异常：{e}")
 
-def erp_choose_warehouse(window_name, app=None, warehouse='chaozhou'):
+def erp_choose_warehouse(window_name, app=None, warehouse='sz'):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
@@ -862,15 +861,91 @@ def erp_choose_warehouse(window_name, app=None, warehouse='chaozhou'):
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 点击仓库下拉框
-        app.move_and_click(860, 55)
-        time.sleep(0.2)
+        app.move_and_click(166, 85)
+        time.sleep(0.1)
         # 点击仓库
-        app.move_and_click(860, 252)
+        if warehouse =='sz':
+            app.move_and_click(166, 130)
+        elif warehouse == 'cz':
+            app.move_and_click(166, 152)
 
     except Exception as e:
         print(f"ERP选择仓库异常：{e}")
 
-def erp_common_action_1(window_name, app=None):
+
+def erp_add_product(window_name, app=None):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 点击添加商品
+        app.move_and_click(60, 280, 'left')
+        time.sleep(0.3)
+        # 点击货品名称输入框
+        app.move_and_click(1188, 288)
+        time.sleep(0.1)
+
+    except Exception as e:
+        print(f"ERP添加商品异常：{e}")
+
+def erp_add_product_notes(window_name, app=None, local='sz'):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 点击添加商品
+        erp_add_product(window_name, app)
+        # 输入备注内容
+        if local =='sz':
+            keyboard.write('（深圳仓）')
+        else:
+            keyboard.write('（潮州仓）')
+        keyboard.press_and_release('enter')
+        # 选中商品
+        app.move_and_click(1000, 400, 'left', 2)
+        # 保存添加备注
+        app.move_and_click(787, 1411)
+
+    except Exception as e:
+        print(f"ERP添加备注异常：{e}")
+
+def erp_add_specific_products(window_name, product_list=None, app=None):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+        :param product_list: 商品列表
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        # 点击添加商品
+        erp_add_product(window_name, app)
+        # 输入备注内容
+        for product in product_list:
+            keyboard.write(product)
+            keyboard.press_and_release('enter')
+            # 选中商品
+            app.move_and_click(1000, 400, 'left', 2)
+            # 点击货品名称输入框
+            app.move_and_click(1188, 288)
+            time.sleep(0.1)
+        # 保存添加备注
+        app.move_and_click(787, 1411)
+
+    except Exception as e:
+        print(f"ERP添加特定商品异常：{e}")
+
+# erp常用操作 选择今天日期 清空商品 选择仓库 添加商品备注 输入备注
+def erp_common_action_1(window_name, warehouse='sz', app=None):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
@@ -881,7 +956,28 @@ def erp_common_action_1(window_name, app=None):
 
         erp_select_today(window_name, app)
         erp_clear_product(window_name, app)
+        erp_add_product_notes(window_name, app, warehouse)
         erp_input_remarks(window_name, '补发', app)
+
+    except Exception as e:
+        print(f"ERP常用操作1异常：{e}")
+
+# erp常用操作2 选择今天日期 清空商品 选择仓库 添加转接头  输入备注
+def erp_common_action_2(window_name, product_list=['内23', '内24'], app=None):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        warehouse = 'sz'
+        erp_select_today(window_name, app)
+        erp_clear_product(window_name, app)
+        erp_choose_warehouse(window_name, app, warehouse)
+        erp_add_specific_products(window_name, product_list, app)
+        erp_input_remarks(window_name, '补发金属转接头', app)
 
     except Exception as e:
         print(f"ERP常用操作1异常：{e}")
