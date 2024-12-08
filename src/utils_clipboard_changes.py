@@ -1,7 +1,7 @@
 import pyperclip
 import re
 import time
-import utils as ut
+from utils import show_toast
 
 def is_full_address(text):
     # 判断条件：
@@ -62,7 +62,7 @@ def replace_phone_in_address(address, phone):
 
 def listen_clipboard_changes():
     print("Waiting for two clipboard changes...")
-    ut.show_toast('提醒', '请复制完整的地址信息到剪贴板，然后再复制电话号码到剪贴板...')
+    show_toast('提醒', '请复制完整的地址信息到剪贴板，然后再复制电话号码到剪贴板...')
     previous_content = pyperclip.paste()
     changed_contents = {}
     
@@ -76,11 +76,11 @@ def listen_clipboard_changes():
             if is_address:
                 changed_contents['address'] = current_content
                 print(f"Address: {current_content}")
-                ut.show_toast('提醒', '已复制完整的地址信息到剪贴板')
+                show_toast('提醒', '已复制完整的地址信息到剪贴板')
             elif is_phone:
                 changed_contents['phone'] = current_content
                 print(f"Phone: {current_content}")
-                ut.show_toast('提醒', '已复制电话号码到剪贴板')
+                show_toast('提醒', '已复制电话号码到剪贴板')
 
             previous_content = current_content
 
@@ -98,11 +98,11 @@ def listen_clipboard_changes():
             updated_addr_info = replace_phone_in_address(changed_contents['address'], changed_contents['phone'])
             if not updated_addr_info:
                 print("Error: Failed to update the address info.")
-                ut.show_toast('提醒', '更新地址信息失败 请重试')
+                show_toast('提醒', '更新地址信息失败 请重试')
                 return
             pyperclip.copy(updated_addr_info)
             print(f"Updated Address Info: {updated_addr_info}")
-            ut.show_toast('提醒', '已更新地址信息到剪贴板')
+            show_toast('提醒', '已更新地址信息到剪贴板')
         except Exception as e:
             print(f"Error: {e}")
 

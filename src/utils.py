@@ -186,7 +186,8 @@ def auto_key(hotkeys):
     seen_keys = set()
     filtered_hotkeys = []
     for hotkey in hotkeys:
-        clean_key = hotkey['key'].replace(" ", "")  # 去掉快捷键中多余的空格
+        # clean_key = hotkey['key'].replace(" ", "")  # 去掉快捷键中多余的空格
+        clean_key = hotkey['key']
         if clean_key in seen_keys:
             print(f"发现重复快捷键 {clean_key}，保留第一个绑定，移除后续重复绑定。")
             continue  # 跳过重复的快捷键
