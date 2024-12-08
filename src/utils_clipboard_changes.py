@@ -1,6 +1,7 @@
 import pyperclip
 import re
 import time
+import utils as ut
 
 def is_full_address(text):
     # 判断条件：
@@ -11,22 +12,37 @@ def is_full_address(text):
 
     # 条件1: 长度足够长
     if len(text) < 20:
-        return False, False
+        return False
     
     # 条件2: 包含连续的数字（手机号码）
     has_consecutive_digits = re.search(r'\d{11}', text) is not None
     if not has_consecutive_digits:
-        return False, False
+        return False
     
     # 条件3: 包含中文逗号
     has_chinese_comma = '，' in text
     if not has_chinese_comma:
-        return False, False
+        return False
     
     # 条件4: 包含"-"符号（可选）
-    has_dash = '-' in text
+    # has_dash = '-' in text
     
-    return True, has_dash
+    return True
+
+def is_phone_number(text):
+    # 判断条件：
+    # 1. 长度为11位
+    # 2. 有且仅为数字
+
+    # 条件1: 长度为11位
+    if len(text)!= 11:
+        return False
+    
+    # 条件2: 有且仅为数字
+    if not text.isdigit():
+        return False
+    
+    return True
 
 def split_addr_info(addr_info):
     # 使用中文逗号分割地址信息为三部分
@@ -39,50 +55,56 @@ def split_addr_info(addr_info):
 def replace_phone_in_address(address, phone):
     # 使用中文逗号分割并替换电话部分
     name, old_phone, address_part = split_addr_info(address)
-    if name and old_phone and address_part:
+    if name and old_phone and address_part and phone:
         updated_addr_info = f"{name}，{phone}，{address_part}"
         return updated_addr_info
-    return address
+    return None
 
 def listen_clipboard_changes():
     print("Waiting for two clipboard changes...")
+    ut.show_toast('提醒', '请复制完整的地址信息到剪贴板，然后再复制电话号码到剪贴板...')
     previous_content = pyperclip.paste()
-    changed_contents = []
+    changed_contents = {}
     
-    while len(changed_contents) < 2:
+    while True:
         current_content = pyperclip.paste()
         
         if current_content != previous_content:
-            print("Clipboard content has changed.")
-            changed_contents.append(current_content)
-            previous_content = current_content
+            is_address = is_full_address(current_content)    
+            is_phone = is_phone_number(current_content)
             
-            if len(changed_contents) == 2:  # 已经收集了两次变化的内容
-                break
+            if is_address:
+                changed_contents['address'] = current_content
+                print(f"Address: {current_content}")
+                ut.show_toast('提醒', '已复制完整的地址信息到剪贴板')
+            elif is_phone:
+                changed_contents['phone'] = current_content
+                print(f"Phone: {current_content}")
+                ut.show_toast('提醒', '已复制电话号码到剪贴板')
+
+            previous_content = current_content
+
+        # 判断是否收集到了两次变化的内容
+        if len(changed_contents) == 2:
+            break
         
-        time.sleep(1)  # 等待一段时间后再次检查
+        time.sleep(0.2)
+        
     
     # 判断并处理收集到的两个内容
     if len(changed_contents) == 2:
-        addr_info = None
-        phone_num = None
-        
-        for content in changed_contents:
-            is_addr, _ = is_full_address(content)
-            if is_addr:
-                addr_info = content
-            elif re.match(r'^1[3-9]\d{9}$', content):  # 检查是否是单独的电话号码
-                phone_num = content
-        
-        if addr_info and phone_num:
+        try:
             print("Processing the address with the new phone number...")
-            updated_addr_info = replace_phone_in_address(addr_info, phone_num)
+            updated_addr_info = replace_phone_in_address(changed_contents['address'], changed_contents['phone'])
+            if not updated_addr_info:
+                print("Error: Failed to update the address info.")
+                ut.show_toast('提醒', '更新地址信息失败 请重试')
+                return
             pyperclip.copy(updated_addr_info)
             print(f"Updated Address Info: {updated_addr_info}")
-        else:
-            print("Failed to identify a full address and a separate phone number.")
-    else:
-        print("Failed to collect two clipboard changes.")
+            ut.show_toast('提醒', '已更新地址信息到剪贴板')
+        except Exception as e:
+            print(f"Error: {e}")
 
 
 if __name__ == '__main__':
