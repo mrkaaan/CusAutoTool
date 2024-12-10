@@ -843,7 +843,9 @@ def erp_input_remarks(window_name, remarks='补发', app=None):
 
         # 清空输入框
         keyboard.press_and_release('ctrl+a')
+        time.sleep(0.1)
         keyboard.press_and_release('backspace')
+        time.sleep(0.1)
 
         # 输入备注内容
         keyboard.write(remarks)
@@ -862,12 +864,12 @@ def erp_choose_warehouse(window_name, app=None, warehouse='sz'):
 
         # 点击仓库下拉框
         app.move_and_click(166, 85)
-        time.sleep(0.1)
+        time.sleep(0.2)
         # 点击仓库
         if warehouse =='sz':
-            app.move_and_click(166, 130)
-        elif warehouse == 'cz':
             app.move_and_click(166, 152)
+        elif warehouse == 'cz':
+            app.move_and_click(166, 130)
 
     except Exception as e:
         print(f"ERP选择仓库异常：{e}")
@@ -888,6 +890,8 @@ def erp_add_product(window_name, app=None):
         # 点击货品名称输入框
         app.move_and_click(1188, 288)
         time.sleep(0.1)
+        keyboard.press_and_release('ctrl+a')
+        keyboard.press_and_release('backspace')
 
     except Exception as e:
         print(f"ERP添加商品异常：{e}")
@@ -912,7 +916,7 @@ def erp_add_product_notes(window_name, app=None, local='sz'):
         # 选中商品
         app.move_and_click(1000, 400, 'left', 2)
         # 保存添加备注
-        app.move_and_click(787, 1411)
+        app.move_and_click(1413, 787)
 
     except Exception as e:
         print(f"ERP添加备注异常：{e}")
@@ -935,11 +939,14 @@ def erp_add_specific_products(window_name, product_list=None, app=None):
             keyboard.press_and_release('enter')
             # 选中商品
             app.move_and_click(1000, 400, 'left', 2)
+            time.sleep(0.1)
+            # 清空输入框 1237 290
+            app.move_and_click(1237, 290)
             # 点击货品名称输入框
             app.move_and_click(1188, 288)
             time.sleep(0.1)
         # 保存添加备注
-        app.move_and_click(787, 1411)
+        app.move_and_click(1413, 787)
 
     except Exception as e:
         print(f"ERP添加特定商品异常：{e}")
@@ -978,6 +985,25 @@ def erp_common_action_2(window_name, product_list=['内23', '内24'], app=None):
         erp_choose_warehouse(window_name, app, warehouse)
         erp_add_specific_products(window_name, product_list, app)
         erp_input_remarks(window_name, '补发金属转接头', app)
+
+    except Exception as e:
+        print(f"ERP常用操作1异常：{e}")
+
+
+# erp常用操作 选择今天日期 清空商品 选择仓库 添加商品备注 输入备注
+def erp_common_action_3(window_name, warehouse='sz', app=None):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        if not app:
+            app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+
+        erp_select_today(window_name, app)
+        erp_clear_product(window_name, app)
+        erp_input_remarks(window_name, '补发', app)
+        erp_add_product(window_name, app, warehouse)
 
     except Exception as e:
         print(f"ERP常用操作1异常：{e}")
