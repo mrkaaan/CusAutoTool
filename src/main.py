@@ -33,15 +33,25 @@ def main():
         {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
         {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]}, # 复制用户名
 
-        {'key': 'ctrl+shift+b+num 1', 'func': ao.erp_select_today, 'args': ['旺店通ERP']}, # erp 选择今天
-        {'key': 'ctrl+shift+b+num 2', 'func': ao.erp_clear_product, 'args': ['旺店通ERP']}, # erp 清空产品
-        {'key': 'ctrl+shift+b+num 3', 'func': ao.erp_input_remarks, 'args': ['旺店通ERP']}, # erp 输入备注
-        {'key': 'ctrl+shift+b+num 4', 'func': ao.erp_add_product_notes, 'args': ['旺店通ERP']}, # erp 添加备注产品
-        {'key': 'ctrl+shift+b+num 5', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', 'cz']}, # erp 常用操作1 潮州仓
-        {'key': 'ctrl+shift+b+num 6', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', 'sz']}, # erp 常用操作1 深圳仓
-        {'key': 'ctrl+shift+b+num 7', 'func': ao.erp_common_action_3, 'args': ['旺店通ERP', 'sz']}, # erp 常用操作1 深圳仓
-        {'key': 'ctrl+shift+b+num 8', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', ['内23', '内24']]}, # erp 常用操作2 转接头23 24
-        {'key': 'ctrl+shift+b+num 9', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', ['内23']]} # erp 常用操作2 转接头23
+        {'key': 'ctrl+b+num 1', 'func': ao.erp_select_today, 'args': ['旺店通ERP']}, # erp 选择今天
+        {'key': 'ctrl+b+num 2', 'func': ao.erp_clear_product, 'args': ['旺店通ERP']}, # erp 清空产品
+        {'key': 'ctrl+b+num 3', 'func': ao.erp_input_remarks, 'args': ['旺店通ERP', '补发']}, # erp 输入备注 "补发"
+        {'key': 'ctrl+b+num 4', 'func': ao.erp_input_remarks, 'args': ['旺店通ERP', '补发金属转接头']}, # erp 输入备注 "补发金属转接头"
+        {'key': 'ctrl+b+num 5', 'func': ao.erp_add_product_notes, 'args': ['旺店通ERP', 'cz']}, # erp 添加备注产品 潮州
+        {'key': 'ctrl+b+num 6', 'func': ao.erp_add_product_notes, 'args': ['旺店通ERP', 'sz']}, # erp 添加备注产品 深圳
+
+        {'key': 'ctrl+b+num 7', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP']}, # erp 常用操作1 不选择仓库 不添加产品 选择今天日期 清空商品
+
+        {'key': 'ctrl+b+num 8', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', False, 'cz', '补发']}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 输入备注
+        {'key': 'ctrl+b+num 9', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', False, 'sz', '补发']}, # erp 常用操作1 深圳仓 选择今天日期 清空商品 选择仓库 输入备注
+        {'key': 'ctrl+b+num /', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', True, 'cz', '补发']}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 添加商品备注 输入备注
+        {'key': 'ctrl+b+num *', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', True, 'sz', '补发']}, # erp 常用操作1 深圳仓 选择今天日期 清空商品 选择仓库 添加商品备注 输入备注
+
+        {'key': 'ctrl+r+num 1', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23'], '补发金属转接头']}, # erp 常用操作2 转接头23
+        {'key': 'ctrl+r+num 2', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内24'], '补发金属转接头']}, # erp 常用操作2 转接头23
+        {'key': 'ctrl+r+num 3', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '内24'], '补发金属转接头']}, # erp 常用操作2 转接头23
+        {'key': 'ctrl+r+num 4', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['万能接头【细'], '补发']}, # erp 常用操作2 转接头23 24
+        {'key': 'ctrl+r+num 5', 'func': ao.erp_common_action_3, 'args': ['旺店通ERP', 'sz', '补发金属转接头']}, # erp 常用操作2 其他转接头
 
     ]
     ut.auto_key(hotkey_actions)
