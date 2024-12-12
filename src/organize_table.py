@@ -34,7 +34,7 @@ def read_excel(input_file, dtype=None):
     return df
 
 # 处理表格
-def process_table(input_filename, form_folder='./form'):
+def process_table(input_filename, form_folder='../form'):
     file_format = input_filename.split('.')[-1]
     # 生成精确日期的文件名
     output_filename = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')}_处理结果.xlsx"

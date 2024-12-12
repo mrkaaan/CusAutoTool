@@ -1,0 +1,402 @@
+[
+    {
+        "shortCut": "icc1",
+        "meaning": "测量",
+        "originalFile": "外丝龙头测量.png"
+    },
+    {
+        "shortCut": "icc2",
+        "meaning": "内丝龙头测量",
+        "originalFile": "内丝龙头测量.png"
+    },
+    {
+        "shortCut": "icl3",
+        "meaning": "深度测量",
+        "originalFile": "深度测量.png"
+    },
+    {
+        "shortCut": "icl4",
+        "meaning": "内外丝测量",
+        "originalFile": "内外丝测量.jpg"
+    },
+    {
+        "shortCut": "ifb",
+        "meaning": "龙头非标对比图",
+        "originalFile": "龙头非标对比图.jpg"
+    },
+    {
+        "shortCut": "izjt1",
+        "meaning": "转接头",
+        "originalFile": "转接头.png"
+    },
+    {
+        "shortCut": "izjt2",
+        "meaning": "防溅头配件",
+        "originalFile": "防溅头配件.png"
+    },
+    {
+        "shortCut": "ists",
+        "meaning": "三通上",
+        "originalFile": "三通上.png"
+    },
+    {
+        "shortCut": "istx",
+        "meaning": "三通下",
+        "originalFile": "三通下.png"
+    },
+    {
+        "shortCut": "istgg",
+        "meaning": "三通规格",
+        "originalFile": "三通规格.png"
+    },
+    {
+        "shortCut": "istjq",
+        "meaning": "三通胶圈",
+        "originalFile": "三通胶圈.png"
+    },
+    {
+        "shortCut": "istjjt",
+        "meaning": "三通嫁接头",
+        "originalFile": "三通嫁接头.png"
+    },
+    {
+        "shortCut": "icj",
+        "meaning": "斜三通裁剪",
+        "originalFile": "斜三通裁剪.png"
+    },
+    {
+        "shortCut": "icstcz2",
+        "meaning": "长三通材质2",
+        "originalFile": "长三通材质2.png"
+    },
+    {
+        "shortCut": "icstcz1",
+        "meaning": "长三通材质1",
+        "originalFile": "长三通材质1.png"
+    },
+    {
+        "shortCut": "ijfsz",
+        "meaning": "角阀水嘴",
+        "originalFile": "角阀水嘴.png"
+    },
+    {
+        "shortCut": "iflq2",
+        "meaning": "法兰圈安装",
+        "originalFile": "法兰圈安装.png"
+    },
+    {
+        "shortCut": "iflcc",
+        "meaning": "法兰尺寸",
+        "originalFile": "法兰尺寸.png"
+    },
+    {
+        "shortCut": "iflsp",
+        "meaning": "法兰圈适配",
+        "originalFile": "法兰圈适配.jpg"
+    },
+    {
+        "shortCut": "ifltz1",
+        "meaning": "法兰圈套装",
+        "originalFile": "法兰圈套装.png"
+    },
+    {
+        "shortCut": "ifltz2",
+        "meaning": "法兰套装2",
+        "originalFile": "法兰套装2.png"
+    },
+    {
+        "shortCut": "ibs",
+        "meaning": "把手拍照",
+        "originalFile": "把手拍照.png"
+    },
+    {
+        "shortCut": "itl",
+        "meaning": "塑料提篮",
+        "originalFile": "塑料提篮.png"
+    },
+    {
+        "shortCut": "idq",
+        "meaning": "放垫圈",
+        "originalFile": "放垫圈.png"
+    },
+    {
+        "shortCut": "ihdq",
+        "meaning": "厚垫圈2",
+        "originalFile": "厚垫圈2.png"
+    },
+    {
+        "shortCut": "ijsg2",
+        "meaning": "洗衣机进水管用龙头",
+        "originalFile": "洗衣机进水管用龙头.png"
+    },
+    {
+        "shortCut": "ibk",
+        "meaning": "塞子B款",
+        "originalFile": "塞子B款.png"
+    },
+    {
+        "shortCut": "idk",
+        "meaning": "塞子D款",
+        "originalFile": "塞子D款.png"
+    },
+    {
+        "shortCut": "iek",
+        "meaning": "塞子E款",
+        "originalFile": "塞子E款.png"
+    },
+    {
+        "shortCut": "iszcz1",
+        "meaning": "塞子材质",
+        "originalFile": "塞子材质.png"
+    },
+    {
+        "shortCut": "iszcz2",
+        "meaning": "塞子材质1",
+        "originalFile": "塞子材质1.jpg"
+    },
+    {
+        "shortCut": "iszcz3",
+        "meaning": "塞子材质2",
+        "originalFile": "塞子材质2.jpg"
+    },
+    {
+        "shortCut": "izj1",
+        "meaning": "支架安装",
+        "originalFile": "支架安装.png"
+    },
+    {
+        "shortCut": "izj2",
+        "meaning": "金属支架安装",
+        "originalFile": "金属支架安装.jpg"
+    },
+    {
+        "shortCut": "izzj2",
+        "meaning": "金属支架安装1",
+        "originalFile": "金属支架安装1.jpg"
+    },
+    {
+        "shortCut": "izj3",
+        "meaning": "支架安装3",
+        "originalFile": "支架安装3.png"
+    },
+    {
+        "shortCut": "izj4",
+        "meaning": "长花洒支架安装",
+        "originalFile": "长花洒支架安装.png"
+    },
+    {
+        "shortCut": "icd1",
+        "meaning": "防溅头长度",
+        "originalFile": "防溅头长度.jpg"
+    },
+    {
+        "shortCut": "icd2",
+        "meaning": "防溅头软管",
+        "originalFile": "防溅头软管.jpg"
+    },
+    {
+        "shortCut": "iwtaz2",
+        "meaning": "五通安装",
+        "originalFile": "五通安装.png"
+    },
+    {
+        "shortCut": "iwt1",
+        "meaning": "五通尺寸",
+        "originalFile": "五通尺寸.png"
+    },
+    {
+        "shortCut": "iwt2",
+        "meaning": "五通尺寸2",
+        "originalFile": "五通尺寸2.png"
+    },
+    {
+        "shortCut": "iwt3",
+        "meaning": "五通尺寸3",
+        "originalFile": "五通尺寸3.png"
+    },
+    {
+        "shortCut": "iwwt3",
+        "meaning": "五通尺寸33",
+        "originalFile": "五通尺寸33.jpg"
+    },
+    {
+        "shortCut": "iwtsz",
+        "meaning": "五通塞子",
+        "originalFile": "五通塞子.png"
+    },
+    {
+        "shortCut": "iwtdb",
+        "meaning": "五通对比图",
+        "originalFile": "五通对比图.png"
+    },
+    {
+        "shortCut": "ijtcc",
+        "meaning": "精铜尺寸",
+        "originalFile": "精铜尺寸.png"
+    },
+    {
+        "shortCut": "ilp",
+        "meaning": "礼品",
+        "originalFile": "礼品.png"
+    },
+    {
+        "shortCut": "ihp",
+        "meaning": "好评",
+        "originalFile": "好评.png"
+    },
+    {
+        "shortCut": "ihd1",
+        "meaning": "防溅头换挡",
+        "originalFile": "防溅头换挡.jpg"
+    },
+    {
+        "shortCut": "izwj1",
+        "meaning": "置物架安装",
+        "originalFile": "置物架安装.png"
+    },
+    {
+        "shortCut": "izwj2",
+        "meaning": "水龙头置物架安装",
+        "originalFile": "水龙头置物架安装.jpg"
+    },
+    {
+        "shortCut": "ipz1",
+        "meaning": "盆子挂钩安装1",
+        "originalFile": "盆子挂钩安装1.png"
+    },
+    {
+        "shortCut": "ipz2",
+        "meaning": "盆子挂钩安装2",
+        "originalFile": "盆子挂钩安装2.png"
+    },
+    {
+        "shortCut": "ipz3",
+        "meaning": "盆子挂钩安装3",
+        "originalFile": "盆子挂钩安装3.png"
+    },
+    {
+        "shortCut": "ipz4",
+        "meaning": "盆子挂钩安装4",
+        "originalFile": "盆子挂钩安装4.png"
+    },
+    {
+        "shortCut": "iwz1",
+        "meaning": "胶圈位置",
+        "originalFile": "胶圈位置.png"
+    },
+    {
+        "shortCut": "iwz2",
+        "meaning": "胶圈位置2",
+        "originalFile": "胶圈位置2.png"
+    },
+    {
+        "shortCut": "icx",
+        "meaning": "支架朝向",
+        "originalFile": "支架朝向.png"
+    },
+    {
+        "shortCut": "izt1",
+        "meaning": "粘贴安装",
+        "originalFile": "粘贴安装.png"
+    },
+    {
+        "shortCut": "izt2",
+        "meaning": "金属挂钩安装",
+        "originalFile": "金属挂钩安装.png"
+    },
+    {
+        "shortCut": "ifzj",
+        "meaning": "肥皂架安装",
+        "originalFile": "肥皂架安装.png"
+    },
+    {
+        "shortCut": "iskk",
+        "meaning": "支付宝",
+        "originalFile": "支付宝.jpg"
+    },
+    {
+        "shortCut": "izyqcc",
+        "meaning": "皂液器尺寸",
+        "originalFile": "皂液器尺寸.png"
+    },
+    {
+        "shortCut": "iwnn1",
+        "meaning": "万能接头取出",
+        "originalFile": "万能接头取出.jpg"
+    },
+    {
+        "shortCut": "iwnn2",
+        "meaning": "万能接头掉",
+        "originalFile": "万能接头掉.png"
+    },
+    {
+        "shortCut": "ixp",
+        "meaning": "毛巾架吸盘安装",
+        "originalFile": "毛巾架吸盘安装.png"
+    },
+    {
+        "shortCut": "imjj",
+        "meaning": "毛巾架材质",
+        "originalFile": "毛巾架材质.jpg"
+    },
+    {
+        "shortCut": "idl1",
+        "meaning": "地漏安装",
+        "originalFile": "地漏安装.jpg"
+    },
+    {
+        "shortCut": "idl2",
+        "meaning": "地漏测量",
+        "originalFile": "地漏测量.jpg"
+    },
+    {
+        "shortCut": "ihf",
+        "meaning": "胶泥混发",
+        "originalFile": "胶泥混发.jpg"
+    },
+    {
+        "shortCut": "ilrjsg",
+        "meaning": "冷热进水管",
+        "originalFile": "冷热进水管.png"
+    },
+    {
+        "shortCut": "imdj",
+        "meaning": "免钉胶",
+        "originalFile": "免钉胶.png"
+    },
+    {
+        "shortCut": "izcwxg",
+        "meaning": "中长万向管",
+        "originalFile": "中长万向管.png"
+    },
+    {
+        "shortCut": "itbcz",
+        "meaning": "联排拖把架材质",
+        "originalFile": "联排拖把架材质.jpg"
+    },
+    {
+        "shortCut": "itb1",
+        "meaning": "联排拖把架安装",
+        "originalFile": "联排拖把架安装.jpg"
+    },
+    {
+        "shortCut": "itb2",
+        "meaning": "联排拖把架安装2",
+        "originalFile": "联排拖把架安装2.jpg"
+    },
+    {
+        "shortCut": "ihdlcz",
+        "meaning": "黑地漏尺寸",
+        "originalFile": "黑地漏尺寸.png"
+    },
+    {
+        "shortCut": "ilrdb",
+        "meaning": "懒人吹风对比",
+        "originalFile": "懒人吹风对比.png"
+    },
+    {
+        "shortCut": "itww",
+        "meaning": "盖子撬开",
+        "originalFile": "盖子撬开.png"
+    }
+]

@@ -506,11 +506,11 @@ def notic_last_data():
     notic_config = load_config()
     notification_reissue_parameter_load = get_last_used(notic_config)
     time.sleep(0.5)
-    notification_reissue_parameter_load['table_path'] = ''
+    # notification_reissue_parameter_load['table_path'] = ''
     notification_reissue_parameter = {
         'window_name':'千牛接待台', # 窗口名称
         'table_name':'2024-11-27_230453_处理结果.xlsx',  # 表格名称
-        'table_path': '', # 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
+        'table_path': '../form/', # 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
         'notic_shop_name':'潮洁居家', # 通知店铺名称
         'notic_mode':2,       # 通知模式  1：输入框通知 2：补发窗口按钮通知
         'show_logistics':False, # 是否显示物流公司 输入框通知模式下生效
