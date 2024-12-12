@@ -992,6 +992,7 @@ def erp_common_action_2(window_name, warehouse='', product_list=[], remarks='', 
         if len(product_list) == 0:
             print('请输入商品')
             return
+        print(product_list)
         erp_add_specific_products(window_name, product_list, app)
         if remarks != '':
             erp_input_remarks(window_name, remarks, app)
