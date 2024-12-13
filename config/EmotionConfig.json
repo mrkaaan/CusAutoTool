@@ -35,6 +35,16 @@
         "originalFile": "防溅头配件.png"
     },
     {
+        "shortCut": "izjtws",
+        "meaning": "转接头外传外",
+        "originalFile": "转接头-外传外.png"
+    },
+    {
+        "shortCut": "izjtns",
+        "meaning": "转接头外传内",
+        "originalFile": "转接头-外传内.png"
+    },
+    {
         "shortCut": "ists",
         "meaning": "三通上",
         "originalFile": "三通上.png"
@@ -158,6 +168,21 @@
         "shortCut": "iszcz3",
         "meaning": "塞子材质2",
         "originalFile": "塞子材质2.jpg"
+    },
+    {
+        "shortCut": "izjcz",
+        "meaning": "支架材质",
+        "originalFile": "支架材质.png"
+    },
+    {
+        "shortCut": "iqk1",
+        "meaning": "支架撬开盖子1",
+        "originalFile": "盖子撬开1.png"
+    },
+    {
+        "shortCut": "iqk2",
+        "meaning": "支架撬开盖子2",
+        "originalFile": "盖子撬开2.png"
     },
     {
         "shortCut": "izj1",
@@ -320,6 +345,11 @@
         "originalFile": "皂液器尺寸.png"
     },
     {
+        "shortCut": "iwnjt",
+        "meaning": "万能接头",
+        "originalFile": "万能接头.png"
+    },
+    {
         "shortCut": "iwnn1",
         "meaning": "万能接头取出",
         "originalFile": "万能接头取出.jpg"
@@ -403,5 +433,15 @@
         "shortCut": "iwxt",
         "meaning": "短款防溅头的万向头",
         "originalFile": "短款防溅头的万向头.png"
+    },
+    {
+        "shortCut": "igzcx",
+        "meaning": "管子粗细",
+        "originalFile": "管子粗细.png"
+    },
+    {
+        "shortCut": "itips",
+        "meaning": "防溅头长短选择和小窍门",
+        "originalFile": "防溅头长短选择和小窍门.png"
     }
 ]
