@@ -10,9 +10,9 @@ import configparser
 from organize_table import process_table
 
 config = configparser.ConfigParser()
-config.read('../config/config.ini')
+config.read('../config/window_config.ini')
 # 访问环境变量
-window_open_mode = config['numbers'].get('WINDOW_OPEN_MODE')
+window_open_mode = config['defaults'].get('WINDOW_OPEN_MODE')
 # 尝试将 TRY_NUMBER 转换为整数
 window_open_mode = int(window_open_mode)
 
@@ -276,7 +276,7 @@ def create_window(mode=0):    # 主窗口
         label.bind("<Button-1>", lambda event, i=index: pyperclip.copy(full_name))
 
     def open_form_folder():
-        os.startfile(os.path.join(os.getcwd(), "form"))
+        os.startfile(os.path.join(os.getcwd(), "../form"))
 
     # 右下角打开项目根目录下form文件夹按钮
     open_form_folder_button = tk.Label(root, text="form", cursor='hand2', compound='center', font=f'{button_font_fam} {button_font_size} bold', fg=button_color)

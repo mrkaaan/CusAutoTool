@@ -21,3 +21,6 @@ temp/
 # 意外文件
 src/*.json
 src/*.log
+
+# 本地配置文件
+config/window_config.ini
