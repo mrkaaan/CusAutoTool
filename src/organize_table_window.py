@@ -35,7 +35,7 @@ def choose_table(enter, open_desktop=True):
 
     # 打开目录选择文件
     if not open_desktop:
-        default_path = f"./form"
+        default_path = f"../form"
     file_path_temp = filedialog.askopenfilename(
         title="选择文件",
         initialdir=default_path,  # 默认打开桌面
@@ -53,7 +53,7 @@ def choose_table(enter, open_desktop=True):
 
         # 获取当前日期的年月日
         today = datetime.now().strftime('%Y-%m-%d')
-        target_dir = f"./form/{today}"
+        target_dir = f"../form/{today}"
 
         # 在项目目录下./from下创建当天日期文件夹
         if not os.path.exists(target_dir):

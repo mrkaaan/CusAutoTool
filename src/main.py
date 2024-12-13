@@ -59,13 +59,6 @@ def main():
     
 
 def test():
-
-#     Error in atexit._run_exitfuncs:
-# Traceback (most recent call last):
-#   File "C:\Users\A\miniconda3\envs\gui\lib\site-packages\plyer\platforms\win\libs\balloontip.py", line 157, in __del__
-#     win_api_defs.DestroyWindow(self._hwnd)
-# KeyboardInterrupt
-
     print("Running tests...")
     # ---------- 快捷键启动 -------------
     hotkey_actions = [

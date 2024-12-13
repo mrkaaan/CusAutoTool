@@ -16,9 +16,9 @@ import auto_operation as au
 from pyautogui import FailSafeException
 
 config = configparser.ConfigParser()
-config.read('../config/config.ini')
+config.read('../config/window_config.ini')
 # 访问环境变量
-window_open_mode = config['numbers'].get('WINDOW_OPEN_MODE')
+window_open_mode = config['defaults'].get('WINDOW_OPEN_MODE')
 # 尝试将 TRY_NUMBER 转换为整数
 window_open_mode = int(window_open_mode)
 
@@ -79,7 +79,7 @@ def choose_table(entry_var, open_desktop=True):
 
     # 打开目录选择文件
     if not open_desktop:
-        default_path = f"./form"
+        default_path = f"../form"
     file_path_temp = filedialog.askopenfilename(
         title="选择文件",
         initialdir=default_path,  # 默认打开桌面
@@ -96,7 +96,7 @@ def choose_table(entry_var, open_desktop=True):
 
         # 获取当前日期的年月日
         today = datetime.now().strftime('%Y-%m-%d')
-        target_dir = f"./form/{today}"
+        target_dir = f"../form/{today}"
 
         # 在项目目录下./from下创建当天日期文件夹
         if not os.path.exists(target_dir):
@@ -350,9 +350,9 @@ def create_window(mode=0):
     button_x_offset = 140
     button_y_offset = 300
     # 功能按钮设置
-    set_button_x_offset = window_width - 140 if mode == 0 else window_width - 136  # button x轴位置间隔设置
+    set_button_x_offset = window_width - 140 if mode == 0 else window_width - 180  # button x轴位置间隔设置
     set_button_y_offset = window_height - 40 if mode == 0 else window_height - 43  # button y轴位置间隔设置
-    set_button_x_interval = 26  if mode == 0 else 30  # button x轴位置间隔设置
+    set_button_x_interval = 26  if mode == 0 else 40  # button x轴位置间隔设置
     
     # 设置窗口位于屏幕的右上部分中间
     scnwidth, scnheight = window.maxsize()
@@ -510,7 +510,7 @@ def notic_last_data():
     notification_reissue_parameter = {
         'window_name':'千牛接待台', # 窗口名称
         'table_name':'2024-11-27_230453_处理结果.xlsx',  # 表格名称
-        'table_path': '../form/', # 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
+        'table_path': '', # 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
         'notic_shop_name':'潮洁居家', # 通知店铺名称
         'notic_mode':2,       # 通知模式  1：输入框通知 2：补发窗口按钮通知
         'show_logistics':False, # 是否显示物流公司 输入框通知模式下生效
@@ -539,5 +539,5 @@ def notic_last_data():
 
 # 测试
 if __name__ == "__main__":
-    # create_window()
-    notic_last_data()
+    create_window(window_open_mode)
+    # notic_last_data()

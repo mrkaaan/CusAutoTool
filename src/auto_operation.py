@@ -329,9 +329,9 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         # 组合表单路径
         # 如果使用今天日期 则进行组合
         if not use_today:
-            form_folder += f"{table_path}{datetime.datetime.now().strftime('%Y-%m-%d')}"
+            form_folder += f"/{datetime.datetime.now().strftime('%Y-%m-%d')}"
         else:
-            form_folder += f"{table_path}{use_today}"
+            form_folder += f"/{use_today}"
         table_file = os.path.join(form_folder, table_name)
 
 
