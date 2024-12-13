@@ -47,7 +47,7 @@ def main():
 
         {'key': 'ctrl+r+num 1', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23'], '补发金属转接头']}, # erp 常用操作2 转接头23
         {'key': 'ctrl+r+num 2', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内24'], '补发金属转接头']}, # erp 常用操作2 转接头23
-        {'key': 'ctrl+r+num 6', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '内24'], '补发金属转接头']}, # erp 常用操作2 转接头23
+        {'key': 'ctrl+r+num 6', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '内24'], '补发金属转接头']}, # erp 常用操作2 转接头23 24
         {'key': 'ctrl+r+num 4', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['万能接头【细'], '补发']}, # erp 常用操作2 转接头23 24
         {'key': 'ctrl+r+num 5', 'func': ao.erp_common_action_3, 'args': ['旺店通ERP', 'sz', '补发金属转接头']}, # erp 常用操作2 其他转接头
 

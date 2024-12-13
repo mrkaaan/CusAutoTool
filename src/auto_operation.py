@@ -257,7 +257,7 @@ def run_test(window_name):
 
 # 通知补发单号
 # mode1 使用输入框通知 mode2 使用补发窗口通知
-def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, test_mode=0, is_write=True, table_path='', form_folder='./form'):
+def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, test_mode=0, is_write=True, table_path='', form_folder='../form'):
     '''
         :param window_name: 应用窗口的名称
         :param table_name: 表单名称

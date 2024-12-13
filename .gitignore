@@ -24,3 +24,6 @@ src/*.log
 
 # 本地配置文件
 config/window_config.ini
+
+# 句柄文件
+config/handles.json
