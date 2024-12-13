@@ -103,7 +103,7 @@ def is_loop_over(app, icon):
     return valid
 
 # 千牛 执行一次备注操作
-def run_once_remarks_by_qianniu(window_name, unmark=True, unmark_mode=1):
+def run_once_remarks_by_qianniu(window_name, click_remarks=True, unmark=True, unmark_mode=1):
     '''
         :param window_name: 应用窗口的名称
         :param unmark: 是否取消标记
@@ -115,11 +115,12 @@ def run_once_remarks_by_qianniu(window_name, unmark=True, unmark_mode=1):
     try:
         # app.get_app_screenshot()
         # 点击备注
-        button_remarks_x, button_remarks_y, find_button_remarks = app.locate_icon('Button_Remarks.png',0.7,1.0,0.2,0.9)
-        if not find_button_remarks:
-            logger.info(f"END | not find Button_Remarks.png, windoe name: {window_name}") # 停止记录
-            return
-        app.move_and_click(button_remarks_x, button_remarks_y)
+        if click_remarks:
+            button_remarks_x, button_remarks_y, find_button_remarks = app.locate_icon('Button_Remarks.png',0.7,1.0,0.2,0.9)
+            if not find_button_remarks:
+                logger.info(f"END | not find Button_Remarks.png, windoe name: {window_name}") # 停止记录
+                return
+            app.move_and_click(button_remarks_x, button_remarks_y)
         # 点击红色备注
         redflag_x, redflag_y, is_find_redflag = app.locate_icon('Button_RedFlag.png',0.5,1.0,0.6,1.0)
         if not is_find_redflag:
@@ -130,15 +131,8 @@ def run_once_remarks_by_qianniu(window_name, unmark=True, unmark_mode=1):
         app.move_and_click(redflag_x, redflag_y+150)
         # 获取输入框当前的内容
         keyboard.press_and_release('ctrl+a')  
-        keyboard.press_and_release('ctrl+c')  # 模拟按下并释放
-        current_text = pyperclip.paste().strip()      # 获取剪贴板中的文本
-        print(f"{current_text}")
         # 按下右边取消选中
         keyboard.press_and_release('right')
-        # time.sleep(0.1)
-        # 判断输入框是否有内容
-        if not current_text:
-            entry_text = '\n已登记补发'
         entry_text = '已登记补发'
         # 输入
         keyboard.write(entry_text)
@@ -182,17 +176,22 @@ def run_once_unmark_by_qianniu(window_name, mode=1, app=None):
             keyboard.press_and_release('ctrl+w')
             time.sleep(0.1)
         elif mode == 2:
-            local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.3,0.1,0.9)
-            if is_find:
-                app.move_and_click(local_x, local_y, 'right')
-                # 按下上方向键
-                keyboard.press_and_release('up')
-                # 按下回车
-                keyboard.press_and_release('enter')
-                # time.sleep(0.1)
-                # button_cancel_x, button_cancel_y, is_find_buuton_canbel = app.locate_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
-                # if is_find_buuton_canbel:
-                #     app.move_and_click(button_cancel_x, button_cancel_y)
+            # 千牛左侧列表有两个状态 正在接待列表 和  全部买家列表， 两个列表中被选中的用户的图案不同 判断在哪个列表中
+            select_all_buyers = app.check_icon('select_all_buyers.png', 0, 0.3, 0.1, 0.4)
+            if not select_all_buyers:
+                local_x, local_y, is_find = app.locate_icon('button_selected_session_annotation.png',0,0.3,0.1,0.9)
+                if is_find:
+                    app.move_and_click(local_x, local_y, 'right')
+                    # 按下上方向键
+                    keyboard.press_and_release('up')
+                    # 按下回车
+                    keyboard.press_and_release('enter')
+                    # time.sleep(0.1)
+                    # button_cancel_x, button_cancel_y, is_find_buuton_canbel = app.locate_icon('button_cancel_annotations.png',0,0.4,0.2,1.0)
+                    # if is_find_buuton_canbel:
+                    #     app.move_and_click(button_cancel_x, button_cancel_y)
+                else:
+                    logger.info(f"END | not find button_selected_session_annotation.png, windoe name: {window_name}") # 停止记录
             else:
                 # 找 button_selected_session_annotation.png
                 local_other_x, local_other_y, is_find_other = app.locate_icon('button_selected_session_annotation_other.png',0,0.4,0,1.0)
