@@ -22,9 +22,9 @@ def main():
         {'key': 'ctrl+shift+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
         {'key': 'f3', 'func': ac.clear_clipboard, 'use_thread':False}, # 清空剪切板
         
-        {'key': 'ctrl+shift+alt+z', 'func': tb_win.call_create_window, 'use_thread':False}, # 打开窗口，用于整理表格
-        {'key': 'ctrl+shift+alt+a', 'func': nr_win.call_create_window, 'use_thread':False}, # 打开窗口，用于通知补发
-        {'key': 'ctrl+shift+alt+q', 'func': nr_win.notic_last_data, 'use_thread':False}, # 使用上次数据直接通知补发
+        {'key': 'ctrl+shift+num 1', 'func': tb_win.call_create_window, 'use_thread':False}, # 打开窗口，用于整理表格
+        {'key': 'ctrl+shift+num 2', 'func': nr_win.call_create_window, 'use_thread':False}, # 打开窗口，用于通知补发
+        {'key': 'ctrl+shift+num 3', 'func': nr_win.notic_last_data, 'use_thread':False}, # 使用上次数据直接通知补发
 
         {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
         {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图

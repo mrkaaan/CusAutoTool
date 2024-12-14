@@ -332,13 +332,12 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         else:
             form_folder += f"/{use_today}"
         table_file = os.path.join(form_folder, table_name)
-
-
+        table_file = r"{}".format(table_path)
         # 根据不同文件格式读取表格
         file_format = table_name.split('.')
         if 'xls' in file_format[1]:
             # 表格不存在提示
-            if os.path.exists(table_file):
+            if not os.path.exists(table_file):
                 print(f"表单文件：{table_file} 不存在")
                 show_toast('提醒', f'表单文件：{table_file} 不存在')
                 return
