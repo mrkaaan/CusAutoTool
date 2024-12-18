@@ -938,11 +938,12 @@ def erp_add_specific_products(window_name, product_list=None, app=None):
             # 选中商品
             app.move_and_click(1000, 400, 'left', 2)
             time.sleep(0.1)
-            # 清空输入框 1237 290
-            app.move_and_click(1237, 290)
-            # 点击货品名称输入框
-            app.move_and_click(1188, 288)
-            time.sleep(0.1)
+            if len(product_list) > 1:
+                # 清空输入框 1237 290
+                app.move_and_click(1237, 290)
+                # 点击货品名称输入框
+                app.move_and_click(1188, 288)
+                time.sleep(0.1)
         # 保存添加备注
         app.move_and_click(1413, 787)
 
