@@ -80,9 +80,19 @@
         "originalFile": "长三通材质2.png"
     },
     {
+        "shortCut": "icstcz3",
+        "meaning": "长三通材质3",
+        "originalFile": "长三通材质3.png"
+    },
+    {
         "shortCut": "icstcz1",
         "meaning": "长三通材质1",
         "originalFile": "长三通材质1.png"
+    },
+    {
+        "shortCut": "icstcz1",
+        "meaning": "长三通胶圈",
+        "originalFile": "长三通胶圈.png"
     },
     {
         "shortCut": "ijfsz",
@@ -438,5 +448,10 @@
         "shortCut": "itips",
         "meaning": "防溅头长短选择和小窍门",
         "originalFile": "防溅头长短选择和小窍门.png"
+    },
+    {
+        "shortCut": "iwtkk",
+        "meaning": "五通卡扣",
+        "originalFile": "五通卡扣.png"
     }
 ]
