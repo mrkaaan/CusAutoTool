@@ -453,5 +453,10 @@
         "shortCut": "iwtkk",
         "meaning": "五通卡扣",
         "originalFile": "五通卡扣.png"
+    },
+    {
+        "shortCut": "ibjxp",
+        "meaning": "吸盘不用扭太紧",
+        "originalFile": "吸盘不紧.png"
     }
 ]
