@@ -241,9 +241,9 @@ def get_express_company(tracking_number):
         return "韵达"
     elif tracking_number.startswith('77'):
         return "申通"
-    elif tracking_number.startswith('sf'):
+    elif tracking_number.startswith('SF'):
         return "顺丰"
-    elif tracking_number.startswith('jt'):
+    elif tracking_number.startswith('JT'):
         return "极兔"
     elif tracking_number.startswith('788') or tracking_number.startswith('784') or tracking_number.startswith('756'):
         return "中通"
@@ -251,16 +251,17 @@ def get_express_company(tracking_number):
         return ""
 
 def update_clipboard_express_company():
-    # 读取剪切板的内容
-    tracking_number = pyperclip.paste().strip().lower()
+    # 读取剪切板的内容 大写
+    tracking_number = pyperclip.paste().strip().upper()
 
     if not tracking_number:
         print("剪切板内容为空，退出更新")
         return
     tracking_number_len = len(tracking_number)
     # 判断是否为物流单号
-    if tracking_number_len < 10 or tracking_number_len > 20:
+    if tracking_number_len < 10 or tracking_number_len > 15:
         print("剪切板内容长度不符合要求，退出更新")
+        show_toast('提醒', '剪切板内容长度不符合要求，退出更新')
         return
     # 获取快递公司
     express_company = get_express_company(tracking_number)
