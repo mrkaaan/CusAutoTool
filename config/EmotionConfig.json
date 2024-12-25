@@ -458,5 +458,10 @@
         "shortCut": "ibjxp",
         "meaning": "吸盘不用扭太紧",
         "originalFile": "吸盘不紧.png"
+    },
+    {
+        "shortCut": "isld",
+        "meaning": "生料带",
+        "originalFile": "生料带.png"
     }
 ]
