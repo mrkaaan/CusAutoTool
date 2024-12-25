@@ -364,7 +364,7 @@ def create_window(mode=0):
 
     # 禁止更改窗口大小
     window.resizable(False, False)  # 禁止更改大小
-    window.update()  #
+    window.update()  # 刷新窗口
 
     # 窗口名
     window_name_label = tk.Label(window, text="窗口名称:", font=f'{label_font_fam} {label_font_size} {label_weight}', fg=label_color)

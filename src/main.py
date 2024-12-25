@@ -119,7 +119,7 @@ def test():
 
     # ---------- 表格处理 -------------
     # tb.process_table('11月27日天猫补发单号.csv')
-
+    ao.erp_aciton_box()
 if __name__ == "__main__":
     # 配置参数
     setup_pyautogui()

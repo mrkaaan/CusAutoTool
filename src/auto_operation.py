@@ -9,6 +9,7 @@ import pyperclip
 import pandas as pd
 from utils import show_toast
 from loguru import logger  
+import tkinter as tk
 
 # 循环执行 直到出现标志或者手动终止 需要修改
 def running_loop(window_name, cycle_number=-1):
@@ -1021,3 +1022,132 @@ def erp_common_action_3(window_name, warehouse='', remarks='', app=None):
 
     except Exception as e:
         print(f"ERP常用操作1异常：{e}")
+
+
+# erp操作集合
+def erp_action_collection(action_list=None):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+        :param action_list: 操作列表
+    '''
+    try:
+        if action_list == None:
+            print('请输入操作列表')
+            return
+        app = action_list.get('app', None)
+        if not app:
+            window_name = action_list.get('window_name', '')
+            if window_name == '':
+                app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
+            else:
+                print('请输入窗口名称')
+                return
+            
+        # 获取action_list中的product_list
+        product_list = action_list.get('product_list', [])
+        if len(product_list) == 0:
+            print('商品列表为空')
+            
+    except Exception as e:
+        print(f"ERP操作集合异常：{e}")
+
+# erp处理输入框的内容
+def erp_handle_input_content(input_content):
+    '''
+        :param input_content: 输入内容
+    '''
+    try:
+        # 处理输入内容
+        if not input_content:
+            print('输入内容为空')
+            return
+        # 去除空格
+        input_content = input_content.replace(' ', '')
+        
+        action_list = {}
+
+        # 设置action_list中的window_name
+        action_list['window_name'] = '旺店通ERP'
+
+        # 设置action_list中的selecct_today为True
+        action_list['select_today'] = True
+
+
+        # 设置action_list中的clear_product为True
+        action_list['clear_product'] = True
+
+        # 设置action_list中的warehouse 判断输入内容是否含有sz cz（如果有多个则只取第一个）
+        if'sz' in input_content:
+            action_list['warehouse'] = 'sz'
+        elif 'cz' in input_content:
+            action_list['warehouse'] = 'cz'
+
+
+        erp_action_collection(action_list)
+    except Exception as e:
+        print(f"ERP处理输入框内容异常：{e}")
+
+# erp创建输入框操作
+def erp_aciton_box(mode=0):
+    '''
+        :param window_name: 窗口名称
+        :param app: WinGUI 实例 默认为 None
+    '''
+    try:
+        # 使用tk创建一个输入框 按下回车确认并存储输入内容
+        tk_window = tk.Tk()
+        # 去掉标题栏
+        tk_window.overrideredirect(True)
+
+        # 设置窗口大小
+        window_width = 300
+        window_height = 90
+
+        # entry设置
+        entry_font_fam = '楷体'
+        entry_font_size = 11
+        entry_color = '#000000'
+
+        # button设置
+        button_font_fam = '楷体'
+        button_font_size = 10
+        button_color = '#000000'
+
+        # 设置窗口位于屏幕的中间
+        scnwidth, scnheight = tk_window.maxsize()
+        x_offset = (scnwidth - window_width) / 2
+        y_offset = (scnheight - window_height) / 2
+        tk_window.geometry(f'{window_width}x{window_height}+{int(x_offset)}+{int(y_offset)}')
+
+        # 禁止更改窗口大小
+        tk_window.resizable(False, False)
+
+        # 创建一个Frame来放置Entry和Buttons，确保它们可以正确地对齐
+        frame = tk.Frame(tk_window)
+        frame.place(relx=0.5, rely=0.5, anchor='center', relwidth=1, relheight=1)
+
+        # Entry将填满整个窗口宽度，使用place而不是pack
+        tk_entry = tk.Entry(frame, font=(entry_font_fam, entry_font_size), fg=entry_color)
+        tk_entry.place(relx=0.5, rely=0.3, anchor='center', relwidth=0.9, relheight=0.4)
+
+        # 确认按钮
+        tk_button_confirm = tk.Button(frame, text='确认', command=lambda: tk_window.quit(), font=(button_font_fam, button_font_size), fg=button_color)
+        tk_button_confirm.place(relx=0.3, rely=0.8, anchor='center')
+
+        # 取消按钮
+        tk_button_cancel = tk.Button(frame, text='取消', command=tk_window.destroy, font=(button_font_fam, button_font_size), fg=button_color)
+        tk_button_cancel.place(relx=0.7, rely=0.8, anchor='center')
+
+        tk_window.mainloop()
+
+        input_content = tk_entry.get()
+        
+        if input_content == '':
+            print('输入内容为空')
+            return
+        else:
+            print(f'输入内容：{input_content}')
+            erp_handle_input_content(input_content)
+    except Exception as e:
+        print(f"ERP创建输入框操作异常：{e}")
