@@ -463,5 +463,10 @@
         "shortCut": "isld",
         "meaning": "生料带",
         "originalFile": "生料带.png"
+    },
+    {
+        "shortCut": "ixd",
+        "meaning": "点击立即下单",
+        "originalFile": "立即下单.png"
     }
 ]
