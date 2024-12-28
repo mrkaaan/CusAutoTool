@@ -10,6 +10,9 @@ import pandas as pd
 from utils import show_toast
 from loguru import logger  
 import tkinter as tk
+import json
+
+rule_json_path = r'../config/product_rules.json'
 
 # 循环执行 直到出现标志或者手动终止 需要修改
 def running_loop(window_name, cycle_number=-1):
@@ -1062,20 +1065,21 @@ def erp_handle_input_content(input_content):
         if not input_content:
             print('输入内容为空')
             return
-        # 去除空格
-        input_content = input_content.replace(' ', '')
+        # 去除空格前后的空格
+        input_content = input_content.strip()
+        input_content = input_content.split(' ')
+        print(f"处理后输入内容：{input_content}")
         
-        action_list = {}
-
-        # 设置action_list中的window_name
-        action_list['window_name'] = '旺店通ERP'
-
-        # 设置action_list中的selecct_today为True
-        action_list['select_today'] = True
-
-
-        # 设置action_list中的clear_product为True
-        action_list['clear_product'] = True
+        action_list = {
+            'window_name': '旺店通ERP',  # 窗口名称
+            'warehouse': None,  # 可以是 "Shenzhen" 或 "Chaozhou"
+            'select_today': True,  # 可以是 True 或 False
+            'clear_product': True,  # 可以是 True 或 False
+            'reissue_order': None,  # 可以是 True 或 False 选择是则为补发界面，不选择则为手工建单界面
+            'notes': ["补发"],  # 默认备注列表，
+            'product_items': [],  # 用于存储产品的列表
+            'undefined_product': [],  # 不存在的产品存储
+        }
 
         # 设置action_list中的warehouse 判断输入内容是否含有sz cz（如果有多个则只取第一个）
         if'sz' in input_content:
@@ -1083,8 +1087,14 @@ def erp_handle_input_content(input_content):
         elif 'cz' in input_content:
             action_list['warehouse'] = 'cz'
 
+        
+        # 加载映射规则
+        mapping_rules = load_mapping_from_json(rule_json_path)
+        # 执行验证和转换
+        result = validate_and_convert(input_content, mapping_rules)
+        print(result)
 
-        erp_action_collection(action_list)
+        # erp_action_collection(action_list)
     except Exception as e:
         print(f"ERP处理输入框内容异常：{e}")
 
@@ -1098,7 +1108,7 @@ def erp_aciton_box(mode=0):
         # 使用tk创建一个输入框 按下回车确认并存储输入内容
         tk_window = tk.Tk()
         # 去掉标题栏
-        tk_window.overrideredirect(True)
+        # tk_window.overrideredirect(True)
 
         # 设置窗口大小
         window_width = 300
@@ -1151,3 +1161,38 @@ def erp_aciton_box(mode=0):
             erp_handle_input_content(input_content)
     except Exception as e:
         print(f"ERP创建输入框操作异常：{e}")
+
+
+
+def load_mapping_from_json(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+def validate_and_convert(input_content, mapping):
+    action_list = {
+        'product_items': [],  # 成功转换的产品列表
+        'undefined_product': []  # 不存在的产品列表
+    }
+
+    # 验证映射是否有效
+    if not isinstance(mapping, dict) or not mapping.get('mapping'):
+        raise ValueError("Invalid mapping structure")
+
+    for key, value in mapping['mapping'].items():
+        if not key or not value:
+            raise ValueError(f"Empty key or value found for entry: {key}:{value}")
+
+    # 转换输入内容为标准产品名称
+    converted_products = set()  # 使用集合去重
+    for item in input_content:
+        found = False
+        for standard_name, aliases in mapping['mapping'].items():
+            if item in aliases:
+                converted_products.add(standard_name)
+                found = True
+                break
+        if not found:
+            action_list['undefined_product'].append(item)
+
+    action_list['product_items'] = list(converted_products)
+    return action_list
