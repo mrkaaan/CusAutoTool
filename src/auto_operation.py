@@ -10,6 +10,9 @@ import pandas as pd
 from utils import show_toast
 from loguru import logger  
 import tkinter as tk
+import json
+
+rule_json_path = r'../config/product_rules.json'
 
 # 循环执行 直到出现标志或者手动终止 需要修改
 def running_loop(window_name, cycle_number=-1):
@@ -1053,41 +1056,6 @@ def erp_action_collection(action_list=None):
     except Exception as e:
         print(f"ERP操作集合异常：{e}")
 
-# erp处理输入框的内容
-def erp_handle_input_content(input_content):
-    '''
-        :param input_content: 输入内容
-    '''
-    try:
-        # 处理输入内容
-        if not input_content:
-            print('输入内容为空')
-            return
-        # 去除空格
-        input_content = input_content.replace(' ', '')
-        
-        action_list = {}
-
-        # 设置action_list中的window_name
-        action_list['window_name'] = '旺店通ERP'
-
-        # 设置action_list中的selecct_today为True
-        action_list['select_today'] = True
-
-
-        # 设置action_list中的clear_product为True
-        action_list['clear_product'] = True
-
-        # 设置action_list中的warehouse 判断输入内容是否含有sz cz（如果有多个则只取第一个）
-        if'sz' in input_content:
-            action_list['warehouse'] = 'sz'
-        elif 'cz' in input_content:
-            action_list['warehouse'] = 'cz'
-
-
-        erp_action_collection(action_list)
-    except Exception as e:
-        print(f"ERP处理输入框内容异常：{e}")
 
 # erp创建输入框操作
 def erp_aciton_box(mode=0):
@@ -1095,11 +1063,44 @@ def erp_aciton_box(mode=0):
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
     '''
+
+    input_content = ''
+
+    def on_confirm(entry):
+        global input_content
+        input_content = entry.get()
+        entry.delete(0, tk.END)
+        
+        if input_content == '':
+            print('输入内容为空')
+            show_toast('提示', '输入内容为空')
+        else:
+            print(f'输入内容：{input_content}')
+            if auto_close.get():
+                tk_window.quit()
+
+            erp_handle_input_content(input_content, reissuse_order.get())
+
+    def toggle_reissue_order():
+        reissuse_order.set(not reissuse_order.get())  # 切换补发选项的状态
+        print(f"补发选项: {'打开' if reissuse_order.get() else '关闭'}")
+        show_toast('提示', f"补发选项: {'打开' if reissuse_order.get() else '关闭'}")
+
+    def toggle_auto_close():
+        auto_close.set(not auto_close.get())          # 切换自动关闭选项的状态
+        print(f"自动关闭选项: {'打开' if auto_close.get() else '关闭'}")
+        show_toast('提示', f"自动关闭选项: {'打开' if reissuse_order.get() else '关闭'}")
+
     try:
-        # 使用tk创建一个输入框 按下回车确认并存储输入内容
         tk_window = tk.Tk()
+
+        # 设置标题
+        tk_window.title('ERP_BOX')
         # 去掉标题栏
-        tk_window.overrideredirect(True)
+        # tk_window.overrideredirect(True)
+
+        reissuse_order = tk.BooleanVar(value=True) # 选择是则为补发界面，不选择则为手工建单界面
+        auto_close = tk.BooleanVar(value=False) # 选择是则点击确认后自动关闭窗口
 
         # 设置窗口大小
         window_width = 300
@@ -1114,6 +1115,11 @@ def erp_aciton_box(mode=0):
         button_font_fam = '楷体'
         button_font_size = 10
         button_color = '#000000'
+
+        # checkbox设置
+        checkbox_font_fam = '楷体'
+        checkbox_font_size = 6
+        checkbox_color = '#000000'
 
         # 设置窗口位于屏幕的中间
         scnwidth, scnheight = tk_window.maxsize()
@@ -1132,23 +1138,139 @@ def erp_aciton_box(mode=0):
         tk_entry = tk.Entry(frame, font=(entry_font_fam, entry_font_size), fg=entry_color)
         tk_entry.place(relx=0.5, rely=0.3, anchor='center', relwidth=0.9, relheight=0.4)
 
-        # 确认按钮
-        tk_button_confirm = tk.Button(frame, text='确认', command=lambda: tk_window.quit(), font=(button_font_fam, button_font_size), fg=button_color)
-        tk_button_confirm.place(relx=0.3, rely=0.8, anchor='center')
+        # 确认按钮 
+        tk_button_confirm = tk.Button(frame, text='确认', command=lambda: on_confirm(tk_entry), font=(button_font_fam, button_font_size), fg=button_color)
+        tk_button_confirm.place(relx=0.15, rely=0.8, anchor='center')
 
         # 取消按钮
         tk_button_cancel = tk.Button(frame, text='取消', command=tk_window.destroy, font=(button_font_fam, button_font_size), fg=button_color)
-        tk_button_cancel.place(relx=0.7, rely=0.8, anchor='center')
+        tk_button_cancel.place(relx=0.38, rely=0.8, anchor='center')
+
+        # 添加两个复选框
+        tk_check_reissue_order = tk.Checkbutton(frame, text='补发', variable=reissuse_order, font=(checkbox_font_fam, checkbox_font_size), fg=checkbox_color)
+        tk_check_reissue_order.place(relx=0.7, rely=0.8, anchor='center')
+
+        tk_check_auto_close = tk.Checkbutton(frame, text='自动关闭', variable=auto_close, font=(checkbox_font_fam, checkbox_font_size), fg=checkbox_color)
+        tk_check_auto_close.place(relx=0.9, rely=0.8, anchor='center')
+
+        # 绑定回车键到确认按钮
+        tk_window.bind('<Return>', lambda event: on_confirm(tk_entry))
+
+        # 绑定ctrl+回车到取消按钮
+        tk_window.bind('<Control-Return>', lambda event: tk_window.destroy())
+
+        # 绑定 Ctrl+1 到补发选项
+        tk_window.bind('<Control-Key-1>', lambda event: toggle_reissue_order())
+
+        # 绑定 Ctrl+2 到自动关闭选项
+        tk_window.bind('<Control-Key-2>', lambda event: toggle_auto_close())
 
         tk_window.mainloop()
 
-        input_content = tk_entry.get()
-        
-        if input_content == '':
-            print('输入内容为空')
-            return
-        else:
-            print(f'输入内容：{input_content}')
-            erp_handle_input_content(input_content)
     except Exception as e:
         print(f"ERP创建输入框操作异常：{e}")
+
+# erp处理输入框的内容
+def erp_handle_input_content(input_content, reissuse_order=True):
+    '''
+        :param input_content: 输入内容
+    '''
+    try:
+        # 处理输入内容
+        if not input_content:
+            print('输入内容为空')
+            return
+        # 去除空格前后的空格
+        input_content = input_content.strip()
+        input_content = input_content.split(' ')
+        print(f"分割后输入内容：{input_content}")
+        
+        action_list = {
+            'window_name': '旺店通ERP',  # 窗口名称
+            'warehouse': None,  # 可以是 "Shenzhen" 或 "Chaozhou"
+            'select_today': True,  # 可以是 True 或 False 默认True
+            'clear_product': True,  # 可以是 True 或 False 默认True
+            'reissue_order': reissuse_order,  # 可以是 True 或 False 选择是则为补发界面，不选择则为手工建单界面
+            'notes': ["补发"],  # 默认备注列表，
+            'product_items': [],  # 用于存储产品的列表
+            'undefined_product': [],  # 不存在的产品存储
+        }
+
+        # 加载映射规则
+        mapping_rules = load_mapping_from_json(rule_json_path)
+        # 执行验证和转换
+        result = validate_and_convert(input_content, mapping_rules)
+        if not result:
+            print('输入内容不符合规则')
+        else:
+            # 处理结果
+            action_list.update(result)
+            print(f"处理结果：{action_list}")
+    
+        # erp_action_collection(action_list)
+    except Exception as e:
+        print(f"ERP处理输入框内容异常：{e}")
+
+
+def load_mapping_from_json(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return json.load(file)
+
+def validate_and_convert(input_content, mapping):
+    action_list = {
+        'product_items': [],  # 成功转换的产品列表
+        'undefined_product': [],  # 不存在的产品列表
+        'warehouse': None  # 仓库名称
+    }
+
+    # 验证映射是否有效
+    if not isinstance(mapping, dict) or not mapping.get('produdcts'):
+        raise ValueError("Invalid mapping structure")
+
+    for key, value in mapping['produdcts'].items():
+        if not key or not value:
+            raise ValueError(f"Empty key or value found for entry: {key}:{value}")
+    
+    # 所有转换头的key手动存一个list
+    trans = mapping['trans']
+    # 转换输入内容为标准产品名称
+    converted_products = set()  # 使用集合去重
+    found_warehouse = False # 是否找到仓库
+    is_trans = False # 是否有转接头
+    for item in input_content:
+        found_product = False
+        for standard_name, aliases in mapping['produdcts'].items():
+            if item in aliases:
+                if standard_name in trans:
+                    is_trans = True
+                converted_products.add(standard_name)
+                found_product = True
+                break
+
+        # 设置仓库
+        # 有转接头内容则默认为深圳仓 有转接头还是指定深圳仓（找到一次就会停止）
+        # 有转接头但是指定潮州仓 就用潮州的 并提示
+        for warehouse_name, warehouse_aliases in mapping['warehouse'].items():
+            if item in warehouse_aliases and not found_warehouse:
+                action_list['warehouse'] = warehouse_name
+                if is_trans and warehouse_name == '潮州': # 如果有转接头 并且指定了潮州仓 则提示
+                    print('输入内容包含转接头，但仓库为潮州仓，请确认是否正确')
+                    show_toast('提示', '输入内容包含转接头，但仓库为潮州仓，请确认是否正确')
+                found_warehouse = True
+                break
+
+        if not found_warehouse:
+            if is_trans: # 如果有转接头 则默认为深圳仓
+                action_list['warehouse'] = '深圳'
+            else:
+                action_list['warehouse'] = None  # 如果没有找到匹配的仓库，设置为None
+
+        # 判断是不是仓库 如果是则不存入undefined_product列表 否则存入undefined_product列表 
+        if not found_product and not found_warehouse:
+            action_list['undefined_product'].append(item)
+
+    action_list['product_items'] = list(converted_products)
+    return action_list
+
+
+# 备注 跑通 *几 只有备注的操作
