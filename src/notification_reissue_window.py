@@ -216,7 +216,7 @@ def create_window(mode=0):
         if notic:
             # 关闭窗口
             window.destroy()
-            show_toast("提醒", "开始补发通知...")
+            # show_toast("提醒", "开始补发通知...")
             # 调用函数 a
             au.notification_reissue(**notification_reissue_parameter)
         else:

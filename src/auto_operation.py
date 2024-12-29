@@ -418,12 +418,12 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             # 原始单号为空 提示并跳过
             if not original_number:
                 print(f"原始单号为空 跳过")
-                show_toast('提醒', f'原始单号为空 跳过')
+                # show_toast('提醒', f'原始单号为空 跳过')
                 continue
             # 物流单号为空 提示并跳过
             if not logistics_number:
                 print(f"物流单号为空 跳过")
-                show_toast('提醒', f'物流单号为空 跳过')
+                # show_toast('提醒', f'物流单号为空 跳过')
                 continue
 
             # original_number=123456789789
@@ -514,6 +514,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 if not is_find_recent_orders_text:
                     app.click_icon('installation_services.png', 0.6, 1, 0.2, 1)
                 # time.sleep(0.1)
+                pyautogui.scroll(-100)
 
                 # 尝试点击两次搜索订单按钮
                 is_find_search_button = False 
@@ -524,7 +525,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                         selected_search_button_x, selected_search_button_y, is_find_selected_search_button = app.locate_icon('selected_search_order_button.png', 0.6, 1, 0.2, 1)
                         if not is_find_selected_search_button:
                             print(f'未找到搜索订单按钮，尝试滑动后再次查找...')
-                            pyautogui.scroll(-100)
+                            pyautogui.scroll(-160)
                         else:
                             print(f'当前搜索按钮已被点击直接执行下一步...')
                             is_find_search_button = True
@@ -540,12 +541,12 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 # 尝试点击两次搜索框
                 is_find_search_text = False
                 for i in range(2):
+                    pyautogui.scroll(-100)
                     search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
                     if is_find_search_text:
                         print(f'找到搜索框，点击搜索框...')
                         break
                     print(f'未找到搜索框，尝试滑动后再次查找...')
-                    pyautogui.scroll(-150)
 
                 if not is_find_search_text:
                     print(f'未找到搜索框，跳过{logistics_number}')
@@ -570,12 +571,12 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 #  尝试点击两次补发按钮
                 is_find_reissue_button = False
                 for _ in range(2):
+                    pyautogui.scroll(-150)
                     reissue_button_x, reissue_button_y, is_find_reissue_button = app.locate_icon('reissue_button.png', 0.6, 1, 0.2, 1)
                     if is_find_reissue_button:
                         print(f'找到补发按钮，点击补发按钮...')
                         break
                     print(f'未找补发按钮，尝试滑动后再次查找...')
-                    pyautogui.scroll(-150)
 
                 if not is_find_reissue_button:
                     print(f'未找到补发按钮，跳过{original_number}')
@@ -649,7 +650,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         # 使用pyperclip库清空剪切板
         pyperclip.copy('')
         print('通知程序已退出')
-        show_toast('提示', '程序已退出')
+        show_toast('提示', '通知程序已退出')
         # 将更改写回 Excel 文件
         with pd.ExcelWriter(table_file, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
             # 只写回当前处理的sheet
