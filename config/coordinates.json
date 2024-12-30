@@ -1,0 +1,52 @@
+{
+    "coordinates_by_reissue": {
+        "date_dropdown": {
+            "position": [800, 55],
+            "description": "日期下拉框坐标"
+        },
+        "today_date": {
+            "position": [888, 252],
+            "description": "今天日期坐标"
+        },
+        "first_product": {
+            "position": [385, 330],
+            "description": "第一个商品坐标，用于删除商品"
+        },
+        "remarks_input": {
+            "position": [1200, 985],
+            "description": "备注输入框坐标"
+        },
+        "warehouse_dropdown": {
+            "position": [166, 85],
+            "description": "仓库下拉框坐标"
+        },
+        "warehouse_sz": {
+            "position": [166, 152],
+            "description": "深圳仓库选择坐标"
+        },
+        "warehouse_cz": {
+            "position": [166, 130],
+            "description": "潮州仓库选择坐标"
+        },
+        "add_product_button": {
+            "position": [60, 280],
+            "description": "添加商品按钮坐标"
+        },
+        "product_name_input": {
+            "position": [1188, 288],
+            "description": "货品名称输入框坐标"
+        },
+        "select_product": {
+            "position": [1000, 400],
+            "description": "选中商品坐标"
+        },
+        "save_notes": {
+            "position": [1413, 787],
+            "description": "保存备注按钮坐标"
+        },
+        "clear_product_input": {
+            "position": [1237, 290],
+            "description": "清空输入框坐标"
+        }
+    }
+}
