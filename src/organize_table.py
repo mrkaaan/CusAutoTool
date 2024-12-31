@@ -24,7 +24,7 @@ def read_excel(input_file, dtype=None):
     df = None
     for encoding in encodings:
         try:
-            if dtype is not None:
+            if not dtype:
                 df = pd.read_excel(input_file, dtype=dtype, encoding=encoding)
             else:
                 df = pd.read_excel(input_file, encoding=encoding)
@@ -56,7 +56,8 @@ def process_table(input_filename, form_folder='../form'):
     if file_format == 'csv':
         df = read_csv(input_file)
     elif file_format in ['xlsx', 'xls']:
-        df = read_excel(input_file, sheet_name=None)
+        # df = read_excel(input_file, None)
+        df = pd.read_excel(input_file)
     else:
         raise ValueError(f"不支持的文件格式：{file_format}")
 
@@ -111,9 +112,10 @@ def process_table(input_filename, form_folder='../form'):
 
             # 获取所有的店铺名称
             shops = sheet_df['店铺名称'].unique()
+            print(sheet_name)
 
             # 如果是单个 sheet 且只有一个默认名称，按店铺名称分割数据
-            if sheet_name == 'Sheet1' and len(shops) > 1:
+            if sheet_name == 'Sheet1' or  sheet_name == '天猫' and len(shops) > 1:
                 for shop in shops:
                     # 选择当前店铺的数据
                     df_shop = sheet_df[sheet_df['店铺名称'] == shop]
@@ -121,7 +123,11 @@ def process_table(input_filename, form_folder='../form'):
                     df_shop.to_excel(writer, sheet_name=shop, index=False)
                     
                     # 提取当前店铺的订单编号
-                    shop_orders = df_shop['订单编号'].dropna().astype(str).tolist()
+                    # 判断有无订单编号列
+                    if '订单编号' in df_shop.columns:
+                        shop_orders = df_shop['订单编号'].dropna().astype(str).tolist()
+                    else:
+                        shop_orders = df_shop['原始单号'].dropna().astype(str).tolist()
                     shop_order_numbers[shop] = shop_orders
                     all_order_numbers_set.update(shop_orders)
                 continue

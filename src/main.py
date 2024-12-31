@@ -12,7 +12,7 @@ def main():
         # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
         {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP'], 'use_thread':False}, # 打开制定软件
         
-        {'key': 'ctrl+shift+q', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, True, True, 2]}, # 添加备注 并 取消标记 不需点击备注按钮
+        # {'key': 'ctrl+shift+q', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, True, True, 2]}, # 添加备注 并 取消标记 不需点击备注按钮
         {'key': 'ctrl+shift+w', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, False, True, 2]}, # 添加备注 并 取消标记 需点击备注按钮
 
         {'key': 'f2', 'func': ac.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
