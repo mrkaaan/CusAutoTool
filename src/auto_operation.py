@@ -11,8 +11,50 @@ from utils import show_toast
 from loguru import logger  
 import tkinter as tk
 import json
+from pathlib import Path
 
 rule_json_path = r'../config/product_rules.json'
+
+# 定义全局变量来存储坐标信息
+coordinates = {}
+json_file_path = '../config/coordinates.json'
+
+def load_coordinates_from_json(file_path, reissue=True):
+    """
+    从指定路径加载JSON文件，并填充全局变量 `coordinates`。
+    如果文件不存在或内容为空，则打印警告信息。
+    """
+    global coordinates
+    if reissue:
+        key_name = 'coordinates_by_reissue'
+    else:
+        key_name = 'coordinates'
+    try:
+        if not Path(file_path).is_file():
+            print(f"Warning: The file {file_path} does not exist.")
+            return
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        if not data or 'coordinates' not in data:
+            print("Warning: JSON file is empty or does not contain 'coordinates'.")
+            return
+
+        coordinates = data[key_name]
+
+        # 验证每个坐标点是否包含位置和描述
+        for key, value in coordinates.items():
+            if not all(k in value for k in ('position', 'description')):
+                print(f"Warning: Invalid format for coordinate '{key}'.")
+                coordinates[key] = {'position': None, 'description': None}
+
+    except json.JSONDecodeError:
+        print(f"Error: Failed to decode JSON from file {file_path}.")
+    except Exception as e:
+        print(f"An error occurred while loading coordinates: {e}")
+
+load_coordinates_from_json(json_file_path, True)
 
 # 循环执行 直到出现标志或者手动终止 需要修改
 def running_loop(window_name, cycle_number=-1):
@@ -1052,7 +1094,37 @@ def erp_action_collection(action_list=None):
         product_list = action_list.get('product_list', [])
         if len(product_list) == 0:
             print('商品列表为空')
-            
+
+        warehouse = action_list.get('warehouse', '')
+        if not warehouse:
+            print('未选择仓库')
+            return
+        else:
+            if warehouse == '深圳':
+                warehouse ='sz'
+            elif warehouse == '潮州':
+                warehouse = 'cz'
+            else:
+                print('仓库名称错误')
+                return
+                
+        # 选择今天
+        if action_list.get('select_today', False):
+            erp_select_today(window_name, app)  
+        # 清空商品
+        if action_list.get('clear_product', False):
+            erp_clear_product(window_name, app)  
+        # 选择仓库
+        erp_choose_warehouse(window_name, app, warehouse)
+        # 添加备注
+        remarks = action_list.get('remarks', ['补发'])
+        for remark in remarks:
+            erp_input_remarks(window_name, app, remark)
+        # 添加商品
+        products = action_list.get('products', [])
+        if len(products) > 0:
+            erp_add_specific_products(window_name, app, products)
+        
     except Exception as e:
         print(f"ERP操作集合异常：{e}")
 
@@ -1191,7 +1263,7 @@ def erp_handle_input_content(input_content, reissuse_order=True):
             'select_today': True,  # 可以是 True 或 False 默认True
             'clear_product': True,  # 可以是 True 或 False 默认True
             'reissue_order': reissuse_order,  # 可以是 True 或 False 选择是则为补发界面，不选择则为手工建单界面
-            'notes': ["补发"],  # 默认备注列表，
+            'remarks': ["补发"],  # 默认备注列表，
             'product_items': [],  # 用于存储产品的列表
             'undefined_product': [],  # 不存在的产品存储
         }
@@ -1204,6 +1276,9 @@ def erp_handle_input_content(input_content, reissuse_order=True):
             print('输入内容不符合规则')
         else:
             # 处理结果
+            if '补发金属转接头' in result['remarks']:
+                if '补发' in action_list['remarks']:
+                    action_list['remarks'].remove('补发')
             action_list.update(result)
             print(f"处理结果：{action_list}")
     
@@ -1220,7 +1295,8 @@ def validate_and_convert(input_content, mapping):
     action_list = {
         'product_items': [],  # 成功转换的产品列表
         'undefined_product': [],  # 不存在的产品列表
-        'warehouse': None  # 仓库名称
+        'warehouse': None,  # 仓库名称
+        'remarks': [],  # 备注列表
     }
 
     # 验证映射是否有效
@@ -1268,9 +1344,10 @@ def validate_and_convert(input_content, mapping):
         # 判断是不是仓库 如果是则不存入undefined_product列表 否则存入undefined_product列表 
         if not found_product and not found_warehouse:
             action_list['undefined_product'].append(item)
-
+    if is_trans:
+        action_list['remarks'].append('补发金属转接头')
     action_list['product_items'] = list(converted_products)
     return action_list
 
 
-# 备注 跑通 *几 只有备注的操作
+# *几 坐标点
