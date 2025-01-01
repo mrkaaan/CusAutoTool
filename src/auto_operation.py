@@ -563,7 +563,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
 
                 # 尝试点击两次搜索订单按钮
                 is_find_search_button = False 
-                for i in range(2):
+                for i in range(3):
                     search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
                     if not is_find_search_button:
                         # 未找到搜索订单按钮 尝试点击以选中的按钮
@@ -579,49 +579,50 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                         app.move_and_click(search_button_x, search_button_y)
                         break
                 if not is_find_search_button:
-                    print(f'未找到搜索订单按钮，跳过{logistics_number}')
-                    continue
+                    print(f'未找到搜索订单按钮，尝试直接寻找搜索框...')
                 # time.sleep(0.1)
 
                 # 尝试点击两次搜索框
                 is_find_search_text = False
-                for i in range(2):
-                    pyautogui.scroll(-100)
+                for i in range(3):
                     search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
                     if is_find_search_text:
                         print(f'找到搜索框，点击搜索框...')
                         break
                     print(f'未找到搜索框，尝试滑动后再次查找...')
+                    pyautogui.scroll(-100)
 
                 if not is_find_search_text:
-                    print(f'未找到搜索框，跳过{logistics_number}')
+                    print(f'未找到搜索框，尝试直接点击补发按钮...')
                     continue
                 else:
                     app.move_and_click(search_text_x+100, search_text_y)
                 time.sleep(0.3)
 
-                # 保证输入框没有内容
-                keyboard.press_and_release('ctrl+a') 
-                keyboard.press_and_release('backspace') 
-                # 输入订单号
-                pyperclip.copy(original_number)
-                keyboard.press_and_release('ctrl+v') 
-                # time.sleep(0.1)
-                # 模拟按下回车搜索
-                keyboard.press_and_release('enter')
-                # 使用 pyautogui 向下滚动鼠标滚轮
-                pyautogui.scroll(-300)
-                time.sleep(0.3)
+                if is_find_search_text:
+                    # 保证输入框没有内容
+                    keyboard.press_and_release('ctrl+a') 
+                    keyboard.press_and_release('backspace') 
+                    # 输入订单号
+                    pyperclip.copy(original_number)
+                    keyboard.press_and_release('ctrl+v') 
+                    # time.sleep(0.1)
+                    # 模拟按下回车搜索
+                    keyboard.press_and_release('enter')
+                    time.sleep(0.3)
+                    # 使用 pyautogui 向下滚动鼠标滚轮
+                    pyautogui.scroll(-300)
+                    time.sleep(0.3)
 
                 #  尝试点击两次补发按钮
                 is_find_reissue_button = False
-                for _ in range(2):
-                    pyautogui.scroll(-150)
+                for _ in range(3):
                     reissue_button_x, reissue_button_y, is_find_reissue_button = app.locate_icon('reissue_button.png', 0.6, 1, 0.2, 1)
                     if is_find_reissue_button:
                         print(f'找到补发按钮，点击补发按钮...')
                         break
                     print(f'未找补发按钮，尝试滑动后再次查找...')
+                    pyautogui.scroll(-150)
 
                 if not is_find_reissue_button:
                     print(f'未找到补发按钮，跳过{original_number}')
