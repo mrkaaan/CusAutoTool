@@ -12,6 +12,7 @@ from loguru import logger
 import tkinter as tk
 import json
 from pathlib import Path
+import random
 
 rule_json_path = r'../config/product_rules.json'
 
@@ -109,7 +110,7 @@ def running_loop_test(cycle_number=-1):
         exit_flag = True
 
     # 设置组合键监听
-    keyboard.add_hotkey('shift+ctrl+e', set_exit_flag)
+    keyboard.add_hotkey('shift+ctrl+q', set_exit_flag)
 
     cycle_count = 0  # 初始化循环计数器
     try:
@@ -118,8 +119,11 @@ def running_loop_test(cycle_number=-1):
             if cycle_number > 0 and cycle_count >= cycle_number:  # 检查是否达到设定的循环次数
                 logger.info(f"finished {cycle_count} cycles!")  # 记录完成循环次数
                 return
-                
+
+            print(f'do something {cycle_count}')
+            time.sleep(1)    
             cycle_count += 1  # 循环计数加一
+
 
             # 省略一系列复杂操作
             # 操作末尾给当前数据打上处理完毕标记
@@ -317,45 +321,54 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         :param table_path: 表单路径 暂时用不到 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
         :param form_folder: 表单文件夹路径
     '''
+
+    def handle_shop_name(notic_shop_name):
+        shop_name_icon = ''
+        shop_name_icon_not_selected = ''
+        # 避免店铺名称冲突
+        if notic_shop_name == '团洁':
+            notic_shop_name = '团洁旗舰'
+        # 设置店铺名称图片名称 包含选中与未选中状态
+        # '潮洁居家日用旗舰店-天猫', '余猫旗舰店-天猫', '团洁3504猫宁-天猫', '团洁旗舰店-天猫', '潮洁873猫宁-天猫'
+        if notic_shop_name == '团洁旗舰':
+            shop_name_icon = 'tuanjie_table_icon_selected.png'
+            shop_name_icon_not_selected = 'tuanjie_table_icon_not_selected.png'
+        elif notic_shop_name == '潮洁居家':
+            shop_name_icon = 'chaojie_table_icon_selected.png'
+            shop_name_icon_not_selected = 'chaojie_table_icon_not_selected.png'
+        elif notic_shop_name == '余猫旗舰':
+            shop_name_icon = 'yumao_table_icon_selected.png'
+            shop_name_icon_not_selected = 'yumao_table_icon_not_selected.png'
+        elif notic_shop_name == '猫宁3504':
+            notic_shop_name = '3504猫宁'
+            shop_name_icon = 'maoning_table_icon_selected.png'
+            shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
+        elif notic_shop_name == '猫宁873':
+            notic_shop_name = '873猫宁'
+            shop_name_icon = 'maoning_table_icon_selected.png'
+            shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
+        elif notic_shop_name == '音美旗舰':
+            shop_name_icon = 'yinmei_table_icon_selected.png'
+            shop_name_icon_not_selected = 'yinmei_table_icon_not_selected.png'
+        elif notic_shop_name == 'lelodi':
+            shop_name_icon = 'lelodi_table_icon_selected.png'
+            shop_name_icon_not_selected = 'lelodi_table_icon_not_selected.png'
+        elif notic_shop_name == 'yemo':
+            shop_name_icon = 'yemo_table_icon_selected.png'
+            shop_name_icon_not_selected = 'yemo_table_icon_not_selected.png'
+        else:
+            print(f"未知店铺名称：{notic_shop_name}")
+            notic_shop_name = ''
+        return notic_shop_name, shop_name_icon, shop_name_icon_not_selected
+
     # 打印参数信息 每条信息换行
     print(f"窗口名称：{window_name}\n表单名称：{table_name}\n店铺名称：{notic_shop_name}\n通知模式：{notic_mode}\n显示物流公司：{show_logistics}\n物流模式：{logistics_mode}\n是否使用今天日期作为路径：{use_today}\n测试模式：{test_mode}\n是否写入数据：{is_write}\n表单路径：{table_path}\n表单文件夹路径：{form_folder}")
 
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
-    # 避免店铺名称冲突
-    if notic_shop_name == '团洁':
-        notic_shop_name = '团洁旗舰'
+    notic_shop_name, shop_name_icon, shop_name_icon_not_selected = handle_shop_name(notic_shop_name)
 
-    # 设置店铺名称图片名称 包含选中与未选中状态
-    # '潮洁居家日用旗舰店-天猫', '余猫旗舰店-天猫', '团洁3504猫宁-天猫', '团洁旗舰店-天猫', '潮洁873猫宁-天猫'
-    if notic_shop_name == '团洁旗舰':
-        shop_name_icon = 'tuanjie_table_icon_selected.png'
-        shop_name_icon_not_selected = 'tuanjie_table_icon_not_selected.png'
-    elif notic_shop_name == '潮洁居家':
-        shop_name_icon = 'chaojie_table_icon_selected.png'
-        shop_name_icon_not_selected = 'chaojie_table_icon_not_selected.png'
-    elif notic_shop_name == '余猫旗舰':
-        shop_name_icon = 'yumao_table_icon_selected.png'
-        shop_name_icon_not_selected = 'yumao_table_icon_not_selected.png'
-    elif notic_shop_name == '猫宁3504':
-        notic_shop_name = '3504猫宁'
-        shop_name_icon = 'maoning_table_icon_selected.png'
-        shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
-    elif notic_shop_name == '猫宁873':
-        notic_shop_name = '873猫宁'
-        shop_name_icon = 'maoning_table_icon_selected.png'
-        shop_name_icon_not_selected = 'maoning_table_icon_not_selected.png'
-    elif notic_shop_name == '音美旗舰':
-        shop_name_icon = 'yinmei_table_icon_selected.png'
-        shop_name_icon_not_selected = 'yinmei_table_icon_not_selected.png'
-    elif notic_shop_name == 'lelodi':
-        shop_name_icon = 'lelodi_table_icon_selected.png'
-        shop_name_icon_not_selected = 'lelodi_table_icon_not_selected.png'
-    elif notic_shop_name == 'yemo':
-        shop_name_icon = 'yemo_table_icon_selected.png'
-        shop_name_icon_not_selected = 'yemo_table_icon_not_selected.png'
-    else:
-        print(f"未知店铺名称：{notic_shop_name}")
+    if notic_shop_name == '':
         return
     
     # 定义一个退出标志
@@ -445,11 +458,62 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         else:
             print(f"当前sheet: {current_sheet_name}，处理所有行")
             df_subset = df_current_sheet
+
         print(df_subset)
+
+        waiting_script = [
+            '亲亲，抱歉呢，目前咨询人数较多，为了更好的给您解决问题，麻烦您稍等一下哦，先不用回复，小妹会尽快为您提供帮助',
+            '亲亲，感谢您的咨询，当前咨询量较大，小妹正在逐一回复，您先不用回复，请您稍等片刻(づ￣3￣)づ╭❤～'，
+            '亲亲，您耐心等待一下，正在为您查找解决方案呢，会尽快给您一个明确的答复，先不用回复小妹呢亲',
+            '非常理解您希望尽快解决问题的心情，正在为您查询相关的处理流程，您先不用回复，小妹会尽快为您解决问题',
+            '亲亲，这里看下记录亲，您先稍等一下不用回复',
+            '亲亲，当前客服系统正在进行数据同步，请您稍等片刻，不用回复，我们会尽快回到您的问题上来，感谢您的耐心',
+            '亲亲，由于系统短暂维护，我们将在几分钟后恢复服务。请您耐心等待，小妹会尽快处理您的问题'
+        ]
+        global_random_number = 99
+
         # 逐行处理DataFrame
-        for index, row in df_subset.iterrows():
-            if exit_flag:
-                break  # 如果接收到退出信号，则终止循环
+        cycle_count  = 0
+        while not exit_flag and cycle_count < len(df_subset):
+
+            # 有新的信息提示 回复稍等
+            is_find_new_message = app.click_icon('new_message.png',0.4,0.9,0.1,0.9)
+            if is_find_new_message:
+                # 按下快捷键 Ctrl+E 呼出新消息界面
+                keyboard.press_and_release('ctrl+e')
+                time.sleep(0.2)
+                # 按下快捷键Ctrl+i，聚焦到输入框
+                keyboard.press_and_release('ctrl+i')
+                time.sleep(0.2)
+
+                # 随机等待消息 避免两次内容相同
+                random_number_max = len(waiting_script) - 1
+                random_number = random.randint(0, random_number_max)
+                while random_number == 99 or random_number == global_random_number:
+                    random_number = random.randint(0, random_number_max)
+                    global_random_number = random_number
+
+                # 输入随机等待消息
+                pyperclip.copy(waiting_script[random_number])
+                keyboard.press_and_release('ctrl+v')
+                time.sleep(0.2)
+                # 模拟按下回车键发送消息
+                keyboard.press_and_release('enter')
+                time.sleep(0.2)
+
+                # 判断是否出现提示框 消息重复发送
+                is_find_repeat_message = app.click_icon('repeat_message.png',0.4,0.9,0.1,0.9)
+                if is_find_repeat_message:
+                    # 聚焦到输入框
+                    keyboard.press_and_release('ctrl+i')
+                    time.sleep(0.2)
+                    # 直接按下回车键发送消息
+                    keyboard.press_and_release('enter')
+                    time.sleep(0.2)
+             
+            #使用iloc根据索引获取当前行的数据
+            row = df_subset.iloc[cycle_count]
+            index = df_subset.index[cycle_count]  # 获取原始索引
             
             # 检查是否已经通知
             if row['是否通知'] == 1:
