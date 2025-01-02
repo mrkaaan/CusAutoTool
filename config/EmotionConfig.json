@@ -435,6 +435,11 @@
         "originalFile": "懒人吹风对比.png"
     },
     {
+        "shortCut": "ilraz",
+        "meaning": "懒人吹风安装",
+        "originalFile": "懒人吹风安装.png"
+    },
+    {
         "shortCut": "iwxt",
         "meaning": "短款防溅头的万向头",
         "originalFile": "短款防溅头的万向头.png"
@@ -468,5 +473,10 @@
         "shortCut": "ixd",
         "meaning": "点击立即下单",
         "originalFile": "立即下单.png"
+    },
+    {
+        "shortCut": "iys",
+        "meaning": "试水",
+        "originalFile": "龙头有水.png"
     }
 ]
