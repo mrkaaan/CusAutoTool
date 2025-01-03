@@ -13,6 +13,7 @@ import tkinter as tk
 import json
 from pathlib import Path
 import random
+import threading
 
 rule_json_path = r'../config/product_rules.json'
 
@@ -305,6 +306,20 @@ def run_test(window_name):
     except Exception as err:
         logger.info(err)  # 记录异常信息
 
+# 定义一个退出标志
+# exit_flag = False
+exit_event = threading.Event()
+
+# 定义按键监听事件
+def set_exit_flag():
+    # global exit_flag
+    # exit_flag = True
+    exit_event.set()
+    print(f"END | terminated by user")
+    show_toast('提醒', '程序终止')
+    
+keyboard.add_hotkey('shift+ctrl+q', set_exit_flag)
+
 # 通知补发单号
 # mode1 使用输入框通知 mode2 使用补发窗口通知
 def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2, show_logistics=False, logistics_mode=1, use_today=None, test_mode=0, is_write=True, table_path='', form_folder='../form'):
@@ -321,6 +336,8 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
         :param table_path: 表单路径 暂时用不到 预留位置 当前逻辑比较畸形避免处可以用于出错后续优化
         :param form_folder: 表单文件夹路径
     '''
+
+    # global exit_flag
 
     def handle_shop_name(notic_shop_name):
         shop_name_icon = ''
@@ -371,18 +388,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
     if notic_shop_name == '':
         return
     
-    # 定义一个退出标志
-    exit_flag = False
-    
-    # 定义按键监听事件
-    def set_exit_flag():
-        nonlocal exit_flag
-        print(f"END | terminated by user")
-        exit_flag = True
-    
-    keyboard.add_hotkey('shift+ctrl+q', set_exit_flag)
-
-
     try:
         # 组合表单路径
         # 如果使用今天日期 则进行组合
@@ -474,10 +479,16 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
 
         # 逐行处理DataFrame
         cycle_count  = 0
-        while not exit_flag and cycle_count < len(df_subset):
+        # while not exit_flag:
+        while not exit_event.is_set():
+            if cycle_count >= len(df_subset):
+                print('所有行已处理完毕')
+                show_toast('提醒', '所有行已处理完毕')
+                break
 
             # 有新的信息提示 回复稍等
-            is_find_new_message = app.click_icon('new_message.png',0.4,0.9,0.1,0.9)
+            is_find_new_message = False
+            # is_find_new_message = app.click_icon('new_message.png',0.4,0.9,0.1,0.9)
             if is_find_new_message:
                 # 按下快捷键 Ctrl+E 呼出新消息界面
                 keyboard.press_and_release('ctrl+e')
@@ -502,14 +513,14 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 time.sleep(0.2)
 
                 # 判断是否出现提示框 消息重复发送
-                is_find_repeat_message = app.click_icon('repeat_message.png',0.4,0.9,0.1,0.9)
-                if is_find_repeat_message:
-                    # 聚焦到输入框
-                    keyboard.press_and_release('ctrl+i')
-                    time.sleep(0.2)
-                    # 直接按下回车键发送消息
-                    keyboard.press_and_release('enter')
-                    time.sleep(0.2)
+                # is_find_repeat_message = app.click_icon('repeat_message.png',0.4,0.9,0.1,0.9)
+                # if is_find_repeat_message:
+                #     # 聚焦到输入框
+                #     keyboard.press_and_release('ctrl+i')
+                #     time.sleep(0.2)
+                #     # 直接按下回车键发送消息
+                #     keyboard.press_and_release('enter')
+                #     time.sleep(0.2)
              
             #使用iloc根据索引获取当前行的数据
             row = df_subset.iloc[cycle_count]
@@ -518,6 +529,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             # 检查是否已经通知
             if row['是否通知'] == 1:
                 print('当前用户已通知')
+                cycle_count += 1
                 continue  # 如果已经通知，则跳过当前行
 
             # 获取原始单号和物流单号
@@ -528,10 +540,12 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             if not original_number:
                 print(f"原始单号为空 跳过")
                 # show_toast('提醒', f'原始单号为空 跳过')
+                cycle_count += 1
                 continue
             # 物流单号为空 提示并跳过
             if not logistics_number:
                 print(f"物流单号为空 跳过")
+                cycle_count += 1
                 # show_toast('提醒', f'物流单号为空 跳过')
                 continue
 
@@ -569,6 +583,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             _, __, not_find_cus = app.locate_icon('not_find_customer.png',0, 0.4, 0, 0.6)
             if not_find_cus:
                 print(f"未搜索到结果，跳过 {original_number}")
+                cycle_count += 1
                 continue  # 未搜索到直接continue下一个
             else:
               print('搜索到指定用户，即将发送通知...')
@@ -658,7 +673,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
 
                 if not is_find_search_text:
                     print(f'未找到搜索框，尝试直接点击补发按钮...')
-                    continue
                 else:
                     app.move_and_click(search_text_x+100, search_text_y)
                 time.sleep(0.3)
@@ -690,6 +704,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
 
                 if not is_find_reissue_button:
                     print(f'未找到补发按钮，跳过{original_number}')
+                    cycle_count += 1
                     continue
                 app.move_and_click(reissue_button_x, reissue_button_y, 'left')
                 time.sleep(0.3)
@@ -698,6 +713,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 add_logistics_number_x, add_logistics_number_y, is_find_add_logistics_number = app.locate_icon('add_logistics_number.png', 0.6, 1, 0.5, 1)
                 if not is_find_add_logistics_number:
                     print(f'未找到添加物流单号提示文字，跳过{original_number}')
+                    cycle_count += 1
                     continue
                 app.move_and_click(add_logistics_number_x, add_logistics_number_y)
 
@@ -732,20 +748,22 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 confirm_button_x, confirm_button_y, is_find_confirm_button = app.locate_icon('confirm_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_confirm_button:
                     print(f'未找到确认补发按钮，跳过{original_number}')
+                    cycle_count += 1
                     continue
                 else:
                     # 点击确认按钮
                     app.move_and_click(confirm_button_x, confirm_button_y)
 
                 # change  判断是否弹出失败提示
-
             else:
                 print(f"未知通知模式：{notic_mode}")
+                show_toast('提示', '未知通知模式')
                 return
                 
             # 将当前行的"是否通知"标记为1
             print(f'已通知 {notic_shop_name} {original_number}')
             df_current_sheet.at[index, '是否通知'] = 1
+            cycle_count += 1
                 
             # 循环结束暂停
             time.sleep(0.2)
