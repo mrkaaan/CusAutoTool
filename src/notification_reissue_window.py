@@ -10,7 +10,7 @@ import openpyxl
 import configparser
 import time
 from utils import show_toast
-
+from threading import Thread
 
 import auto_operation as au
 from pyautogui import FailSafeException
@@ -217,8 +217,12 @@ def create_window(mode=0):
             # 关闭窗口
             window.destroy()
             # show_toast("提醒", "开始补发通知...")
-            # 调用函数 a
-            au.notification_reissue(**notification_reissue_parameter)
+            # 调用函数
+
+            thread = Thread(target=au.notification_reissue, kwargs=notification_reissue_parameter)
+            thread.daemon = True  # 守护线程，主线程结束后自动清理
+            thread.start()
+            # au.notification_reissue(**notification_reissue_parameter)
         else:
             show_toast("提醒", "保存配置成功")
 

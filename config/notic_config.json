@@ -20,7 +20,7 @@
         "show_logistics": true,
         "logistics_mode": 1,
         "use_today": "2025-01-03",
-        "test_mode": 1,
+        "test_mode": 3,
         "is_write": true
     }
 }

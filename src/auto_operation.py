@@ -122,7 +122,16 @@ def running_loop_test(cycle_number=-1):
                 return
 
             print(f'do something {cycle_count}')
-            time.sleep(1)    
+            time.sleep(0.3)
+            
+            print(f'do something {cycle_count}')
+            time.sleep(0.3)
+            
+            print(f'do something {cycle_count}')
+            time.sleep(0.3)
+            
+            print(f'do something {cycle_count}')
+            time.sleep(0.3)    
             cycle_count += 1  # 循环计数加一
 
 
@@ -382,7 +391,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
     print(f"窗口名称：{window_name}\n表单名称：{table_name}\n店铺名称：{notic_shop_name}\n通知模式：{notic_mode}\n显示物流公司：{show_logistics}\n物流模式：{logistics_mode}\n是否使用今天日期作为路径：{use_today}\n测试模式：{test_mode}\n是否写入数据：{is_write}\n表单路径：{table_path}\n表单文件夹路径：{form_folder}")
 
     app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
-
     notic_shop_name, shop_name_icon, shop_name_icon_not_selected = handle_shop_name(notic_shop_name)
 
     if notic_shop_name == '':
@@ -562,7 +570,8 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             # time.sleep(0.5)
             # keyboard.press_and_release('ctrl+f')
             # time.sleep(0.5)
-
+            if exit_event.is_set():
+                break
             # 点击搜索框
             app.click_icon('button_search_cus.png',0,0.3,0,0.3)
             time.sleep(0.1)
@@ -579,8 +588,15 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             # 等待搜索结果响应
             time.sleep(0.2)
 
+            if exit_event.is_set():
+                break
+
             # 判断是否未找到
             _, __, not_find_cus = app.locate_icon('not_find_customer.png',0, 0.4, 0, 0.6)
+            
+            if exit_event.is_set():
+                break
+
             if not_find_cus:
                 print(f"未搜索到结果，跳过 {original_number}")
                 cycle_count += 1
@@ -588,11 +604,16 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             else:
               print('搜索到指定用户，即将发送通知...')
             
+            if exit_event.is_set():
+                break
+
             # 模拟按下回车键进入指定用户的聊天窗口
             keyboard.press_and_release('enter')
             time.sleep(0.3)
 
-            
+            if exit_event.is_set():
+                break
+
             # 通知模式 1：输入框通知 2：补发窗口通知
             if notic_mode == 1:
                 # 按下 ctrl+J 定位到输入框中
@@ -613,6 +634,10 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 keyboard.press_and_release('backspace')
 
                 time.sleep(0.2)
+
+                if exit_event.is_set():
+                    break
+
                 # 获取快递公司
                 if show_logistics:
                     logistics = ul.get_express_company(logistics_number)
@@ -627,23 +652,45 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 # pyautogui.typewrite(message, paste=True)
                 time.sleep(0.2)
 
+                if exit_event.is_set():
+                    break
+
                 # 模拟按下回车发送消息
                 keyboard.press_and_release('enter')
+
+                if exit_event.is_set():
+                    break
             elif notic_mode == 2:
                 # 聚焦到智能客服 避免误触
                 keyboard.press_and_release('ctrl+o')
                 # 点击最近三月订单和安装服务 避免误触
                 recent_orders_text_x, recent_orders_text_y, is_find_recent_orders_text = app.locate_icon('recent_orders_text.png', 0.6, 1, 0.2, 1)
+                
+                if exit_event.is_set():
+                    break
+                
                 app.click_icon('recent_orders_text.png', 0.6, 1, 0.2, 1)
                 if not is_find_recent_orders_text:
+
+                    if exit_event.is_set():
+                        break
                     app.click_icon('installation_services.png', 0.6, 1, 0.2, 1)
                 # time.sleep(0.1)
                 pyautogui.scroll(-100)
 
+                if exit_event.is_set():
+                    break
+
                 # 尝试点击两次搜索订单按钮
                 is_find_search_button = False 
                 for i in range(3):
+                    if exit_event.is_set():
+                        break
                     search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
+                    
+                    if exit_event.is_set():
+                        break
+
                     if not is_find_search_button:
                         # 未找到搜索订单按钮 尝试点击以选中的按钮
                         selected_search_button_x, selected_search_button_y, is_find_selected_search_button = app.locate_icon('selected_search_order_button.png', 0.6, 1, 0.2, 1)
@@ -661,15 +708,28 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     print(f'未找到搜索订单按钮，尝试直接寻找搜索框...')
                 # time.sleep(0.1)
 
+                if exit_event.is_set():
+                    break
+                
                 # 尝试点击两次搜索框
                 is_find_search_text = False
                 for i in range(3):
+                    if exit_event.is_set():
+                        break
+
                     search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
+                    
+                    if exit_event.is_set():
+                        break
+
                     if is_find_search_text:
                         print(f'找到搜索框，点击搜索框...')
                         break
                     print(f'未找到搜索框，尝试滑动后再次查找...')
                     pyautogui.scroll(-100)
+
+                if exit_event.is_set():
+                    break
 
                 if not is_find_search_text:
                     print(f'未找到搜索框，尝试直接点击补发按钮...')
@@ -677,7 +737,12 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     app.move_and_click(search_text_x+100, search_text_y)
                 time.sleep(0.3)
 
+                if exit_event.is_set():
+                    break
+                
                 if is_find_search_text:
+                    if exit_event.is_set():
+                        break
                     # 保证输入框没有内容
                     keyboard.press_and_release('ctrl+a') 
                     keyboard.press_and_release('backspace') 
@@ -692,10 +757,16 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     pyautogui.scroll(-300)
                     time.sleep(0.3)
 
+                if exit_event.is_set():
+                    break
                 #  尝试点击两次补发按钮
                 is_find_reissue_button = False
                 for _ in range(3):
+                    if exit_event.is_set():
+                        break
                     reissue_button_x, reissue_button_y, is_find_reissue_button = app.locate_icon('reissue_button.png', 0.6, 1, 0.2, 1)
+                    if exit_event.is_set():
+                        break
                     if is_find_reissue_button:
                         print(f'找到补发按钮，点击补发按钮...')
                         break
@@ -703,26 +774,40 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     pyautogui.scroll(-150)
 
                 if not is_find_reissue_button:
+                    if exit_event.is_set():
+                        break
                     print(f'未找到补发按钮，跳过{original_number}')
                     cycle_count += 1
                     continue
                 app.move_and_click(reissue_button_x, reissue_button_y, 'left')
                 time.sleep(0.3)
 
+                if exit_event.is_set():
+                    break
+
                 # 点击输入框
                 add_logistics_number_x, add_logistics_number_y, is_find_add_logistics_number = app.locate_icon('add_logistics_number.png', 0.6, 1, 0.5, 1)
+                
+                if exit_event.is_set():
+                    break
+                
                 if not is_find_add_logistics_number:
                     print(f'未找到添加物流单号提示文字，跳过{original_number}')
                     cycle_count += 1
                     continue
                 app.move_and_click(add_logistics_number_x, add_logistics_number_y)
 
+                if exit_event.is_set():
+                    break
                 # 将中文字符串复制到剪贴板
                 pyperclip.copy(logistics_number)
                 keyboard.press_and_release('ctrl+v') 
                 keyboard.press_and_release('tab')
                 time.sleep(0.5)
 
+                if exit_event.is_set():
+                    break
+                
                 # 手动输入物流公司
                 if logistics_mode == 2:
                     print(f'手动输入快递公司模式..')
@@ -743,7 +828,8 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     keyboard.press_and_release('enter')
                 time.sleep(0.1)
 
-
+                if exit_event.is_set():
+                    break
                 # 点击确认补发按钮
                 confirm_button_x, confirm_button_y, is_find_confirm_button = app.locate_icon('confirm_button.png', 0.6, 1, 0.2, 1)
                 if not is_find_confirm_button:
@@ -753,7 +839,8 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 else:
                     # 点击确认按钮
                     app.move_and_click(confirm_button_x, confirm_button_y)
-
+                if exit_event.is_set():
+                    break
                 # change  判断是否弹出失败提示
             else:
                 print(f"未知通知模式：{notic_mode}")
@@ -764,7 +851,8 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             print(f'已通知 {notic_shop_name} {original_number}')
             df_current_sheet.at[index, '是否通知'] = 1
             cycle_count += 1
-                
+            if exit_event.is_set():
+                break
             # 循环结束暂停
             time.sleep(0.2)
     except KeyboardInterrupt:
