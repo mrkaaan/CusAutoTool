@@ -14,6 +14,7 @@ import json
 from pathlib import Path
 import random
 import threading
+import configparser
 
 rule_json_path = r'../config/product_rules.json'
 
@@ -1299,6 +1300,35 @@ def erp_action_collection(action_list=None):
     except Exception as e:
         print(f"ERP操作集合异常：{e}")
 
+config = configparser.ConfigParser()
+config.read('../config/window_config.ini')
+# 访问环境变量
+window_open_mode = config['defaults'].get('WINDOW_OPEN_MODE')
+# 尝试将 TRY_NUMBER 转换为整数
+window_open_mode = int(window_open_mode)
+
+tk_window = None  
+tk_window_initialized = False # 标志 window 是否已经初始化
+
+def on_close():
+    global tk_window, tk_window_initialized
+    tk_window.destroy()
+    tk_window = None
+    tk_window_initialized = False  # 窗口关闭后重置标志
+
+# 定义一个回调函数，在主线程中调用create_window
+def call_create_window():
+    global tk_window, tk_entry
+    if tk_window is not None and tk_window.winfo_exists():
+        print("窗口已存在，不再创建")
+        # 使用 wm_attributes 来确保窗口会暂时位于最顶层
+        tk_window.attributes('-topmost', True)
+        tk_window.after(50, lambda: tk_window.attributes('-topmost', False))
+        tk_window.lift()  # 将窗口提升到最前面
+        tk_window.after(50, tk_window.focus_force)  # 强制窗口获得焦点，并添加小延迟
+    else:
+        erp_aciton_box(mode=window_open_mode)
+        # tk_window.after(0, create_window)  # 如果窗口不存在，创建新窗口
 
 # erp创建输入框操作
 def erp_aciton_box(mode=0):
@@ -1307,6 +1337,11 @@ def erp_aciton_box(mode=0):
         :param app: WinGUI 实例 默认为 None
     '''
 
+    global tk_window, tk_window_initialized
+    if tk_window is not None and tk_window.winfo_exists():
+        tk_window.lift()  # 如果窗口已经存在，将其提升到最前面
+        return
+    
     input_content = ''
 
     def on_confirm(entry):
@@ -1408,6 +1443,16 @@ def erp_aciton_box(mode=0):
         # 绑定 Ctrl+2 到自动关闭选项
         tk_window.bind('<Control-Key-2>', lambda event: toggle_auto_close())
 
+        tk_entry.focus_set()  # 设置Entry为焦点
+
+        tk_window.protocol("WM_DELETE_WINDOW", on_close)  # 设置关闭窗口时的回调函数
+
+        # 确保窗口初始化完成后，再执行以下操作
+        tk_window.update_idletasks()  # 确保所有待处理的任务都被执行，包括GUI更新
+        tk_window.lift()  # 尝试将窗口提升到最前面
+        tk_window.attributes('-topmost', True)  # 暂时设置为最顶层
+        tk_window.after(50, lambda: tk_window.attributes('-topmost', False))  # 然后恢复正常
+        tk_window.focus_force()  # 强制窗口获得焦点
         tk_window.mainloop()
 
     except Exception as e:

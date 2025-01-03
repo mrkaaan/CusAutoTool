@@ -40,6 +40,7 @@ def main():
 
         {'key': 'ctrl+b+num 7', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP']}, # erp 常用操作1 不选择仓库 不添加产品 选择今天日期 清空商品
 
+        {'key': 'ctrl+t+num 5', 'func': ao.call_create_window}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 输入备注
         {'key': 'ctrl+b+num 8', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', False, 'cz', '补发']}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 输入备注
         {'key': 'ctrl+b+num 9', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', False, 'sz', '补发']}, # erp 常用操作1 深圳仓 选择今天日期 清空商品 选择仓库 输入备注
         {'key': 'ctrl+b+num /', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', True, 'cz', '补发']}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 添加商品备注 输入备注
