@@ -480,6 +480,13 @@ def create_window(mode=0):
 
     # 运行主循环
     window.protocol("WM_DELETE_WINDOW", on_close)  # 设置关闭窗口时的回调函数
+
+    # 确保窗口初始化完成后，再执行以下操作
+    window.update_idletasks()  # 确保所有待处理的任务都被执行，包括GUI更新
+    window.lift()  # 尝试将窗口提升到最前面
+    window.attributes('-topmost', True)  # 暂时设置为最顶层
+    window.after(50, lambda: window.attributes('-topmost', False))  # 然后恢复正常
+    window.focus_force()  # 强制窗口获得焦点
     window.mainloop()
 
 
@@ -493,8 +500,12 @@ def on_close():
 def call_create_window():
     global window
     if window is not None and window.winfo_exists():
-        window.lift()  # 如果窗口已经存在，将其提升到最前面
-        window.focus_force()  # 强制窗口获得焦点
+        print("窗口已存在，不再创建")
+        # 使用 wm_attributes 来确保窗口会暂时位于最顶层
+        window.attributes('-topmost', True)
+        window.after(50, lambda: window.attributes('-topmost', False))
+        window.lift()  # 将窗口提升到最前面
+        window.after(50, window.focus_force)  # 强制窗口获得焦点，并添加小延迟
     else:
         create_window(mode=window_open_mode)
         # window.after(0, create_window)  # 如果窗口不存在，创建新窗口

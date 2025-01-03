@@ -284,6 +284,13 @@ def create_window(mode=0):    # 主窗口
     open_form_folder_button.place(x=form_label_x_offset, y=form_label_y_offset)
 
     root.protocol("WM_DELETE_WINDOW", on_close)  # 设置关闭窗口时的回调函数
+
+    # 确保窗口初始化完成后，再执行以下操作
+    root.update_idletasks()  # 确保所有待处理的任务都被执行，包括GUI更新
+    root.lift()  # 尝试将窗口提升到最前面
+    root.attributes('-topmost', True)  # 暂时设置为最顶层
+    root.after(50, lambda: root.attributes('-topmost', False))  # 然后恢复正常
+    root.focus_force()  # 强制窗口获得焦点
     root.mainloop()
 
 def on_close():
@@ -296,10 +303,19 @@ def on_close():
 def call_create_window():
     global root
     if root is not None and root.winfo_exists():
-        root.lift()  # 如果窗口已经存在，将其提升到最前面
-        root.focus_force()  # 强制窗口获得焦点
+        print("窗口已存在，不再创建")
+        # 使用 wm_attributes 来确保窗口会暂时位于最顶层
+        root.attributes('-topmost', True)
+        root.after(50, lambda: root.attributes('-topmost', False))
+        root.lift()  # 将窗口提升到最前面
+        root.after(50, root.focus_force)  # 强制窗口获得焦点，并添加小延迟
     else:
         create_window(mode=window_open_mode)
+        # # 假设 create_window 会在最后初始化 root，再次确保窗口获得焦点
+        # root.attributes('-topmost', True)
+        # root.after(50, lambda: root.attributes('-topmost', False))
+        # root.lift()
+        # root.after(50, root.focus_force)
         # root.after(0, create_window)  # 如果窗口不存在，创建新窗口
 
 if __name__ == "__main__":
