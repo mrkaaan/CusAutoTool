@@ -91,7 +91,8 @@ def on_press_clipboard(specify_filename='', auto_copy=True, check_interval=True,
 
             # 检查当前输入的文本是否是热字符串
             for hotstring in hotstrings_set:
-                if current_text.endswith(hotstring):
+                if current_text == hotstring:
+                # if current_text.endswith(hotstring):
                     is_find_hotstring = True
                     file_path = hotstrings[hotstring]
 

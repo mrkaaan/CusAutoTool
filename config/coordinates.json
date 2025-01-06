@@ -42,10 +42,60 @@
         },
         "save_notes": {
             "position": [1413, 787],
-            "description": "保存备注按钮坐标"
+            "description": "保存商品按钮坐标"
         },
         "clear_product_input": {
             "position": [1237, 290],
+            "description": "清空输入框坐标"
+        }
+    },
+    "another": {
+        "date_dropdown": {
+            "position": [804,111],
+            "description": "日期下拉框坐标"
+        },
+        "today_date": {
+            "position": [892, 306],
+            "description": "今天日期坐标"
+        },
+        "first_product": {
+            "position": [89, 380],
+            "description": "第一个商品坐标，用于删除商品"
+        },
+        "remarks_input": {
+            "position": [1194, 968],
+            "description": "备注输入框坐标"
+        },
+        "warehouse_dropdown": {
+            "position": [168, 140],
+            "description": "仓库下拉框坐标"
+        },
+        "warehouse_sz": {
+            "position": [140, 205],
+            "description": "深圳仓库选择坐标"
+        },
+        "warehouse_cz": {
+            "position": [140, 168],
+            "description": "潮州仓库选择坐标"
+        },
+        "add_product_button": {
+            "position": [59, 331],
+            "description": "添加商品按钮坐标"
+        },
+        "product_name_input": {
+            "position": [1170, 289],
+            "description": "货品名称输入框坐标"
+        },
+        "select_product": {
+            "position": [959, 405],
+            "description": "选中商品坐标"
+        },
+        "save_notes": {
+            "position": [1410, 787],
+            "description": "保存商品按钮坐标"
+        },
+        "clear_product_input": {
+            "position": [1238, 291],
             "description": "清空输入框坐标"
         }
     }
