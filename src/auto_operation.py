@@ -16,6 +16,7 @@ import random
 import threading
 import configparser
 
+
 rule_json_path = r'../config/product_rules.json'
 
 # 定义全局变量来存储坐标信息
@@ -324,6 +325,9 @@ def wait_a_moment_by_qianniu(window_name, mode=1, app=None):
         :param app: WinGUI 实例，用于窗口操作
     '''
     
+    # mode 只能1的时候直接调用，如果想要为2时在其他模式中调用，可能因为线程原因会影响 两个函数的终止快捷键都失效
+
+
     if not app:
         app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
@@ -346,7 +350,7 @@ def wait_a_moment_by_qianniu(window_name, mode=1, app=None):
         exit_flag = True
 
     # 设置组合键监听
-    keyboard.add_hotkey('shift+ctrl+q', set_exit_flag)
+    keyboard.add_hotkey('shift+ctrl+a', set_exit_flag)
     cycle_count = 0  # 初始化循环计数器
 
     if mode == 1:
@@ -387,15 +391,14 @@ def wait_a_moment_by_qianniu(window_name, mode=1, app=None):
                 if is_find_repeat_message:
                     # 聚焦到输入框
                     app.move_and_click(repeat_message_x, repeat_message_y)
-                if mode == 2:
-                    break
+            if mode == 2:
+                print('结束检测未回复消息')
+                break
     except KeyboardInterrupt:
         print("检测到 Ctrl+C，正在退出...")
     except Exception as e:
         print(f"快捷键监听出错：{e}")
     finally:
-        # 回写文件
-        
         # 移除所有快捷键监听
         keyboard.unhook_all()
         print('退出监听')
@@ -560,6 +563,17 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             df_subset = df_current_sheet
 
         print(df_subset)
+        
+        waiting_script = [
+            '亲亲，抱歉呢，目前咨询人数较多，为了更好的给您解决问题，麻烦您稍等一下哦，先不用回复，小妹会尽快为您提供帮助',
+            '亲亲，感谢您的咨询，当前咨询量较大，小妹正在逐一回复，您先不用回复，请您稍等片刻(づ￣3￣)づ╭❤～',
+            '亲亲，您耐心等待一下，正在为您查找解决方案呢，会尽快给您一个明确的答复，先不用回复小妹呢亲',
+            '非常理解您希望尽快解决问题的心情，正在为您查询相关的处理流程，您先不用回复，小妹会尽快为您解决问题',
+            '亲亲，这里看下记录亲，您先稍等一下不用回复',
+            '亲亲，当前客服系统正在进行数据同步，请您稍等片刻，不用回复，我们会尽快回到您的问题上来，感谢您的耐心',
+            '亲亲，由于系统短暂维护，我们将在几分钟后恢复服务。请您耐心等待，小妹会尽快处理您的问题'
+        ]
+        global_random_number = 99
 
         # 逐行处理DataFrame
         cycle_count  = 0
@@ -571,7 +585,37 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 break
             is_find_new_message = True
             if is_find_new_message:
-                wait_a_moment_by_qianniu('千牛接待台', 2, app)
+                # 有新的信息提示 回复稍等
+                _, __, is_find_new_message = app.locate_icon('new_message.png',0.4,0.9,0.1,0.9,1)
+                if is_find_new_message:
+                    # 按下快捷键 Ctrl+E 呼出新消息界面
+                    keyboard.press_and_release('ctrl+e')
+                    time.sleep(0.2)
+                    # 按下快捷键Ctrl+i，聚焦到输入框
+                    keyboard.press_and_release('ctrl+i')
+                    time.sleep(0.2)
+
+                    # 随机等待消息 避免两次内容相同
+                    random_number_max = len(waiting_script) - 1
+                    random_number = random.randint(0, random_number_max)
+                    while random_number == 99 or random_number == global_random_number:
+                        random_number = random.randint(0, random_number_max)
+                        global_random_number = random_number
+
+                    # 输入随机等待消息
+                    pyperclip.copy(waiting_script[random_number])
+                    keyboard.press_and_release('ctrl+v')
+                    print(waiting_script[random_number])
+                    # 模拟按下回车键发送消息
+                    keyboard.press_and_release('enter')
+                    cycle_count += 1
+                    time.sleep(3)
+
+                    # 判断是否出现提示框 消息重复发送
+                    repeat_message_x, repeat_message_y, is_find_repeat_message = app.locate_icon('repeat_message.png',0.2,0.8,0.2,0.8,1)
+                    if is_find_repeat_message:
+                        # 聚焦到输入框
+                        app.move_and_click(repeat_message_x, repeat_message_y)
              
             #使用iloc根据索引获取当前行的数据
             row = df_subset.iloc[cycle_count]
@@ -903,8 +947,9 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
     except Exception as e:
         print(f"通知程序异常：{e}")
         # 如果读取过程中出现异常，可能是文件被其他程序占用（例如已打开）
-        if 'Permission error' in str(e) or '已被其他程序打开' in str(e):
-            print("文件可能已被其他程序打开，请确保文件未被打开后再试。")
+    except PermissionError:
+        print("文件可能已被其他程序打开，请确保文件未被打开后再试。")
+        show_toast('提示', '文件可能已被其他程序打开，请确保文件未被打开后再试。')
     finally:
         # 使用pyperclip库清空剪切板
         pyperclip.copy('')
