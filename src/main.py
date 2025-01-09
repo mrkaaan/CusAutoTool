@@ -25,6 +25,7 @@ def main():
         {'key': 'ctrl+t+num 1', 'func': tb_win.call_create_window, 'use_thread':False}, # 打开窗口，用于整理表格
         {'key': 'ctrl+t+num 2', 'func': nr_win.call_create_window, 'use_thread':True}, # 打开窗口，用于通知补发
         {'key': 'ctrl+t+num 3', 'func': nr_win.notic_last_data, 'use_thread':True}, # 使用上次数据直接通知补发
+        {'key': 'ctrl+t+num 4', 'func': ao.wait_a_moment_by_qianniu, 'args': ['千牛接待台'], 'use_thread':True}, # 临时自动回复
 
         {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
         {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图
@@ -126,7 +127,8 @@ def test():
     # tb.process_table('11月27日天猫补发单号.csv')
     # ao.erp_aciton_box()
     # tb_win.create_window(0)
-    ao.running_loop_test()
+
+    ao.wait_a_moment_by_qianniu('千牛接待台')
 if __name__ == "__main__":
     # 配置参数
     setup_pyautogui()

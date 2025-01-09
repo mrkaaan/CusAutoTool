@@ -96,7 +96,7 @@ def load_handles(file_path=handles, encoding=None):
 
 
 # 显示通知
-def show_toast(title, message, timeout=0.2):
+def show_toast(title='title', message='message', timeout=0.2):
     notification.notify(
         title=title,
         message=message,
