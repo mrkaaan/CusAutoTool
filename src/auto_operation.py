@@ -940,17 +940,28 @@ def auto_send_price_link(window_name, product_number=1, mode=1):
         # 寻找搜索商品图
         search_product_x, search_product_y, is_find_search_product = app.locate_icon('search_products.png', 0.6, 1, 0.2, 1)
         if not is_find_search_product:
-            print('未找到搜索商品图标，程序退出')
-            return
+            print('未找到搜索商品图标，寻找足迹按钮位置')
+            footprint_x, footprint_y, is_find_footprint = app.locate_icon('footprint.png', 0.6, 1, 0.2, 1)
+            if not is_find_footprint:
+                print('未找到足迹图标，程序退出')
+                return
 
         # 点击搜索商品图标
-        app.move_and_click(search_product_x, search_product_y)
+        if is_find_search_product:
+            app.move_and_click(search_product_x, search_product_y)
+        else:
+            app.move_and_click(footprint_x+313, footprint_y+41)
+            # 删除搜索框内容
+            keyboard.press_and_release('ctrl+a')
+            time.sleep(0.1)
+            keyboard.press_and_release('backspace')
         time.sleep(0.1)
 
         # 搜索差价链接
         keyboard.write('差价')
         keyboard.press_and_release('enter')
         time.sleep(0.1)
+        return
 
         # 移动到邀请下单图标
         invite_order_x, invite_order_y, is_find_invite_order = app.locate_icon('invite_order.png', 0.6, 1, 0.2, 1)
