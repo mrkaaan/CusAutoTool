@@ -23,7 +23,6 @@ rule_json_path = r'../config/product_rules.json'
 coordinates = {}
 coordinate_json_path = '../config/coordinates.json'
 
-
 def read_coordinate_by_key(key, reissue=True):
     global coordinates, coordinate_json_path
     if not coordinates:
@@ -1218,7 +1217,7 @@ def erp_choose_warehouse(window_name, warehouse='sz', app=None):
         print(f"ERP选择仓库异常：{e}")
 
 
-def erp_add_product(window_name, app=None):
+def erp_add_product(window_name, app=None, reissue=False):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
@@ -1228,10 +1227,16 @@ def erp_add_product(window_name, app=None):
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 点击添加商品
-        app.move_and_click(60, 280, 'left')
+        position_add_product_button = read_coordinate_by_key('add_product_button', reissue)
+        if not position_add_product_button:
+            return
+        app.move_and_click(position_add_product_button[0], position_add_product_button[1], 'left')
         time.sleep(0.3)
         # 点击货品名称输入框
-        app.move_and_click(1188, 288)
+        position_product_name_input = read_coordinate_by_key('product_name_input', reissue)
+        if not position_product_name_input:
+            return
+        app.move_and_click(position_product_name_input[0], position_product_name_input[1])
         time.sleep(0.1)
         keyboard.press_and_release('ctrl+a')
         keyboard.press_and_release('backspace')
