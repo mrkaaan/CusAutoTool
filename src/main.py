@@ -5,6 +5,7 @@ import auto_copy_clipboard_latest as ac   # 自动识别剪切板并替换为图
 import organize_table_window as tb_win
 import notification_reissue_window as nr_win
 from config import setup_arguments, setup_pyautogui, setup_logging
+from auto_operation import load_coordinates_from_json
 
 def main():
     # ---------- 快捷键启动 -------------
@@ -125,7 +126,8 @@ def test():
 
     # ---------- 表格处理 -------------
     # tb.process_table('11月27日天猫补发单号.csv')
-    # ao.erp_aciton_box()
+    ao.erp_aciton_box()
+
     # tb_win.create_window(0)
 
     ao.wait_a_moment_by_qianniu('千牛接待台')
@@ -136,6 +138,7 @@ if __name__ == "__main__":
     window_name = r"千牛接待台"  # 窗口名称
     window_name_erp = r"旺店通ERP"
     input_args = setup_arguments()
+    load_coordinates_from_json()
 
     
     if input_args.test:

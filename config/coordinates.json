@@ -49,7 +49,7 @@
             "description": "清空输入框坐标"
         }
     },
-    "another": {
+    "coordinates": {
         "date_dropdown": {
             "position": [804,111],
             "description": "日期下拉框坐标"

@@ -21,7 +21,33 @@ rule_json_path = r'../config/product_rules.json'
 
 # 定义全局变量来存储坐标信息
 coordinates = {}
-json_file_path = '../config/coordinates.json'
+coordinate_json_path = '../config/coordinates.json'
+
+
+def read_coordinate_by_key(key, reissue=True):
+    global coordinates, coordinate_json_path
+    if not coordinates:
+        load_coordinates_from_json(coordinate_json_path, reissue)
+
+    if reissue:
+        key_name = 'coordinates_by_reissue'
+    else:
+        key_name = 'coordinates'
+    # 检查关键字段是否存在且非空
+    if key_name in coordinates and coordinates[key_name] is not None:
+        specific_coordinates = coordinates[key_name]
+        if key in specific_coordinates and specific_coordinates[key] is not None:
+            position = specific_coordinates[key].get('position')
+            if position is not None:
+                return position
+            else:
+                print(f"{key}的坐标信息为空")
+        else:
+            print(f"{key}信息不存在")
+    else:
+        print("具体坐标信息不存在或为空")
+
+    return None
 
 def load_coordinates_from_json(file_path, reissue=True):
     """
@@ -34,8 +60,12 @@ def load_coordinates_from_json(file_path, reissue=True):
     else:
         key_name = 'coordinates'
     try:
+        # 检查文件是否存在
+        # if not os.path.exists(file_path):
+        #     print("文件不存在")
+        #     return None
         if not Path(file_path).is_file():
-            print(f"Warning: The file {file_path} does not exist.")
+            print("文件不存在")
             return
 
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -54,11 +84,9 @@ def load_coordinates_from_json(file_path, reissue=True):
                 coordinates[key] = {'position': None, 'description': None}
 
     except json.JSONDecodeError:
-        print(f"Error: Failed to decode JSON from file {file_path}.")
+        print("文件不是有效的JSON格式")
     except Exception as e:
         print(f"An error occurred while loading coordinates: {e}")
-
-load_coordinates_from_json(json_file_path, True)
 
 # 循环执行 直到出现标志或者手动终止 需要修改
 def running_loop(window_name, cycle_number=-1):
@@ -1566,7 +1594,7 @@ def erp_handle_input_content(input_content, reissuse_order=True):
         if not input_content:
             print('输入内容为空')
             return
-        # 去除空格前后的空格
+        # 去除前后的空格
         input_content = input_content.strip()
         input_content = input_content.split(' ')
         print(f"分割后输入内容：{input_content}")
@@ -1590,9 +1618,9 @@ def erp_handle_input_content(input_content, reissuse_order=True):
             print('输入内容不符合规则')
         else:
             # 处理结果
-            if '补发金属转接头' in result['remarks']:
-                if '补发' in action_list['remarks']:
-                    action_list['remarks'].remove('补发')
+            # if '补发金属转接头' in result['remarks']:
+                # if '补发' in action_list['remarks']:
+                    # action_list['remarks'].remove('补发')
             action_list.update(result)
             print(f"处理结果：{action_list}")
     
