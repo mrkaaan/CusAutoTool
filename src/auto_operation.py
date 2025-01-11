@@ -1033,7 +1033,6 @@ def auto_send_price_link(window_name, product_number=1, mode=1):
         keyboard.write('差价')
         keyboard.press_and_release('enter')
         time.sleep(0.1)
-        return
 
         # 移动到邀请下单图标
         invite_order_x, invite_order_y, is_find_invite_order = app.locate_icon('invite_order.png', 0.6, 1, 0.2, 1)
@@ -1124,7 +1123,7 @@ def handle_auto_send_price_link(window_name, mode=1):
 
 
 
-def erp_select_today(window_name, app=None):
+def erp_select_today(window_name, app=None, reissue=False):
     '''
         :param window_name: 窗口名称
     '''
@@ -1133,15 +1132,21 @@ def erp_select_today(window_name, app=None):
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 点击日期下拉框
-        app.move_and_click(800, 55)
+        date_dropdown = read_coordinate_by_key('date_dropdown', reissue)
+        if not date_dropdown:
+            return
+        app.move_and_click(date_dropdown[0], date_dropdown[1])
         time.sleep(0.3)
         # 点击今天日期
-        app.move_and_click(888,252)
+        today_date = read_coordinate_by_key('today_date', reissue)
+        if not today_date:
+            return
+        app.move_and_click(today_date[0], today_date[1])
 
     except Exception as e:
         print(f"ERP选择今天日期异常：{e}")
 
-def erp_clear_product(window_name, app=None, mode=5):
+def erp_clear_product(window_name, app=None, mode=5, reissue=False):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
@@ -1151,25 +1156,28 @@ def erp_clear_product(window_name, app=None, mode=5):
         if not app:
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
+        first_product = read_coordinate_by_key('first_product', reissue)
+        if not first_product:
+            return
         # 判断是否还有序号为1的商品
         if mode == 1:
             is_find_product = True
             while is_find_product:
                 if is_find_product:
                     # 双击第一个商品以删除
-                    app.move_and_click(385, 330, 'left', 2)
+                    app.move_and_click(first_product[0], first_product[1], 'left', 2)
                     time.sleep(0.1)
                 _, __, is_find_product = app.locate_icon('product_1.png', 0, 0.2, 0.2, 0.8)
                 time.sleep(0.1)
         else:
             for _ in range(mode):
                 # 双击第一个商品以删除
-                pyautogui.moveTo(385, 330)
+                app.move_and_click(first_product[0], first_product[1])
                 pyautogui.doubleClick()
     except Exception as e:
         print(f"ERP清空商品异常：{e}")
 
-def erp_input_remarks(window_name, remarks='补发', app=None):
+def erp_input_remarks(window_name, remarks='补发', app=None, reissue=False):
     '''
         :param window_name: 窗口名称
         :param remarks: 备注内容
@@ -1180,7 +1188,10 @@ def erp_input_remarks(window_name, remarks='补发', app=None):
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 点击备注输入框
-        app.move_and_click(1200, 985, 'left')
+        remarks_input = read_coordinate_by_key('remarks_input', reissue)
+        if not remarks_input:
+            return
+        app.move_and_click(remarks_input[0], remarks_input[1], 'left')
         time.sleep(0.1)
 
         # 清空输入框
@@ -1195,7 +1206,7 @@ def erp_input_remarks(window_name, remarks='补发', app=None):
     except Exception as e:
         print(f"ERP输入备注异常：{e}")
 
-def erp_choose_warehouse(window_name, warehouse='sz', app=None):
+def erp_choose_warehouse(window_name, warehouse='sz', app=None, reissue=False):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
@@ -1205,13 +1216,22 @@ def erp_choose_warehouse(window_name, warehouse='sz', app=None):
             app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
 
         # 点击仓库下拉框
-        app.move_and_click(166, 85)
+        warehouse_dropdown = read_coordinate_by_key('warehouse_dropdown', reissue)
+        if not warehouse_dropdown:
+            return
+        app.move_and_click(warehouse_dropdown[0], warehouse_dropdown[1])
         time.sleep(0.2)
         # 点击仓库
         if warehouse =='sz':
-            app.move_and_click(166, 152)
+            warehouse_sz = read_coordinate_by_key('warehouse_sz', reissue)
+            if not warehouse_sz:
+                return
+            app.move_and_click(warehouse_sz[0], warehouse_sz[1])
         elif warehouse == 'cz':
-            app.move_and_click(166, 130)
+            warehouse_cz = read_coordinate_by_key('warehouse_cz', reissue)
+            if not warehouse_cz:
+                return
+            app.move_and_click(warehouse_cz[0], warehouse_cz[1])
 
     except Exception as e:
         print(f"ERP选择仓库异常：{e}")
