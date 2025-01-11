@@ -1417,17 +1417,18 @@ def erp_action_collection(action_list=None):
         if action_list == None:
             print('请输入操作列表')
             return
+        print(f'ERP操作集合：{action_list}')
         app = action_list.get('app', None)
         if not app:
             window_name = action_list.get('window_name', '')
             if window_name == '':
-                app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
-            else:
                 print('请输入窗口名称')
                 return
+            else:
+                app = WinGUI(window_name)  # 创建 WinGUI 实例，用于窗口操作
             
         # 获取action_list中的product_list
-        product_list = action_list.get('product_list', [])
+        product_list = action_list.get('product_items', [])
         if len(product_list) == 0:
             print('商品列表为空')
 
@@ -1451,11 +1452,11 @@ def erp_action_collection(action_list=None):
         if action_list.get('clear_product', False):
             erp_clear_product(window_name, app)  
         # 选择仓库
-        erp_choose_warehouse(window_name, app, warehouse)
+        erp_choose_warehouse(window_name, warehouse, app)
         # 添加备注
         remarks = action_list.get('remarks', ['补发'])
         for remark in remarks:
-            erp_input_remarks(window_name, app, remark)
+            erp_input_remarks(window_name, remark, app)
         # 添加商品
         products = action_list.get('products', [])
         if len(products) > 0:
@@ -1542,7 +1543,7 @@ def erp_aciton_box(mode=0):
         # tk_window.overrideredirect(True)
 
         reissuse_order = tk.BooleanVar(value=True) # 选择是则为补发界面，不选择则为手工建单界面
-        auto_close = tk.BooleanVar(value=False) # 选择是则点击确认后自动关闭窗口
+        auto_close = tk.BooleanVar(value=True) # 选择是则点击确认后自动关闭窗口
 
         # 设置窗口大小
         window_width = 300
@@ -1660,9 +1661,8 @@ def erp_handle_input_content(input_content, reissuse_order=True):
                 # if '补发' in action_list['remarks']:
                     # action_list['remarks'].remove('补发')
             action_list.update(result)
-            print(f"处理结果：{action_list}")
-    
-        # erp_action_collection(action_list)
+            # print(f"处理结果：{action_list}")
+            erp_action_collection(action_list)
     except Exception as e:
         print(f"ERP处理输入框内容异常：{e}")
 
