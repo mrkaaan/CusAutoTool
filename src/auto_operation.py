@@ -21,32 +21,37 @@ rule_json_path = r'../config/product_rules.json'
 
 # 定义全局变量来存储坐标信息
 coordinates = {}
-coordinate_json_path = '../config/coordinates.json'
+coordinate_json_path = r'../config/coordinates.json'
 
 def read_coordinate_by_key(key, reissue=True):
     global coordinates, coordinate_json_path
     if not coordinates:
         load_coordinates_from_json(coordinate_json_path, reissue)
 
-    if reissue:
-        key_name = 'coordinates_by_reissue'
-    else:
-        key_name = 'coordinates'
+    # if reissue:
+    #     key_name = 'coordinates_by_reissue'
+    # else:
+    #     key_name = 'coordinates'
+    # print(coordinates.keys())
     # 检查关键字段是否存在且非空
-    if key_name in coordinates and coordinates[key_name] is not None:
-        specific_coordinates = coordinates[key_name]
-        if key in specific_coordinates and specific_coordinates[key] is not None:
-            position = specific_coordinates[key].get('position')
-            if position is not None:
-                return position
-            else:
-                print(f"{key}的坐标信息为空")
-        else:
-            print(f"{key}信息不存在")
-    else:
-        print("具体坐标信息不存在或为空")
+    # if not (key_name in coordinates):
+    #     print(f"Key '{key_name}' does not exist in the coordinates.")
+    #     return None
+    # if coordinates[key_name] is None:
+    #     print(f"Value for key '{key_name}' is None in the coordinates.")
+    #     return None
+    # specific_coordinates = coordinates[key_name]
 
-    return None
+    specific_coordinates = coordinates
+    if key in specific_coordinates and specific_coordinates[key] is not None:
+        position = specific_coordinates[key].get('position')
+        if position is not None:
+            return position
+        else:
+            print(f"{key}的坐标信息为空")
+    else:
+        print(f"{key}信息不存在")
+        return None
 
 def load_coordinates_from_json(file_path, reissue=True):
     """
@@ -1123,7 +1128,7 @@ def handle_auto_send_price_link(window_name, mode=1):
 
 
 
-def erp_select_today(window_name, app=None, reissue=False):
+def erp_select_today(window_name, app=None, reissue=True):
     '''
         :param window_name: 窗口名称
     '''
@@ -1134,19 +1139,21 @@ def erp_select_today(window_name, app=None, reissue=False):
         # 点击日期下拉框
         date_dropdown = read_coordinate_by_key('date_dropdown', reissue)
         if not date_dropdown:
+            print('未找到日期下拉框，程序退出')
             return
         app.move_and_click(date_dropdown[0], date_dropdown[1])
         time.sleep(0.3)
         # 点击今天日期
         today_date = read_coordinate_by_key('today_date', reissue)
         if not today_date:
+            print('未找到今天日期，程序退出')
             return
         app.move_and_click(today_date[0], today_date[1])
 
     except Exception as e:
         print(f"ERP选择今天日期异常：{e}")
 
-def erp_clear_product(window_name, app=None, mode=5, reissue=False):
+def erp_clear_product(window_name, app=None, mode=5, reissue=True):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
@@ -1158,6 +1165,7 @@ def erp_clear_product(window_name, app=None, mode=5, reissue=False):
 
         first_product = read_coordinate_by_key('first_product', reissue)
         if not first_product:
+            print('未找到第一个商品，程序退出')
             return
         # 判断是否还有序号为1的商品
         if mode == 1:
@@ -1167,8 +1175,9 @@ def erp_clear_product(window_name, app=None, mode=5, reissue=False):
                     # 双击第一个商品以删除
                     app.move_and_click(first_product[0], first_product[1], 'left', 2)
                     time.sleep(0.1)
-                _, __, is_find_product = app.locate_icon('product_1.png', 0, 0.2, 0.2, 0.8)
-                time.sleep(0.1)
+                else:
+                    _, __, is_find_product = app.locate_icon('product_1.png', 0, 0.2, 0.2, 0.8)
+                    time.sleep(0.1)
         else:
             for _ in range(mode):
                 # 双击第一个商品以删除
@@ -1177,7 +1186,7 @@ def erp_clear_product(window_name, app=None, mode=5, reissue=False):
     except Exception as e:
         print(f"ERP清空商品异常：{e}")
 
-def erp_input_remarks(window_name, remarks='补发', app=None, reissue=False):
+def erp_input_remarks(window_name, remarks='补发', app=None, reissue=True):
     '''
         :param window_name: 窗口名称
         :param remarks: 备注内容
@@ -1190,6 +1199,7 @@ def erp_input_remarks(window_name, remarks='补发', app=None, reissue=False):
         # 点击备注输入框
         remarks_input = read_coordinate_by_key('remarks_input', reissue)
         if not remarks_input:
+            print('未找到备注输入框，程序退出')
             return
         app.move_and_click(remarks_input[0], remarks_input[1], 'left')
         time.sleep(0.1)
@@ -1206,7 +1216,7 @@ def erp_input_remarks(window_name, remarks='补发', app=None, reissue=False):
     except Exception as e:
         print(f"ERP输入备注异常：{e}")
 
-def erp_choose_warehouse(window_name, warehouse='sz', app=None, reissue=False):
+def erp_choose_warehouse(window_name, warehouse='sz', app=None, reissue=True):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
@@ -1218,6 +1228,7 @@ def erp_choose_warehouse(window_name, warehouse='sz', app=None, reissue=False):
         # 点击仓库下拉框
         warehouse_dropdown = read_coordinate_by_key('warehouse_dropdown', reissue)
         if not warehouse_dropdown:
+            print('未找到仓库下拉框，程序退出')
             return
         app.move_and_click(warehouse_dropdown[0], warehouse_dropdown[1])
         time.sleep(0.2)
@@ -1225,11 +1236,13 @@ def erp_choose_warehouse(window_name, warehouse='sz', app=None, reissue=False):
         if warehouse =='sz':
             warehouse_sz = read_coordinate_by_key('warehouse_sz', reissue)
             if not warehouse_sz:
+                print('未找到深圳仓库，程序退出')
                 return
             app.move_and_click(warehouse_sz[0], warehouse_sz[1])
         elif warehouse == 'cz':
             warehouse_cz = read_coordinate_by_key('warehouse_cz', reissue)
             if not warehouse_cz:
+                print('未找到潮州仓库，程序退出')
                 return
             app.move_and_click(warehouse_cz[0], warehouse_cz[1])
 
@@ -1237,7 +1250,7 @@ def erp_choose_warehouse(window_name, warehouse='sz', app=None, reissue=False):
         print(f"ERP选择仓库异常：{e}")
 
 
-def erp_add_product(window_name, app=None, reissue=False):
+def erp_add_product(window_name, app=None, reissue=True):
     '''
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
