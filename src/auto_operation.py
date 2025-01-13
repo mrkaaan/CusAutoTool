@@ -1263,7 +1263,7 @@ def erp_add_product(window_name, app=None, reissue=True):
         position_add_product_button = read_coordinate_by_key('add_product_button', reissue)
         if not position_add_product_button:
             return
-        app.move_and_click(position_add_product_button[0], position_add_product_button[1], 'left')
+        app.move_and_click(position_add_product_button[0], position_add_product_button[1])
         time.sleep(0.3)
         # 点击货品名称输入框
         position_product_name_input = read_coordinate_by_key('product_name_input', reissue)
@@ -1731,3 +1731,16 @@ def validate_and_convert(input_content, mapping):
 
 
 # *几 坐标点
+
+def win_key(num=2):
+    # 确保num是整数
+    if not isinstance(num, int):
+        print("num必须是整数")
+        return
+
+    # 循环发送 Win + 1 至 Win + 2
+    for i in range(1, num+2):
+        # keyboard.press_and_release(f'win+{i}')
+        pyautogui.hotkey('win', str(i))
+        print(f'按下了win+{i}')
+        time.sleep(0.1)
