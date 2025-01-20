@@ -1149,6 +1149,20 @@ def erp_select_today(window_name, app=None, reissue=True):
             print('未找到今天日期，程序退出')
             return
         app.move_and_click(today_date[0], today_date[1])
+        # 获取当前的小时和分钟
+        current_time_hour = datetime.datetime.now().hour
+        current_time_minute = datetime.datetime.now().minute
+        current_time_hour_pos = read_coordinate_by_key('current_time_hour', reissue)
+        current_time_minute_pos = read_coordinate_by_key('current_time_minute', reissue)
+        if not current_time_hour_pos or not current_time_minute_pos:
+            print('未找到当前时间，程序退出')
+            return
+        # 点击小时输入小时
+        app.move_and_click(current_time_hour_pos[0], current_time_hour_pos[1])
+        keyboard.write(str(current_time_hour))
+        # 点击分钟输入分钟
+        app.move_and_click(current_time_minute_pos[0], current_time_minute_pos[1])
+        keyboard.write(str(current_time_minute))
 
     except Exception as e:
         print(f"ERP选择今天日期异常：{e}")
@@ -1740,6 +1754,8 @@ def win_key(num=2):
 
     # 循环发送 Win + 1 至 Win + 2
     for i in range(1, num+2):
+        if i == 10:
+            i = '0'
         # keyboard.press_and_release(f'win+{i}')
         pyautogui.hotkey('win', str(i))
         print(f'按下了win+{i}')

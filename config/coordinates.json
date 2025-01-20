@@ -8,6 +8,14 @@
             "position": [888, 252],
             "description": "今天日期坐标"
         },
+        "current_time_hour": {
+            "position": [821, 57],
+            "description": "当前时间的小时坐标"
+        },
+        "current_time_minute": {
+            "position": [839, 57],
+            "description": "当前时间的分钟坐标"
+        },
         "first_product": {
             "position": [385, 330],
             "description": "第一个商品坐标，用于删除商品"
@@ -57,6 +65,14 @@
         "today_date": {
             "position": [892, 306],
             "description": "今天日期坐标"
+        },
+        "current_time_hour": {
+            "position": [823, 110],
+            "description": "当前时间的小时坐标"
+        },
+        "current_time_minute": {
+            "position": [841, 110],
+            "description": "当前时间的分钟坐标"
         },
         "first_product": {
             "position": [89, 380],
