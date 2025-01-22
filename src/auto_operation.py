@@ -620,6 +620,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 # 有新的信息提示 回复稍等
                 _, __, is_find_new_message = app.locate_icon('new_message.png',0.4,0.9,0.1,0.9,1)
                 if is_find_new_message:
+                    print('有新的信息提示 回复稍等')
                     # 按下快捷键 Ctrl+E 呼出新消息界面
                     keyboard.press_and_release('ctrl+e')
                     time.sleep(0.2)
@@ -640,7 +641,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     print(waiting_script[random_number])
                     # 模拟按下回车键发送消息
                     keyboard.press_and_release('enter')
-                    cycle_count += 1
                     time.sleep(3)
 
                     # 判断是否出现提示框 消息重复发送
@@ -648,7 +648,9 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     if is_find_repeat_message:
                         # 聚焦到输入框
                         app.move_and_click(repeat_message_x, repeat_message_y)
-             
+                else:
+                    print('没有新的信息提示')
+
             #使用iloc根据索引获取当前行的数据
             row = df_subset.iloc[cycle_count]
             index = df_subset.index[cycle_count]  # 获取原始索引
@@ -1758,5 +1760,5 @@ def win_key(num=2):
             i = '0'
         # keyboard.press_and_release(f'win+{i}')
         pyautogui.hotkey('win', str(i))
-        print(f'按下了win+{i}')
-        time.sleep(0.1)
+        # print(f'按下了win+{i}')
+        # time.sleep(0.1)

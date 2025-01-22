@@ -56,7 +56,7 @@ def main():
         {'key': 'ctrl+r+num 5', 'func': ao.erp_common_action_3, 'args': ['旺店通ERP', 'sz', '补发金属转接头']}, # erp 常用操作2 其他转接头
         {'key': 'ctrl+r+num 7', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '万能接头【细'], '补发金属转接头']}, # erp 常用操作2 其他转接头
         
-        {'key': 'alt + ~', 'func': ao.win_key, 'args':[9]}
+        {'key': 'alt + ~', 'func': ao.win_key, 'args':[8]}
     ]
     ut.auto_key(hotkey_actions)
 
