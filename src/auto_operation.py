@@ -393,7 +393,7 @@ def wait_a_moment_by_qianniu(window_name, mode=1, app=None):
         while not exit_flag:
             print(f"当前监听新消息轮数: {cycle_count}")
             # 有新的信息提示 回复稍等
-            _, __, is_find_new_message = app.locate_icon('new_message.png',0.4,0.9,0.1,0.9,1)
+            _, __, is_find_new_message = app.locate_icon('new_message.png',0.3,1,0.1,1,1)
             if is_find_new_message:
                 # 按下快捷键 Ctrl+E 呼出新消息界面
                 keyboard.press_and_release('ctrl+e')
@@ -618,7 +618,7 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
             is_find_new_message = True
             if is_find_new_message:
                 # 有新的信息提示 回复稍等
-                _, __, is_find_new_message = app.locate_icon('new_message.png',0.4,0.9,0.1,0.9,1)
+                _, __, is_find_new_message = app.locate_icon('new_message.png',0.3,1,0.1,1,1)
                 if is_find_new_message:
                     print('有新的信息提示 回复稍等')
                     # 按下快捷键 Ctrl+E 呼出新消息界面
@@ -1474,9 +1474,9 @@ def erp_action_collection(action_list=None):
         for remark in remarks:
             erp_input_remarks(window_name, remark, app)
         # 添加商品
-        products = action_list.get('products', [])
+        products = action_list.get('product_items', [])
         if len(products) > 0:
-            erp_add_specific_products(window_name, app, products)
+            erp_add_specific_products(window_name, products, app)
         
     except Exception as e:
         print(f"ERP操作集合异常：{e}")
@@ -1499,6 +1499,7 @@ def on_close():
 
 # 定义一个回调函数，在主线程中调用create_window
 def call_create_window():
+    print('创建窗口')
     global tk_window, tk_entry
     if tk_window is not None and tk_window.winfo_exists():
         print("窗口已存在，不再创建")
@@ -1508,6 +1509,7 @@ def call_create_window():
         tk_window.lift()  # 将窗口提升到最前面
         tk_window.after(50, tk_window.focus_force)  # 强制窗口获得焦点，并添加小延迟
     else:
+        print("窗口不存在，创建新窗口")
         erp_aciton_box(mode=window_open_mode)
         # tk_window.after(0, create_window)  # 如果窗口不存在，创建新窗口
 

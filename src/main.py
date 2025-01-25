@@ -27,7 +27,7 @@ def main():
         {'key': 'ctrl+t+num 2', 'func': nr_win.call_create_window, 'use_thread':True}, # 打开窗口，用于通知补发
         {'key': 'ctrl+t+num 3', 'func': nr_win.notic_last_data, 'use_thread':True}, # 使用上次数据直接通知补发
         {'key': 'ctrl+t+num 4', 'func': ao.wait_a_moment_by_qianniu, 'args': ['千牛接待台'], 'use_thread':True}, # 临时自动回复
-        {'key': 'ctrl+t+num 5', 'func': ao.call_create_window}, # ERP BOX
+        {'key': 'ctrl+t+num 5', 'func': ao.call_create_window, 'use_thread':True}, # ERP BOX
 
         {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
         {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图
@@ -52,7 +52,7 @@ def main():
         {'key': 'ctrl+r+num 1', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23'], '补发金属转接头']}, # erp 常用操作2 转接头23
         {'key': 'ctrl+r+num 2', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内24'], '补发金属转接头']}, # erp 常用操作2 转接头23
         {'key': 'ctrl+r+num 6', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '内24'], '补发金属转接头']}, # erp 常用操作2 转接头23 24
-        {'key': 'ctrl+r+num 4', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['万能接头【细'], '补发铜嘴万能接头']}, # erp 常用操作2 转接头23 24
+        {'key': 'ctrl+r+num 4', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['万能接头【细'], '补发金属万能接头']}, # erp 常用操作2 转接头23 24
         {'key': 'ctrl+r+num 5', 'func': ao.erp_common_action_3, 'args': ['旺店通ERP', 'sz', '补发金属转接头']}, # erp 常用操作2 其他转接头
         {'key': 'ctrl+r+num 7', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '万能接头【细'], '补发金属转接头']}, # erp 常用操作2 其他转接头
         
