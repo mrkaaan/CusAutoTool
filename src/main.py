@@ -10,44 +10,51 @@ from auto_operation import load_coordinates_from_json
 def main():
     # ---------- 快捷键启动 -------------
     hotkey_actions = [
-        # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
+        # 快捷呼出软件
         {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP'], 'use_thread':False}, # 打开制定软件
+        # {'key': 'alt+shift+e', 'func': ut.open_sof, 'args': ['旺店通ERP',265632,1,'CoolWindow']},
         
+        # 千牛相关操作
         # {'key': 'ctrl+shift+q', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, True, True, 2]}, # 添加备注 并 取消标记 不需点击备注按钮
-        {'key': 'ctrl+shift+w', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, False, True, 2]}, # 添加备注 并 取消标记 需点击备注按钮
+        # {'key': 'ctrl+shift+w', 'func': ao.run_once_remarks_by_qianniu, 'args': [window_name, False, True, 2]}, # 添加备注 并 取消标记 需点击备注按钮
+        {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
+        {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图
+        {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]}, # 复制用户名
+        {'key': 'ctrl+shift+p', 'func': ao.wait_a_moment_by_qianniu, 'args': ['千牛接待台'], 'use_thread':True}, # 临时自动回复
 
+        # 替换剪切板中的内容
+        {'key': 'ctrl+shift+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
+        {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
+        
+        # 快捷文件相关操作
         {'key': 'f2', 'func': ac.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
         {'key': 'ctrl+space', 'func': ac.on_press_clipboard}, # 自动识别输入框并替换剪切板内容为图片或视频文件
-        {'key': 'ctrl+shift+space', 'func': ac.clear_clipboard, 'use_thread':False}, # 清空剪切板
-
-        {'key': 'ctrl+shift+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
         {'key': 'f3', 'func': ac.clear_clipboard, 'use_thread':False}, # 清空剪切板
+        {'key': 'ctrl+shift+space', 'func': ac.clear_clipboard, 'use_thread':False}, # 清空剪切板
         
+        # tk窗口相关
         {'key': 'ctrl+t+num 1', 'func': tb_win.call_create_window, 'use_thread':False}, # 打开窗口，用于整理表格
         {'key': 'ctrl+t+num 2', 'func': nr_win.call_create_window, 'use_thread':True}, # 打开窗口，用于通知补发
         {'key': 'ctrl+t+num 3', 'func': nr_win.notic_last_data, 'use_thread':True}, # 使用上次数据直接通知补发
-        {'key': 'ctrl+t+num 4', 'func': ao.wait_a_moment_by_qianniu, 'args': ['千牛接待台'], 'use_thread':True}, # 临时自动回复
 
-        {'key': 'ctrl+shift+l', 'func': ao.handle_auto_send_price_link, 'args': [window_name, 1]}, # 发送差价链接
-        {'key': 'ctrl+shift+g', 'func': ac.on_press_clipboard, 'args':['hp']}, # 自动识别输入框并替换剪切板内容为图片或视频文件 发送好评截图
-        {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
-        {'key': 'ctrl+shift+a', 'func': ao.run_once_copy_username_by_qianniu, 'args': [window_name]}, # 复制用户名
+        # ERP相关操作
+        ## ERP 窗口操作
+        {'key': 'ctrl+t+num 5', 'func': ao.call_create_window}, # ERP 补发窗口
 
+        ## ERP 单元操作
         {'key': 'ctrl+b+num 1', 'func': ao.erp_select_today, 'args': ['旺店通ERP']}, # erp 选择今天
         {'key': 'ctrl+b+num 2', 'func': ao.erp_clear_product, 'args': ['旺店通ERP']}, # erp 清空产品
         {'key': 'ctrl+b+num 3', 'func': ao.erp_input_remarks, 'args': ['旺店通ERP', '补发']}, # erp 输入备注 "补发"
         {'key': 'ctrl+b+num 4', 'func': ao.erp_input_remarks, 'args': ['旺店通ERP', '补发金属转接头']}, # erp 输入备注 "补发金属转接头"
         {'key': 'ctrl+b+num 5', 'func': ao.erp_add_product_notes, 'args': ['旺店通ERP', 'cz']}, # erp 添加备注产品 潮州
         {'key': 'ctrl+b+num 6', 'func': ao.erp_add_product_notes, 'args': ['旺店通ERP', 'sz']}, # erp 添加备注产品 深圳
-
+        ## ERP 组合操作
         {'key': 'ctrl+b+num 7', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP']}, # erp 常用操作1 不选择仓库 不添加产品 选择今天日期 清空商品
-
-        {'key': 'ctrl+t+num 5', 'func': ao.call_create_window}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 输入备注
         {'key': 'ctrl+b+num 8', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', False, 'cz', '补发']}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 输入备注
         {'key': 'ctrl+b+num 9', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', False, 'sz', '补发']}, # erp 常用操作1 深圳仓 选择今天日期 清空商品 选择仓库 输入备注
         {'key': 'ctrl+b+num /', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', True, 'cz', '补发']}, # erp 常用操作1 潮州仓 选择今天日期 清空商品 选择仓库 添加商品备注 输入备注
         {'key': 'ctrl+b+num *', 'func': ao.erp_common_action_1, 'args': ['旺店通ERP', True, 'sz', '补发']}, # erp 常用操作1 深圳仓 选择今天日期 清空商品 选择仓库 添加商品备注 输入备注
-
+        ## ERP 指定产品
         {'key': 'ctrl+r+num 1', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23'], '补发金属转接头']}, # erp 常用操作2 转接头23
         {'key': 'ctrl+r+num 2', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内24'], '补发金属转接头']}, # erp 常用操作2 转接头23
         {'key': 'ctrl+r+num 6', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '内24'], '补发金属转接头']}, # erp 常用操作2 转接头23 24
@@ -55,6 +62,7 @@ def main():
         {'key': 'ctrl+r+num 5', 'func': ao.erp_common_action_3, 'args': ['旺店通ERP', 'sz', '补发金属转接头']}, # erp 常用操作2 其他转接头
         {'key': 'ctrl+r+num 7', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '万能接头【细'], '补发金属转接头']}, # erp 常用操作2 其他转接头
         
+        # 轮播窗口
         {'key': 'alt + ~', 'func': ao.win_key, 'args':[8]}
     ]
     ut.auto_key(hotkey_actions)

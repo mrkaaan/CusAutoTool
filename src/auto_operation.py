@@ -1460,19 +1460,23 @@ def erp_action_collection(action_list=None):
             else:
                 print('仓库名称错误')
                 return
-                
+        # 确认模式
+        reissuse_order = action_list.get('reissuse_order', False)
+
+        print(f"ERP当前处理模式：{'补发模式' if reissuse_order else '手工建单模式'}")
+
         # 选择今天
         if action_list.get('select_today', False):
-            erp_select_today(window_name, app)  
+            erp_select_today(window_name, app, reissuse_order)
         # 清空商品
         if action_list.get('clear_product', False):
-            erp_clear_product(window_name, app)  
+            erp_clear_product(window_name, app, 5, reissuse_order)  
         # 选择仓库
-        erp_choose_warehouse(window_name, warehouse, app)
+        erp_choose_warehouse(window_name, warehouse, app, reissuse_order)
         # 添加备注
         remarks = action_list.get('remarks', ['补发'])
         for remark in remarks:
-            erp_input_remarks(window_name, remark, app)
+            erp_input_remarks(window_name, remark, app, reissuse_order)
         # 添加商品
         products = action_list.get('product_items', [])
         if len(products) > 0:
@@ -1528,7 +1532,7 @@ def erp_aciton_box(mode=0):
     input_content = ''
 
     def on_confirm(entry):  
-        global input_content
+        global input_content, tk_window
         input_content = entry.get()
         entry.delete(0, tk.END)
         
@@ -1538,7 +1542,8 @@ def erp_aciton_box(mode=0):
         else:
             print(f'输入内容：{input_content}')
             if auto_close.get():
-                tk_window.quit()
+                tk_window.destroy()
+                tk_window = None
 
             erp_handle_input_content(input_content, reissuse_order.get())
 

@@ -195,7 +195,7 @@ def auto_key(hotkeys):
             "key": clean_key,
             "func": hotkey['func'],
             "args": hotkey.get('args', []),
-            "use_thread": hotkey.get('use_thread', True),  # 默认不使用线程
+            "use_thread": hotkey.get('use_thread', False),  # 默认不使用线程
             "redo": hotkey.get('redo', False)  # 是否需要冗余调用，默认不需要
         })
     
