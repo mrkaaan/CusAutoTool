@@ -179,7 +179,6 @@ def open_sof(name, handle=None, class_name=None):
         
     # pos = win32gui.GetWindowRect(handle) # 窗口位置
     # print(f'窗口位置 {pos}') # 打印窗口位置
-
 # 使用快捷键运行指定函数
 def auto_key(hotkeys):
     # 去除空格并移除重复的快捷键
@@ -196,28 +195,47 @@ def auto_key(hotkeys):
             "key": clean_key,
             "func": hotkey['func'],
             "args": hotkey.get('args', []),
-            "use_thread": hotkey.get('use_thread', True)  # 默认不使用线程
+            "use_thread": hotkey.get('use_thread', True),  # 默认不使用线程
+            "redo": hotkey.get('redo', False)  # 是否需要冗余调用，默认不需要
         })
     
     # 绑定快捷键
-    def threaded_function(func, args, use_thread):
+    # 绑定快捷键
+    def threaded_function(func, args, use_thread, redo):
         # 在独立线程中执行功能
         try:
-            if use_thread:
-                thread = Thread(target=func, args=args)
-                thread.daemon = True  # 守护线程，主线程结束后自动清理
-                thread.start()
-            else:
+            def execute():
                 func(*args)
+                
+            if use_thread:
+                if redo:
+                    # 如果需要冗余调用，则创建两次线程
+                    thread1 = Thread(target=execute)
+                    thread2 = Thread(target=execute)
+                    thread1.daemon = True
+                    thread2.daemon = True
+                    thread1.start()
+                    thread2.start()
+                else:
+                    # 否则只创建一次
+                    thread = Thread(target=execute)
+                    thread.daemon = True
+                    thread.start()
+            else:
+                if redo:
+                    # 直接调用两次函数
+                    execute()
+                    execute()
+                else:
+                    execute()
         except Exception as e:
             print(f"快捷键功能执行出错：{e}")
-    
 
     try:
         for hotkey in filtered_hotkeys:
             keyboard.add_hotkey(
                 hotkey['key'],
-                lambda *args, f=hotkey['func'], a=hotkey['args'], u=hotkey['use_thread']: threaded_function(f, a, u)
+                lambda *args, f=hotkey['func'], a=hotkey['args'], u=hotkey['use_thread'], r=hotkey['redo']: threaded_function(f, a, u, r)
             )
         # 保持脚本运行，直到按下退出快捷键
         print("快捷键监听已启动，按下 Shift+Ctrl+E 退出\n")

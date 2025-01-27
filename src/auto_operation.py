@@ -1499,8 +1499,7 @@ def on_close():
 
 # 定义一个回调函数，在主线程中调用create_window
 def call_create_window():
-    print('创建窗口')
-    global tk_window, tk_entry
+    global tk_window
     if tk_window is not None and tk_window.winfo_exists():
         print("窗口已存在，不再创建")
         # 使用 wm_attributes 来确保窗口会暂时位于最顶层
@@ -1519,6 +1518,7 @@ def erp_aciton_box(mode=0):
         :param window_name: 窗口名称
         :param app: WinGUI 实例 默认为 None
     '''
+    print(f"create_window mode: {mode} {'主程序模式' if mode == 0 else '被调用模式'}")
 
     global tk_window, tk_window_initialized
     if tk_window is not None and tk_window.winfo_exists():
@@ -1527,7 +1527,7 @@ def erp_aciton_box(mode=0):
     
     input_content = ''
 
-    def on_confirm(entry):
+    def on_confirm(entry):  
         global input_content
         input_content = entry.get()
         entry.delete(0, tk.END)
@@ -1552,94 +1552,92 @@ def erp_aciton_box(mode=0):
         print(f"自动关闭选项: {'打开' if auto_close.get() else '关闭'}")
         show_toast('提示', f"自动关闭选项: {'打开' if reissuse_order.get() else '关闭'}")
 
-    try:
-        tk_window = tk.Tk()
+    tk_window = tk.Tk()
 
-        # 设置标题
-        tk_window.title('ERP_BOX')
-        # 去掉标题栏
-        # tk_window.overrideredirect(True)
+    # 设置标题
+    tk_window.title('ERP_BOX')
+    # 去掉标题栏
+    # tk_window.overrideredirect(True)
 
-        reissuse_order = tk.BooleanVar(value=True) # 选择是则为补发界面，不选择则为手工建单界面
-        auto_close = tk.BooleanVar(value=True) # 选择是则点击确认后自动关闭窗口
+    reissuse_order = tk.BooleanVar(value=True) # 选择是则为补发界面，不选择则为手工建单界面
+    auto_close = tk.BooleanVar(value=True) # 选择是则点击确认后自动关闭窗口
 
-        # 设置窗口大小
-        window_width = 300
-        window_height = 90
+    # 设置窗口大小
+    window_width = 300
+    window_height = 90
 
-        # entry设置
-        entry_font_fam = '楷体'
-        entry_font_size = 11
-        entry_color = '#000000'
+    # entry设置
+    entry_font_fam = '楷体'
+    entry_font_size = 11
+    entry_color = '#000000'
 
-        # button设置
-        button_font_fam = '楷体'
-        button_font_size = 10
-        button_color = '#000000'
+    # button设置
+    button_font_fam = '楷体'
+    button_font_size = 10
+    button_color = '#000000'
 
-        # checkbox设置
-        checkbox_font_fam = '楷体'
-        checkbox_font_size = 6
-        checkbox_color = '#000000'
+    # checkbox设置
+    checkbox_font_fam = '楷体'
+    checkbox_font_size = 6
+    checkbox_color = '#000000'
 
-        # 设置窗口位于屏幕的中间
-        scnwidth, scnheight = tk_window.maxsize()
-        x_offset = (scnwidth - window_width) / 2
-        y_offset = (scnheight - window_height) / 2
-        tk_window.geometry(f'{window_width}x{window_height}+{int(x_offset)}+{int(y_offset)}')
+    # 设置窗口位于屏幕的中间
+    scnwidth, scnheight = tk_window.maxsize()
+    x_offset = (scnwidth - window_width) / 2
+    y_offset = (scnheight - window_height) / 2
+    tk_window.geometry(f'{window_width}x{window_height}+{int(x_offset)}+{int(y_offset)}')
 
-        # 禁止更改窗口大小
-        tk_window.resizable(False, False)
+    # 禁止更改窗口大小
+    tk_window.resizable(False, False)
+    tk_window.update()  # 刷新窗口
 
-        # 创建一个Frame来放置Entry和Buttons，确保它们可以正确地对齐
-        frame = tk.Frame(tk_window)
-        frame.place(relx=0.5, rely=0.5, anchor='center', relwidth=1, relheight=1)
+    # 创建一个Frame来放置Entry和Buttons，确保它们可以正确地对齐
+    frame = tk.Frame(tk_window)
+    frame.place(relx=0.5, rely=0.5, anchor='center', relwidth=1, relheight=1)
 
-        # Entry将填满整个窗口宽度，使用place而不是pack
-        tk_entry = tk.Entry(frame, font=(entry_font_fam, entry_font_size), fg=entry_color)
-        tk_entry.place(relx=0.5, rely=0.3, anchor='center', relwidth=0.9, relheight=0.4)
+    # Entry将填满整个窗口宽度，使用place而不是pack
+    tk_entry = tk.Entry(frame, font=(entry_font_fam, entry_font_size), fg=entry_color)
+    tk_entry.place(relx=0.5, rely=0.3, anchor='center', relwidth=0.9, relheight=0.4)
 
-        # 确认按钮 
-        tk_button_confirm = tk.Button(frame, text='确认', command=lambda: on_confirm(tk_entry), font=(button_font_fam, button_font_size), fg=button_color)
-        tk_button_confirm.place(relx=0.15, rely=0.8, anchor='center')
+    # 确认按钮 
+    tk_button_confirm = tk.Button(frame, text='确认', command=lambda: on_confirm(tk_entry), font=(button_font_fam, button_font_size), fg=button_color)
+    tk_button_confirm.place(relx=0.15, rely=0.8, anchor='center')
 
-        # 取消按钮
-        tk_button_cancel = tk.Button(frame, text='取消', command=tk_window.destroy, font=(button_font_fam, button_font_size), fg=button_color)
-        tk_button_cancel.place(relx=0.38, rely=0.8, anchor='center')
+    # 取消按钮
+    tk_button_cancel = tk.Button(frame, text='取消', command=tk_window.destroy, font=(button_font_fam, button_font_size), fg=button_color)
+    tk_button_cancel.place(relx=0.38, rely=0.8, anchor='center')
 
-        # 添加两个复选框
-        tk_check_reissue_order = tk.Checkbutton(frame, text='补发', variable=reissuse_order, font=(checkbox_font_fam, checkbox_font_size), fg=checkbox_color)
-        tk_check_reissue_order.place(relx=0.7, rely=0.8, anchor='center')
+    # 添加两个复选框
+    tk_check_reissue_order = tk.Checkbutton(frame, text='补发', variable=reissuse_order, font=(checkbox_font_fam, checkbox_font_size), fg=checkbox_color)
+    tk_check_reissue_order.place(relx=0.7, rely=0.8, anchor='center')
 
-        tk_check_auto_close = tk.Checkbutton(frame, text='自动关闭', variable=auto_close, font=(checkbox_font_fam, checkbox_font_size), fg=checkbox_color)
-        tk_check_auto_close.place(relx=0.9, rely=0.8, anchor='center')
+    tk_check_auto_close = tk.Checkbutton(frame, text='自动关闭', variable=auto_close, font=(checkbox_font_fam, checkbox_font_size), fg=checkbox_color)
+    tk_check_auto_close.place(relx=0.9, rely=0.8, anchor='center')
 
-        # 绑定回车键到确认按钮
-        tk_window.bind('<Return>', lambda event: on_confirm(tk_entry))
+    # 绑定回车键到确认按钮
+    tk_window.bind('<Return>', lambda event: on_confirm(tk_entry))
 
-        # 绑定ctrl+回车到取消按钮
-        tk_window.bind('<Control-Return>', lambda event: tk_window.destroy())
+    # 绑定ctrl+回车到取消按钮
+    tk_window.bind('<Control-Return>', lambda event: tk_window.destroy())
 
-        # 绑定 Ctrl+1 到补发选项
-        tk_window.bind('<Control-Key-1>', lambda event: toggle_reissue_order())
+    # 绑定 Ctrl+1 到补发选项
+    tk_window.bind('<Control-Key-1>', lambda event: toggle_reissue_order())
 
-        # 绑定 Ctrl+2 到自动关闭选项
-        tk_window.bind('<Control-Key-2>', lambda event: toggle_auto_close())
+    # 绑定 Ctrl+2 到自动关闭选项
+    tk_window.bind('<Control-Key-2>', lambda event: toggle_auto_close())
 
-        tk_entry.focus_set()  # 设置Entry为焦点
+    tk_entry.focus_set()  # 设置Entry为焦点
 
-        tk_window.protocol("WM_DELETE_WINDOW", on_close)  # 设置关闭窗口时的回调函数
+    tk_window.protocol("WM_DELETE_WINDOW", on_close)  # 设置关闭窗口时的回调函数
 
-        # 确保窗口初始化完成后，再执行以下操作
-        tk_window.update_idletasks()  # 确保所有待处理的任务都被执行，包括GUI更新
-        tk_window.lift()  # 尝试将窗口提升到最前面
-        tk_window.attributes('-topmost', True)  # 暂时设置为最顶层
-        tk_window.after(50, lambda: tk_window.attributes('-topmost', False))  # 然后恢复正常
-        tk_window.focus_force()  # 强制窗口获得焦点
-        tk_window.mainloop()
+    # 确保窗口初始化完成后，再执行以下操作
+    tk_window.update_idletasks()  # 确保所有待处理的任务都被执行，包括GUI更新
+    tk_window.lift()  # 尝试将窗口提升到最前面
+    tk_window.attributes('-topmost', True)  # 暂时设置为最顶层
+    tk_window.after(50, lambda: tk_window.attributes('-topmost', False))  # 然后恢复正常
+    tk_window.focus_force()  # 强制窗口获得焦点
+    tk_window.mainloop()
 
-    except Exception as e:
-        print(f"ERP创建输入框操作异常：{e}")
 
 # erp处理输入框的内容
 def erp_handle_input_content(input_content, reissuse_order=True):
@@ -1675,9 +1673,6 @@ def erp_handle_input_content(input_content, reissuse_order=True):
             print('输入内容不符合规则')
         else:
             # 处理结果
-            # if '补发金属转接头' in result['remarks']:
-                # if '补发' in action_list['remarks']:
-                    # action_list['remarks'].remove('补发')
             action_list.update(result)
             # print(f"处理结果：{action_list}")
             erp_action_collection(action_list)
@@ -1700,19 +1695,23 @@ def validate_and_convert(input_content, mapping):
     # 验证映射是否有效
     if not isinstance(mapping, dict) or not mapping.get('produdcts'):
         raise ValueError("Invalid mapping structure")
-
     for key, value in mapping['produdcts'].items():
         if not key or not value:
             raise ValueError(f"Empty key or value found for entry: {key}:{value}")
     
     # 所有转换头的key手动存一个list
     trans = mapping['trans']
+
     # 转换输入内容为标准产品名称
     converted_products = set()  # 使用集合去重
     found_warehouse = False # 是否找到仓库
     is_trans = False # 是否有转接头
+
+    # 遍历输入的内容
     for item in input_content:
         found_product = False
+
+        # 遍历映射表 寻找符合的产品 并判断是否为转接头
         for standard_name, aliases in mapping['produdcts'].items():
             if item in aliases:
                 if standard_name in trans:

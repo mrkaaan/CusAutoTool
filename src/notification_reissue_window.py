@@ -482,7 +482,7 @@ def create_window(mode=0):
     save_last_used_button.place(x=set_button_x_offset+int(3.5*set_button_x_interval), y=set_button_y_offset)
 
 
-    # 运行主循环
+    # # 运行主循环
     window.protocol("WM_DELETE_WINDOW", on_close)  # 设置关闭窗口时的回调函数
 
     # 确保窗口初始化完成后，再执行以下操作
@@ -492,6 +492,7 @@ def create_window(mode=0):
     window.after(50, lambda: window.attributes('-topmost', False))  # 然后恢复正常
     window.focus_force()  # 强制窗口获得焦点
     window.mainloop()
+
 
 
 def on_close():

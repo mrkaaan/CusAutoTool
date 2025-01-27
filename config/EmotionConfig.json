@@ -135,7 +135,7 @@
         "originalFile": "塑料提篮.png"
     },
     {
-        "shortCut": "idq",
+        "shortCut": "ifdq",
         "meaning": "放垫圈",
         "originalFile": "放垫圈.png"
     },
@@ -220,6 +220,11 @@
         "originalFile": "长花洒支架安装.png"
     },
     {
+        "shortCut": "izj5",
+        "meaning": "支架安装5",
+        "originalFile": "支架安装5.png"
+    },
+    {
         "shortCut": "icd1",
         "meaning": "防溅头长度",
         "originalFile": "防溅头长度.jpg"
@@ -270,9 +275,19 @@
         "originalFile": "精铜尺寸.png"
     },
     {
-        "shortCut": "ilp",
-        "meaning": "礼品",
-        "originalFile": "礼品.png"
+        "shortCut": "ilp1",
+        "meaning": "礼品1",
+        "originalFile": "礼品1.png"
+    },
+    {
+        "shortCut": "ilp2",
+        "meaning": "礼品2",
+        "originalFile": "礼品2.png"
+    },
+    {
+        "shortCut": "ilp3",
+        "meaning": "礼品3",
+        "originalFile": "礼品3.png"
     },
     {
         "shortCut": "ihp",
@@ -283,6 +298,11 @@
         "shortCut": "ihd1",
         "meaning": "防溅头换挡",
         "originalFile": "防溅头换挡.jpg"
+    },
+    {
+        "shortCut": "ihd2",
+        "meaning": "锥形头换挡",
+        "originalFile": "锥形头换挡.png"
     },
     {
         "shortCut": "izwj1",
@@ -330,6 +350,11 @@
         "originalFile": "支架朝向.png"
     },
     {
+        "shortCut": "iztgg",
+        "meaning": "粘贴规格",
+        "originalFile": "粘贴规格.png"
+    },
+    {
         "shortCut": "izt1",
         "meaning": "粘贴安装",
         "originalFile": "粘贴安装.png"
@@ -350,9 +375,14 @@
         "originalFile": "支付宝.jpg"
     },
     {
-        "shortCut": "izyqcc",
+        "shortCut": "izyqcc1",
         "meaning": "皂液器尺寸",
         "originalFile": "皂液器尺寸.png"
+    },
+    {
+        "shortCut": "izyqcc2",
+        "meaning": "快装款皂液器开孔尺寸",
+        "originalFile": "快装款皂液器开孔尺寸.png"
     },
     {
         "shortCut": "iwnjt",
@@ -375,9 +405,19 @@
         "originalFile": "毛巾架吸盘安装.png"
     },
     {
-        "shortCut": "imjj",
-        "meaning": "毛巾架材质",
-        "originalFile": "毛巾架材质.jpg"
+        "shortCut": "ixxmjgcz1",
+        "meaning": "小熊毛巾架材质1",
+        "originalFile": "小熊毛巾架材质1.jpg"
+    },
+    {
+        "shortCut": "ixxmjgcz2",
+        "meaning": "小熊毛巾架材质2",
+        "originalFile": "小熊毛巾架材质2.png"
+    },
+    {
+        "shortCut": "imjgsq",
+        "meaning": "毛巾杆安装上墙",
+        "originalFile": "毛巾杆安装上墙.png"
     },
     {
         "shortCut": "idl1",
@@ -478,5 +518,60 @@
         "shortCut": "iys",
         "meaning": "试水",
         "originalFile": "龙头有水.png"
+    },
+    {
+        "shortCut": "icdbkj",
+        "meaning": "充电宝开机方法",
+        "originalFile": "充电宝开机方法.jpg"
+    },
+    {
+        "shortCut": "icdbsy",
+        "meaning": "充电宝使用方法",
+        "originalFile": "充电宝使用方法.jpg"
+    },
+    {
+        "shortCut": "igdq",
+        "meaning": "水龙头固定器",
+        "originalFile": "水龙头固定器.png"
+    },
+    {
+        "shortCut": "iwtkg",
+        "meaning": "五通卡箍",
+        "originalFile": "五通卡箍.png"
+    },
+    {
+        "shortCut": "itxcz",
+        "meaning": "弹芯材质",
+        "originalFile": "弹芯材质.png"
+    },
+    {
+        "shortCut": "iyzjs",
+        "meaning": "一键止水",
+        "originalFile": "一键止水.png"
+    },
+    {
+        "shortCut": "idlw",
+        "meaning": "地漏网",
+        "originalFile": "地漏网.png"
+    },
+    {
+        "shortCut": "idq",
+        "meaning": "垫圈",
+        "originalFile": "垫圈.png"
+    },
+    {
+        "shortCut": "ifjtnb1",
+        "meaning": "防溅头内部1",
+        "originalFile": "防溅头内部1.png"
+    },
+    {
+        "shortCut": "ifjtnb2",
+        "meaning": "防溅头内部2",
+        "originalFile": "防溅头内部2.jpg"
+    },
+    {
+        "shortCut": "ifjtcz1",
+        "meaning": "防溅头材质1",
+        "originalFile": "防溅头材质1.png"
     }
 ]
