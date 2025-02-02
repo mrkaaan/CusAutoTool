@@ -8,6 +8,9 @@ from threading import Thread
 import configparser
 from pathlib import Path
 import pyperclip
+from pynput import mouse
+from functools import partial
+import pyautogui
 
 from plyer import notification
 # from win10toast import ToastNotifier
@@ -231,7 +234,27 @@ def auto_key(hotkeys):
         except Exception as e:
             print(f"快捷键功能执行出错：{e}")
 
+    # 定义一个函数来处理侧键事件
+    def handle_side_button(button, func, args, use_thread, redo):
+        if button == mouse.Button.x1:  # 检测侧键1
+            print("Side Button 1 pressed")
+            threaded_function(func, args, use_thread, redo)
+        elif button == mouse.Button.x2:  # 检测侧键2
+            print("Side Button 2 pressed")
+            threaded_function(func, args, use_thread, redo)
+
     try:
+        # if 'sideButton' in hotkey['key']:
+        #     # 使用 pynput 绑定侧键
+        #     listener = mouse.Listener(
+        #         on_click=partial(handle_side_button, 
+        #                         func=hotkey['func'], 
+        #                         args=hotkey.get('args', []), 
+        #                         use_thread=hotkey.get('use_thread', False), 
+        #                         redo=hotkey.get('redo', False))
+        #     )
+        #     listener.start()
+        # else:
         for hotkey in filtered_hotkeys:
             keyboard.add_hotkey(
                 hotkey['key'],
@@ -240,13 +263,23 @@ def auto_key(hotkeys):
         # 保持脚本运行，直到按下退出快捷键
         print("快捷键监听已启动，按下 Shift+Ctrl+E 退出\n")
         keyboard.wait('shift+ctrl+e')  # 按下 Shift+Ctrl+E 退出监听
+
+
+        # hotkeys_dict = {
+        #     hotkey['key']: lambda: threaded_function(hotkey['func'], hotkey.get('args', []), hotkey.get('use_thread', False), hotkey.get('redo', False))
+        #     for hotkey in filtered_hotkeys
+        # }
+
+        # with keyboard.GlobalHotKeys(hotkeys_dict) as listener:
+        #     print("快捷键监听已启动，按下 Shift+Ctrl+E 退出\n")
+        #     listener.join()
     except KeyboardInterrupt:
         print("检测到 Ctrl+C，正在退出...")
     except Exception as e:
         print(f"快捷键监听出错：{e}")
     finally:
         # 无论是否按下 Shift+Ctrl+E 都移除所有快捷键监听
-        keyboard.unhook_all()
+        # keyboard.unhook_all()
         # 清空句柄文件
         if os.path.exists(handles):
             os.remove(handles)
@@ -294,3 +327,7 @@ def update_clipboard_express_company():
     pyperclip.copy(new_content)
 
     print(f"剪切板内容已更新为：{new_content}")
+
+# 移动鼠标
+def move_mouse(x, y):
+    pyautogui.moveTo(x, y)

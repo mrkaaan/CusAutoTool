@@ -23,7 +23,7 @@ def main():
         {'key': 'ctrl+shift+p', 'func': ao.wait_a_moment_by_qianniu, 'args': ['千牛接待台'], 'use_thread':True}, # 临时自动回复
 
         # 替换剪切板中的内容
-        {'key': 'ctrl+shift+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
+        {'key': 'alt+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
         {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
         
         # 快捷文件相关操作
@@ -63,7 +63,12 @@ def main():
         {'key': 'ctrl+r+num 7', 'func': ao.erp_common_action_2, 'args': ['旺店通ERP', 'sz', ['内23', '万能接头【细'], '补发金属转接头']}, # erp 常用操作2 其他转接头
         
         # 轮播窗口
-        {'key': 'alt + ~', 'func': ao.win_key, 'args':[8]}
+        {'key': 'alt + ~', 'func': ao.win_key, 'args':[8]},
+        {'key': 'ctrl + num *', 'func': ao.win_key, 'args':[8]},
+        # {'key': 'sideButton', 'func': ao.win_key, 'args':[8]}
+
+        # 移动鼠标 移动鼠标位置到坐标点 1555,155
+        {'key': 'ctrl+shift+alt+m', 'func': ut.move_mouse, 'args': [1555, 155], 'use_thread':False}, # 移动鼠标到屏幕左上角
     ]
     ut.auto_key(hotkey_actions)
 

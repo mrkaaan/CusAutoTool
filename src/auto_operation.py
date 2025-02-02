@@ -1759,7 +1759,6 @@ def win_key(num=2):
     if not isinstance(num, int):
         print("num必须是整数")
         return
-
     # 循环发送 Win + 1 至 Win + 2
     for i in range(1, num+2):
         if i == 10:
