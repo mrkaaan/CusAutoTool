@@ -24,6 +24,7 @@ def main():
 
         # 替换剪切板中的内容
         {'key': 'alt+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
+        {'key': 'ctrl+shift+x', 'func': ut.update_clipboard_express_company, 'use_thread':False}, # 默认剪切板为物流单号 拼凑为指定格式
         {'key': 'ctrl+shift+d', 'func': uc.listen_clipboard_changes, 'use_thread':False}, # 拼接完整地址 默认复制一次收货人信息一次电话
         
         # 快捷文件相关操作
