@@ -11,6 +11,18 @@ CusAutoTools基于Python开发，通过自动化操作和快捷键集成解决�
 
 ---
 
+## 功能列表
+1. **文件替换功能**
+   - 在输入框中输入指定文字，按下快捷键后，将剪切板中的文字替换为需要的图片或视频文件，便于快速发送。
+2. **应用快捷键调用**
+   - 为没有快捷键的应用设置快捷键，通过快捷键直接调用指定应用。
+3. **旺店通ERP操作**
+   - 快速操作旺店通ERP系统，按下快捷键后，按照预设的坐标点击并输入指定内容，实现产品的补发操作。
+4. **补发通知自动化**
+   - 处理ERP导出的补发单号表格，将其转换为程序需要的格式，并根据处理后的表格自动点击千牛接待台，给不同用户发送补发单号通知。
+
+---
+
 ## 环境准备
 
 ### 基础环境
@@ -166,10 +178,10 @@ def main():
 ### █ 核心工具包
 
 
-#### █ 快捷键引擎：utils.auto_key()
+#### █ utils.auto_key() - 快捷键引擎
 **核心作用**：将快捷键绑定到具体功能，并处理多线程执行
 
-#### 工作流程伪代码
+##### 工作流程伪代码
 ```python
 def auto_key(hotkeys):
     # 阶段1：过滤重复快捷键
@@ -227,36 +239,235 @@ ut.auto_key([
 ])
 ```
 
-#### 1. utils.py - 基础工具
+#### █ utils.py - 基础工具
 依赖keyboard、win32con、win32gu、pypercli等库，主要操作剪切板以及对键盘和鼠标
 - **open_sof()**：通过窗口句柄快速打开软件（缓存句柄到handles.json）
 - **move_mouse()**：移动鼠标到预设坐标（调试用）
 
-#### 2. auto_operation.py - ERP/千牛自动化
-依赖于WinGUI二次开发，核心功能包括：
-- **erp_common_action_1()**：ERP通用操作（选择日期+清空商品+输入备注）
-- **handle_auto_send_price_link()**：自动发送差价链接
-- **win_key()**：窗口切换快捷键（绑定鼠标侧键）
+#### █ auto_operation.py - ERP/千牛自动化操作核心
+依赖于WinGUI二次开发
+- **截图存放**：`image/`目录下的png文件（如erp_confirm_button.png）
+```python
+# 基于 WinGUI 的自动化操作
+class WinGUI:  # 来自 src/WinGUI.py
+    def get_app_screenshot(self): ...  # 获取窗口截图
+    def move_and_click(self, x, y): ...  # 移动鼠标并点击
+    def locate_icon(self, img_name): ...  # 通过图像匹配定位按钮
 
-#### 3. auto_copy_clipboard_latest.py - 文件替换工具
-核心功能：根据输入框文字自动粘贴对应文件
-**on_press_clipboard()** 工作流程：
-1. 监听当前输入框文字
-2. 匹配`hotstrings_cn.json`中的预设关键词
-3. 调用`scripts/copy_clipboard.bat`将对应文件复制到剪切板
-4. 自动执行Ctrl+V粘贴
+# 典型功能实现
+def erp_common_action_1(window_name):
+    '''ERP标准补发流程'''
+    app = WinGUI(window_name)  # 初始化窗口控制器
+    app.move_and_click(*load_coordinates('清空按钮'))  # 点击清空按钮
+    app.move_and_click(*load_coordinates('今天日期'))  # 选择当天日期
+    # 更多步骤...
 
-#### 4. notification_reissue_window.py - 补发通知
+def wait_a_moment_by_qianniu(window_name):
+    '''千牛自动回复'''
+    app = WinGUI(window_name)
+    while 运行标志:
+        if 发现新消息弹窗():
+            app.move_and_click(输入框坐标)  # 定位到聊天窗口
+            pyautogui.typewrite("请稍等正在查询...")  # 发送预设话术
+        time.sleep(2)  # 每2秒检测一次
+def handle_auto_send_price_link():
+   '''自动发送差价链接'''
+
+def win_key():
+   '''窗口切换快捷键（绑定鼠标侧键）'''
+```
+
+
+
+#### █ notification_reissue_window.py - 补发通知
 - **call_create_window()**：创建TKinter配置窗口
 - **notic_last_data()**：使用上次配置自动发送通知
 - 依赖`config/notic_config.json`存储配置
 
+
+#### █ auto_copy_clipboard_latest.py - 文件替换工具
+核心功能：根据输入框文字自动粘贴对应文件
+```python
+def on_press_clipboard(keyword='hp'):
+    '''
+    工作流程：
+    1. 监听当前输入框内容（如用户输入"好评截图"）
+    2. 匹配`hotstrings_cn.json`中的预设关键词
+    3. 调用`scripts/copy_clipboard.bat`将对应文件复制到剪切板
+    4. 自动按下Ctrl+V完成粘贴
+    '''
+    # 示例配置文件内容
+    # hotstrings_cn.json:
+    # {
+    #   "好评截图": "D:/images/好评截图.jpg",
+    #   "差价链接": "D:/links/差价.html"
+    # }
+```
+
+**文件映射配置**：
+- 配置文件：`config/hotstrings_cn.json`
+- 格式：`{"关键词": "文件路径"}`
+
+**bat脚本作用**：
+- 功能：将指定文件复制到剪切板
+- 调用方式：`scripts/copy_clipboard.bat 文件路径`
+
+
+**维护建议**
+1. **关键词设计**：
+   - 尽量简短易记（如"hp"对应好评截图）
+   - 避免重复映射
+
+2. **文件管理**：
+   - 统一存放路径（如D:/images/）
+   - 定期更新映射文件
+
+---
+
+#### █ notification_reissue_window.py - 补发通知工具
+```python
+# 核心功能：自动发送补发通知
+def call_create_window():
+    '''创建配置窗口'''
+    if 窗口已存在:
+        激活现有窗口
+    else:
+        创建新窗口(mode=window_open_mode)  # 支持两种窗口尺寸
+
+def notic_last_data():
+    '''使用上次配置发送通知'''
+    读取config/notic_config.json中的参数
+    调用auto_operation.notification_reissue()
+```
+
+##### 工作流程
+1. **数据准备**：
+   - 从ERP导出补发订单表格（CSV格式）
+   - 使用`organize_table`整理数据
+
+2. **通知发送**：
+   - 读取整理后的Excel文件
+   - 逐个客户发送补发单号
+   - 标记已通知客户
+
+3. **参数配置**：
+   - 配置文件：`config/notic_config.json`
+   - 包含：
+     - 默认参数（窗口显示用）
+     - 上次使用的参数
+
+##### 特殊机制
+1. **多店铺支持**：
+   - 不同店铺使用不同通知模板
+   - 支持自定义点击步骤
+
+2. **测试模式**：
+   - 不实际发送消息
+   - 不修改Excel文件
+
+3. **历史记录**：
+   - 每次通知结果记录到日志
+   - 支持断点续传
+
+##### 典型调用
+```python
+# 快捷键绑定示例
+{'key': 'ctrl+t+num 2', 'func': call_create_window}  # 打开配置窗口
+{'key': 'ctrl+t+num 3', 'func': notic_last_data}    # 使用上次配置直接发送
+```
+
+---
+
+#### █ organize_table_window.py - 表格整理工具
+```python
+# 核心功能：ERP表格整理
+def call_create_window():
+    '''创建表格整理窗口'''
+    if 窗口已存在:
+        激活现有窗口
+    else:
+        创建新窗口(mode=window_open_mode)
+```
+
+##### 主要作用
+1. **数据拆分**：
+   - 按店铺分割订单数据
+   - 生成多个工作表
+
+2. **格式转换**：
+   - CSV → Excel
+   - 自动添加表头
+
+3. **文件管理**：
+   - 按日期归档（form/YYYY-MM-DD/）
+   - 保留原始数据备份
+
+##### 使用场景
+- ERP导出数据后一键整理
+- 快速生成分店铺报表
 ---
 
 ## 特殊机制说明
-### ▶ 坐标定位
-- **原理**：通过`WinGUI.py`的find_image()方法匹配界面截图
-- **截图存放**：`image/`目录下的png文件（如erp_confirm_button.png）
+### ▶ WinGUI 窗口控制器
+
+
+#### 核心功能
+```python
+# 初始化
+app = WinGUI("窗口标题")  # 必须与目标窗口标题完全一致
+
+# 常用方法
+app.get_app_screenshot()  # 获取窗口截图（保存到temp/app.png）
+app.move_and_click(x, y)  # 移动鼠标到(x,y)并点击
+app.locate_icon("按钮截图.png")  # 通过图像匹配定位按钮
+```
+
+#### 工作原理
+1. **窗口定位**：
+   - 使用`win32gui`库根据窗口标题查找句柄
+   - 自动将目标窗口置顶并最大化
+
+2. **图像匹配**：
+   - 依赖OpenCV的模板匹配算法
+   - 匹配精度可配置（默认相似度>90%）
+
+3. **坐标系统**：
+   - 所有坐标基于屏幕左上角(0,0)
+   - 支持相对坐标移动（rel_remove_and_click）
+
+#### 维护建议
+1. **截图规范**：
+   - 截图存放于`image/`目录
+   - 命名规则：`功能_按钮名.png`
+   - 建议尺寸：50x50像素
+
+2. **性能优化**：
+   - 首次运行会生成窗口截图（temp/app.png）
+   - 后续操作直接使用缓存截图
+
+3. **调试技巧**：
+   - 使用`get_workscreen_screenshot()`获取全屏截图
+   - 通过`check_icon()`验证按钮是否存在
+
+### ▶ 坐标定位系统
+#### 实现方式
+```python
+# 坐标来源（二选一）
+1. 手动配置：直接修改config/coordinates.json
+   - 格式：{"清空按钮": [125, 330]}
+
+2. 自动获取：通过WinGUI的locate_icon()
+   - 示例：app.locate_icon("清空按钮.png")
+```
+
+
+**常见问题**：
+| 现象                 | 解决方案                          |
+|----------------------|-----------------------------------|
+| 点击位置偏移         | 检查截图是否匹配，重新生成坐标     |
+| 找不到按钮           | 确认窗口名称正确，调整截图区域     |  
+| 部分分辨率失效       | 在对应分辨率电脑重新采集坐标       |
+
 
 ### ▶ 多窗口模式适配
 - 通过`window_config.ini`中的WINDOW_OPEN_MODE参数切换：
@@ -285,3 +496,26 @@ ut.auto_key([
 ## 致谢声明
 本项目基于 [Joey Gambler的python-WinGUI](https://github.com/JoeyGambler/python-WinGUI) 开发，核心窗口操作类`WinGUI.py`直接继承自原项目，遵循MIT协议（完整协议见LICENSE文件）。
 
+## 开发中功能
+
+结合以上功能，选择一个合适的技术方法，将项目封装为一个操作友好的应用，并实现以下功能：
+- 桌面的悬浮球（类似utools的悬浮球），可以拖动，可以关闭，可以最小化，可以右键呼出菜单
+- 悬浮球带有右下角托盘图标 右键点击可以呼出菜单
+- 悬浮球无论使用什么技术实现都要可以与python原本的功能进行通信，便于后续功能的开发
+- 悬浮球的菜单以及右下角托盘的菜单要有的功能
+   - 结束程序
+   - 重启程序   
+（为了便于你的理解，我这里解释一下我的程序的启动流程是，保证进入项目下的src目录下，使用python main.py运行，使用ctrl+c进行结束）
+
+我是个人开发的工具，使用起来比较要求界面的美观以及响应速度快，以及开发相对简单
+1 选用Electron（结合 Python 和前端技术），因为我本身有一定的前端基础，electron也已经入门，而且也美观，这个暂时不用提供代码，而是讲解一下python这边要用什么技术处理呢，比如Flask 或 FastAPI ，这两个是什么，讲解一下
+
+2 解答我关于打包的疑惑，因为我的最终目标是悬浮窗与原本的python为一体，我是否需要先将我的项目打包再创建悬浮窗，还是先构建悬浮窗再打包。或者换句话说悬浮窗与python原本是同级别还是包含关系
+
+3 有关项目依赖还有一个疑惑，我的项目依赖于conda的虚拟环境，虚拟环境配置好后我个人开发的时候需要 conda activate gui，
+虽然可以将 Conda 环境导出为 requirements.txt 文件：
+conda list --export > requirements.txt
+然后在打包时指定该文件，确保所有依赖被包含。
+但是如果在conda activate gui激活的情况下直接不指定requirements.txt文件打包会是这么样子呢？默认把conda环境下的所有包都打包进去吗？
+
+4 还有就是打包时是否需要指定什么参数吗，因为我的项目比较大涉及到比如键盘操作，循环监听，异步，tk窗口等，直接打包可以吗
