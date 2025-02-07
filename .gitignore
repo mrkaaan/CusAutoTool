@@ -27,3 +27,6 @@ config/window_config.ini
 
 # 句柄文件
 config/handles.json
+
+# electron项目依赖
+electron/node_modules/

@@ -480,9 +480,14 @@
         "originalFile": "懒人吹风安装.png"
     },
     {
-        "shortCut": "iwxt",
+        "shortCut": "iwxt1",
         "meaning": "短款防溅头的万向头",
         "originalFile": "短款防溅头的万向头.png"
+    },
+    {
+        "shortCut": "iwxt2",
+        "meaning": "刀片防溅头的万向头",
+        "originalFile": "刀片防溅头的万向头.png"
     },
     {
         "shortCut": "igzcx",
