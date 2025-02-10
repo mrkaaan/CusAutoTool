@@ -1463,7 +1463,7 @@ def erp_action_collection(action_list=None):
         # 确认模式
         reissuse_order = action_list.get('reissuse_order', False)
 
-        print(f"ERP当前处理模式：{'补发模式' if reissuse_order else '手工建单模式'}")
+        print(f"ERP当前处理模式：{'补发模式' if not reissuse_order else '手工建单模式'}")
 
         # 选择今天
         if action_list.get('select_today', False):
@@ -1748,6 +1748,8 @@ def validate_and_convert(input_content, mapping):
             action_list['undefined_product'].append(item)
     if is_trans:
         action_list['remarks'].append('补发金属转接头')
+    else:
+        action_list['remarks'].append('补发')
     action_list['product_items'] = list(converted_products)
     return action_list
 
