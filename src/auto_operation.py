@@ -615,9 +615,20 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 print('所有行已处理完毕')
                 show_toast('提醒', '所有行已处理完毕')
                 break
+            
+            #使用iloc根据索引获取当前行的数据
+            row = df_subset.iloc[cycle_count]
+            index = df_subset.index[cycle_count]  # 获取原始索引
+
+            # 检查是否已经通知
+            if row['是否通知'] == 1:
+                print('当前用户已通知')
+                cycle_count += 1
+                continue  # 如果已经通知，则跳过当前行
+
+            # 有新的信息提示 回复稍等
             is_find_new_message = True
             if is_find_new_message:
-                # 有新的信息提示 回复稍等
                 _, __, is_find_new_message = app.locate_icon('new_message.png',0.3,1,0.1,1,1)
                 if is_find_new_message:
                     print('有新的信息提示 回复稍等')
@@ -650,16 +661,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                         app.move_and_click(repeat_message_x, repeat_message_y)
                 else:
                     print('没有新的信息提示')
-
-            #使用iloc根据索引获取当前行的数据
-            row = df_subset.iloc[cycle_count]
-            index = df_subset.index[cycle_count]  # 获取原始索引
-            
-            # 检查是否已经通知
-            if row['是否通知'] == 1:
-                print('当前用户已通知')
-                cycle_count += 1
-                continue  # 如果已经通知，则跳过当前行
 
             # 获取原始单号和物流单号
             original_number = row['原始单号']
@@ -786,19 +787,15 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 keyboard.press_and_release('ctrl+o')
                 # 点击最近三月订单和安装服务 避免误触
                 recent_orders_text_x, recent_orders_text_y, is_find_recent_orders_text = app.locate_icon('recent_orders_text.png', 0.6, 1, 0.2, 1)
-                
                 if exit_event.is_set():
                     break
-                
                 app.click_icon('recent_orders_text.png', 0.6, 1, 0.2, 1)
                 if not is_find_recent_orders_text:
-
                     if exit_event.is_set():
                         break
                     app.click_icon('installation_services.png', 0.6, 1, 0.2, 1)
                 # time.sleep(0.1)
                 pyautogui.scroll(-100)
-
                 if exit_event.is_set():
                     break
 
@@ -808,7 +805,6 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                     if exit_event.is_set():
                         break
                     search_button_x, search_button_y, is_find_search_button = app.locate_icon('search_order_button.png', 0.6, 1, 0.2, 1)
-                    
                     if exit_event.is_set():
                         break
 
@@ -837,21 +833,16 @@ def notification_reissue(window_name, table_name, notic_shop_name, notic_mode=2,
                 for i in range(3):
                     if exit_event.is_set():
                         break
-
                     search_text_x, search_text_y, is_find_search_text = app.locate_icon('search_order_text.png', 0.6, 1, 0.2, 1)
-                    
                     if exit_event.is_set():
                         break
-
                     if is_find_search_text:
                         print(f'找到搜索框，点击搜索框...')
                         break
                     print(f'未找到搜索框，尝试滑动后再次查找...')
                     pyautogui.scroll(-100)
-
                 if exit_event.is_set():
                     break
-
                 if not is_find_search_text:
                     print(f'未找到搜索框，尝试直接点击补发按钮...')
                 else:
