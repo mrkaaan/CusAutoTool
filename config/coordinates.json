@@ -29,7 +29,7 @@
             "description": "仓库下拉框坐标"
         },
         "warehouse_sz": {
-            "position": [166, 152],
+            "position": [111,169],
             "description": "深圳仓库选择坐标"
         },
         "warehouse_cz": {
